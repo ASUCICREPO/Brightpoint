@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-brightpoint-dev-608f0-authRole",
+      "UnauthRoleArn": "arn:aws:iam::108782065617:role/amplify-brightpoint-dev-608f0-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::108782065617:role/amplify-brightpoint-dev-608f0-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-brightpoint-dev-608f0-deployment",
+      "UnauthRoleName": "amplify-brightpoint-dev-608f0-unauthRole",
+      "StackName": "amplify-brightpoint-dev-608f0",
+      "StackId": "arn:aws:cloudformation:us-west-2:108782065617:stack/amplify-brightpoint-dev-608f0/9e76b380-0bb9-11f0-9478-024f754ceba1",
+      "AmplifyAppId": "d1etn3hybc7dbl"
+    },
+    "categories": {
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d1etn3hybc7dbl",
+          "type": "manual"
+        }
+      }
+    }
+  }
+}
