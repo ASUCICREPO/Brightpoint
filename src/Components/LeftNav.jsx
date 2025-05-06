@@ -3,11 +3,18 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import { useLanguage } from "../utilities/LanguageContext";
-import { ABOUT_US_HEADER_BACKGROUND, ABOUT_US_TITLE, CONTACTS_BACKGROUND, CONTACTS_TEXT, ABOUT_US_TEXT, FAQ_HEADER_BACKGROUND, TEXT } from "../utilities/constants";
+import {
+  ABOUT_US_HEADER_BACKGROUND,
+  ABOUT_US_TEXT,
+  CONTACTS_BACKGROUND,
+  CONTACTS_TEXT,
+  FAQ_HEADER_BACKGROUND,
+  TEXT,
+} from "../utilities/constants";
 import phoneIcon from "../Assets/phone_icon.svg";
 
 function LeftNav({ showLeftNav = true }) {
-  const { language } = useLanguage();
+  const { language } = useLanguage(); // This will dynamically change
 
   return (
     <Grid className="appHeight100">
@@ -17,23 +24,23 @@ function LeftNav({ showLeftNav = true }) {
             {/* About Us */}
             <Grid item>
               <Typography variant="h6" sx={{ fontWeight: "bold" }} color={ABOUT_US_HEADER_BACKGROUND}>
-                {TEXT["EN"].ABOUT_US_TITLE}
+                {TEXT[language].ABOUT_US_TITLE}
               </Typography>
             </Grid>
             <Grid item>
               <Typography variant="subtitle1" sx={{ px: 2 }} color={ABOUT_US_TEXT}>
-                {TEXT["EN"].ABOUT_US}
+                {TEXT[language].ABOUT_US}
               </Typography>
             </Grid>
 
             {/* Contact Section */}
             <Grid item>
               <Typography variant="h6" sx={{ fontWeight: "bold" }} color={CONTACTS_BACKGROUND}>
-                {TEXT["EN"].CONTACT_US_TITLE}
+                {TEXT[language].CONTACT_US_TITLE}
               </Typography>
             </Grid>
 
-            {TEXT["EN"].CONTACT_US.map(([name, phone], index) => (
+            {TEXT[language].CONTACT_US.map(([name, phone], index) => (
               <React.Fragment key={index}>
                 <Grid container alignItems="center" justifyContent="space-between" sx={{ px: 4 }}>
                   <Grid item xs={6}>
@@ -52,7 +59,7 @@ function LeftNav({ showLeftNav = true }) {
                     </Grid>
                   </Grid>
                 </Grid>
-                {index < TEXT["EN"].CONTACT_US.length - 1 && (
+                {index < TEXT[language].CONTACT_US.length - 1 && (
                   <Divider sx={{ backgroundColor: "#d3d3d3", margin: "0" }} />
                 )}
               </React.Fragment>
@@ -61,11 +68,11 @@ function LeftNav({ showLeftNav = true }) {
             {/* FAQ Section */}
             <Grid item sx={{ marginTop: 2 }}>
               <Typography variant="h6" sx={{ fontWeight: "bold" }} color={FAQ_HEADER_BACKGROUND}>
-                {TEXT["EN"].FAQ_TITLE}
+                {TEXT[language].FAQ_TITLE}
               </Typography>
             </Grid>
             <ul style={{ listStyleType: "disc", paddingLeft: "20px", marginTop: 0 }}>
-              {TEXT["EN"].FAQS.map((question, index) => (
+              {TEXT[language].FAQS.map((question, index) => (
                 <li key={index} style={{ color: "black", paddingLeft: "8px" }}>
                   <Typography variant="subtitle1">{question}</Typography>
                 </li>

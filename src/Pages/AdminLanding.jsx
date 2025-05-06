@@ -6,9 +6,8 @@ import BrightpointLogo from '../Assets/Brightpoint_logo.svg';
 import { useUser } from '../utilities/UserContext'; // Import UserContext
 import { handleReferralOnLogin } from "../utilities/userReferralHandler"; // Import the referral handler
 import { signIn, signOut } from 'aws-amplify/auth'; // Correct import for Auth
-import { fetchAndStoreUserData } from '../utilities/handleLogin'; // add at top
 
-const LandingPage = () => {
+const AdminLanding = () => {
   const { updateUser } = useUser(); // Get updateUser function from context
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -36,10 +35,19 @@ const LandingPage = () => {
       const user = await signIn({ username, password });
       console.log('Cognito login success:', user);
 
-      // Trigger API call to fetch and store user info
-      await fetchAndStoreUserData(user.username, updateUser); // Call after login
+      updateUser({ username, zipcode });
 
-      navigate('/app'); // move navigation after successful data fetch
+      // Handle referrals
+      handleReferralOnLogin(username, (referrals) => {
+        if (referrals && referrals.length > 0) {
+          updateUser({ referrals });
+          console.log('Referrals updated in user context:', referrals);
+        } else {
+          console.error('Error: No referral data returned');
+        }
+      });
+
+      navigate('/admindashboard'); // Navigate to the next page
 
     } catch (error) {
       console.error('Cognito login error:', error.message || error);
@@ -53,11 +61,11 @@ const LandingPage = () => {
     <Box height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" bgcolor="white">
       
       {/* Logo above the container */}
-      <img src={BrightpointLogo} alt="Brightpoint Logo" height="10%" style={{ marginBottom: 10 }} />
+      <img src={BrightpointLogo} alt="Brightpoint Logo" height="50" style={{ marginBottom: 10 }} />
 
       <Box
-        width="40%"
-        maxWidth="40%"
+        width="100%"
+        maxWidth="400px"
         bgcolor="white"
         p={4}
         borderRadius={4}
@@ -141,7 +149,7 @@ const LandingPage = () => {
         </Button>
       </Box>
 
-      {/* Sign Up Text outside the box */}
+      {/* Sign Up Text outside the box
       <Box mt={2}>
         <Typography variant="body2">
           Don’t have an account?{' '}
@@ -150,10 +158,10 @@ const LandingPage = () => {
           </Link>
           {' '}to create an account
         </Typography>
-      </Box>
+      </Box> */}
 
     </Box>
   );
 };
 
-export default LandingPage;
+export default AdminLanding;

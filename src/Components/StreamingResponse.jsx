@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Grid, Avatar, Typography } from "@mui/material";
 import BotAvatar from "../Assets/BotAvatar.svg";
-import { WEBSOCKET_API, ALLOW_MARKDOWN_BOT } from "../utilities/constants";
+import { CHAT_API, ALLOW_MARKDOWN_BOT } from "../utilities/constants";
 import ReactMarkdown from "react-markdown";
 
 const StreamingMessage = ({ initialMessage, setProcessing }) => {
@@ -11,7 +11,7 @@ const StreamingMessage = ({ initialMessage, setProcessing }) => {
 
   useEffect(() => {
     // Initialize WebSocket connection
-    ws.current = new WebSocket(WEBSOCKET_API);
+    ws.current = new WebSocket(CHAT_API);
 
     ws.current.onopen = () => {
       // console.log("✅ WebSocket Connected");

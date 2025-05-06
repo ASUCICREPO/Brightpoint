@@ -1,13 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
-import { ALLOW_LANDING_PAGE } from './constants';
+import { ALLOW_LANDING_PAGE } from './constants'; // Set this to false if not using landing page
 
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
   const [cookies, setCookie] = useCookies(['language']);
-  //const defaultLanguage = cookies.language || (!ALLOW_LANDING_PAGE ? 'EN' : '');
-  const defaultLanguage = cookies.language || (!ALLOW_LANDING_PAGE ? 'EN' : '');
+  const supportedLanguages = ['EN', 'ES', 'PL'];
+  const cookieLanguage = cookies.language;
+  const defaultLanguage =
+    supportedLanguages.includes(cookieLanguage)
+      ? cookieLanguage
+      : (!ALLOW_LANDING_PAGE ? 'EN' : '');
+
   const [language, setLanguage] = useState(defaultLanguage);
 
   useEffect(() => {
@@ -16,10 +21,8 @@ export const LanguageProvider = ({ children }) => {
     }
   }, [language, setCookie, cookies.language]);
 
-  const value = { language, setLanguage };
-
   return (
-    <LanguageContext.Provider value={value}>
+    <LanguageContext.Provider value={{ language, setLanguage }}>
       {children}
     </LanguageContext.Provider>
   );

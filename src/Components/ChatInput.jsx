@@ -30,7 +30,7 @@ function ChatInput({ onSendMessage, processing }) {
       onSendMessage(message);
       setMessage("");
     } else {
-      setHelperText(TEXT["EN"].HELPER_TEXT);
+      setHelperText(TEXT[language].HELPER_TEXT);
     }
   };
 
@@ -52,7 +52,7 @@ function ChatInput({ onSendMessage, processing }) {
           maxRows={4}
           fullWidth
           disabled={isListening}
-          placeholder={TEXT["EN"].CHAT_INPUT_PLACEHOLDER}
+          placeholder={TEXT[language].CHAT_INPUT_PLACEHOLDER}
           id="USERCHATINPUT"
           value={getMessage(message, transcript, isListening)}
           onKeyDown={(e) => {
@@ -62,7 +62,7 @@ function ChatInput({ onSendMessage, processing }) {
             }
           }}
           onChange={handleTyping}
-          helperText={isListening ? TEXT["EN"].SPEECH_RECOGNITION_HELPER_TEXT : helperText}
+          helperText={isListening ? TEXT[language].SPEECH_RECOGNITION_HELPER_TEXT : helperText}
           sx={{
             backgroundColor: "#F9F8FF",
             borderRadius: "30px",

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { 
   Box, Button, Typography, TextField, Link, InputAdornment, IconButton 
 } from '@mui/material';
@@ -6,8 +6,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import BrightpointLogo from '../Assets/Brightpoint_logo.svg';
 import { useUser } from '../utilities/UserContext'; // Import UserContext
-import { signUpUser } from '../utilities/cognitoSignUp'; // ⬅️ Add this import
-import {signUp} from 'aws-amplify/auth';
+import {signUp, signOut} from 'aws-amplify/auth';
 
 const NewSignUp = () => {
   const { updateUser } = useUser(); // Get updateUser function
@@ -17,6 +16,20 @@ const NewSignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const logoutPreviousUser = async () => {
+      try {
+        await signOut(); // Sign out the previous user (if any)
+        console.log("Previous user logged out successfully.");
+      } catch (error) {
+        console.error("Error signing out the previous user:", error.message || error);
+      }
+    };
+
+    logoutPreviousUser();
+  }, []); // Empty dependency array ensures this runs only once when the page loads
+
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {

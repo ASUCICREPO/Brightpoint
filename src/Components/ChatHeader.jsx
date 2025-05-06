@@ -18,7 +18,7 @@ function ChatHeader({ selectedLanguage }) {
       }}
     >
       <Typography
-        variant="h5"
+        variant="h3"
         className="chatHeaderText"
         sx={{ fontWeight: "bold",}}
         // sx={{

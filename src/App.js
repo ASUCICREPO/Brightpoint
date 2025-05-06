@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import theme from "./theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { LanguageProvider } from "./utilities/LanguageContext";
-import { UserProvider } from "./utilities/UserContext"; // Import UserContext
+import { UserProvider } from "./utilities/UserContext";
 import LandingPage from "./Pages/LandingPage";
 import { useCookies } from "react-cookie";
 import { TranscriptProvider } from './utilities/TranscriptContext';
@@ -13,10 +13,14 @@ import MainApp from "./Pages/MainApp";
 import ReferralApp from "./Pages/ReferralApp";
 import { Amplify } from 'aws-amplify';
 import awsExports from './aws-exports';
-import VerifyEmail from "./Pages/VerifyEmail";
-
+import AdminLanding from './Pages/AdminLanding';
+import AdminDashboard from './Pages/AdminDashboard';
+import UserProfilePage from "./Pages/ViewProfile";
+import TestEndpoints from "./fromats/TestEndpoints";
+import { Dashboard } from "@mui/icons-material";
+import DashboardTab from "./Components/DashboardTab";
+import ReferralDatabase from "./Components/ReferralDatabaseTab";
 Amplify.configure(awsExports);
-
 
 function App() {
   const [cookies] = useCookies(['language']);
@@ -30,13 +34,19 @@ function App() {
           <ThemeProvider theme={theme}>
             <Router>
               <Routes>
+                {/* <Route path="/" element={<TestEndpoints />} /> */}
+
                 <Route path="/" element={<LandingPage setOpenModal={setOpenModal} />} />
                 <Route path="/app" element={<MainApp />} />
                 <Route path="/newsignup" element={<NewSignUp />} />
                 <Route path="/newusersignup" element={<NewUser />} />
                 <Route path="/referralapp" element={<ReferralApp />} />
-                <Route path="/verifyemail" element={<VerifyEmail />} />
-                
+                <Route path="/userprofile" element={<UserProfilePage />} />
+                <Route path="/admin" element={<AdminLanding />} />
+                <Route path="/admindashboard" element={<AdminDashboard />} />
+                <Route path="/analytics" element={<DashboardTab />} />
+                <Route path="/referral" element={<ReferralDatabase />} />
+
               </Routes>
             </Router>
           </ThemeProvider>
