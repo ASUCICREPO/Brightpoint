@@ -1,0 +1,110 @@
+{
+ "Description": "Brightpoint Referral Chatbot infrastructure",
+ "Outputs": {
+  "ReferralChatbotAPIUrl": {
+   "Description": "URL of the ReferralChatbotAPI REST API",
+   "Value": "https://pncxzrq0r9.execute-api.us-east-1.amazonaws.com/prod/"
+  },
+  "ProcessUserRestAPIUrl": {
+   "Description": "URL of the ProcessUserRestAPI REST API",
+   "Value": "https://kahgke45yd.execute-api.us-east-1.amazonaws.com/prod/"
+  },
+  "UserDashboardAPIUrl": {
+   "Description": "URL of the UserDashboardAPI REST API",
+   "Value": "https://329yd7xxm0.execute-api.us-east-1.amazonaws.com/dev/"
+  },
+  "QueryAnalyticsAPI1Url": {
+   "Description": "URL of the QueryAnalyticsAPI1 REST API",
+   "Value": "https://adt0bzrd3e.execute-api.us-east-1.amazonaws.com/dev/"
+  },
+  "QueryAnalyticsAPI2Url": {
+   "Description": "URL of the QueryAnalyticsAPI2 REST API",
+   "Value": "https://ite99ljw0b.execute-api.us-east-1.amazonaws.com/dev/"
+  },
+  "ReferralsApiUrl": {
+   "Description": "URL of the ReferralsApi REST API",
+   "Value": "https://twi9ghqfhl.execute-api.us-east-1.amazonaws.com/dev/"
+  },
+  "ReferralChatbotWebSocketUrl": {
+   "Description": "URL of the ReferralChatbotWebSocket WebSocket API",
+   "Value": "wss://lajngh4a22.execute-api.us-east-1.amazonaws.com/prod/"
+  },
+  "ProcessUserWebSocketAPIUrl": {
+   "Description": "URL of the ProcessUserWebSocketAPI WebSocket API",
+   "Value": "wss://p8ea1v23i0.execute-api.us-east-1.amazonaws.com/prod/"
+  },
+  "AnalyticsWebSocketAPIUrl": {
+   "Description": "URL of the AnalyticsWebSocketAPI WebSocket API",
+   "Value": "wss://duqhouj11e.execute-api.us-east-1.amazonaws.com/dev/"
+  },
+  "ReferralsWebSocketAPIUrl": {
+   "Description": "URL of the ReferralsWebSocketAPI WebSocket API",
+   "Value": "wss://z0ebrmmyd0.execute-api.us-east-1.amazonaws.com/dev/"
+  },
+  "WebSocketConnectionsTableName": {
+   "Description": "WebSocket Connections Table Name",
+   "Value": "WebSocketConnections"
+  },
+  "PerplexityQueryCacheTableName": {
+   "Description": "Perplexity Query Cache Table Name",
+   "Value": "perplexity_query_cache"
+  },
+  "QueryAnalyticsTableName": {
+   "Description": "Query Analytics Table Name",
+   "Value": "query_analytics"
+  },
+  "ReferralDataTableName": {
+   "Description": "Referral Data Table Name (Imported)",
+   "Value": "referral_data"
+  },
+  "UserDataTableName": {
+   "Description": "User Data Table Name (Imported)",
+   "Value": "user_data"
+  }
+ },
+ "Resources": {
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/yXISwrCMBAA0LN0n462IuhSBbdKdS+Tjzo2P8yEEErvLurqweuh265h2WBJrdJja0nCdGFUo8CSbpOuHl3QEq4ordljMgIjPZBNwQqDSbyL9GuLTmqEY/aKKfjvzeJw96fMMfMszpWfwS9W0PWwaV6JqH1nz+QMDH8/qbkqn4wAAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

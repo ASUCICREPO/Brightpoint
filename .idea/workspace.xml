@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3ff7ef2e-35a7-4c4d-bd94-9b3ea7ae56b2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brightpoint/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brightpoint/brightpoint_stack.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brightpoint/perplexity_lambda/lambda_function.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brightpoint/process_user_data/lambda_function.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brightpoint/query_analytics_api/lambda_function.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brightpoint/query_analytics_backfill/lambda_function.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brightpoint/referral_chatbot/lambda-function-v9.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brightpoint/referrals_api_handler/lambda_function.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brightpoint/sms_chat_integration/lambda_function.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cdk.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/deploy.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BrightpointCollection.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/referral-chatbot/lambda-function-old.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/referral-chatbot/lambda-function-old/bedrockAgent.py" beforeDir="false" afterPath="$PROJECT_DIR$/brightpoint/referral_chatbot/bedrockAgent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/referral-chatbot/lambda-function-old/getServiceCategories.py" beforeDir="false" afterPath="$PROJECT_DIR$/brightpoint/referral_chatbot/getServiceCategories.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/referral-chatbot/lambda-function-old/referralChatbotLambda.py" beforeDir="false" afterPath="$PROJECT_DIR$/brightpoint/referral_chatbot/referralChatbotLambda.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/referral-chatbot/lambda-function-v9.zip" beforeDir="false" afterPath="$PROJECT_DIR$/referral-chatbot/lambda-function-v9.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/referral-chatbot/referralChatbotLambda.py" beforeDir="false" afterPath="$PROJECT_DIR$/referral-chatbot/referralChatbotLambda.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Pratiksha12051999&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ASUCICREPO/Brightpoint.git&quot;,
+    &quot;accountId&quot;: &quot;06653c56-ca49-40b9-9acc-2342bff90c47&quot;
+  }
+}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2urjnXxDB7jv3unjvicwRBhcmRT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "backend__code",
+    "last_opened_file_path": "/Users/pratikshawadibhasme/Desktop/ASU CIC/Brightpoint/brightpoint/referral_chatbot",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/brightpoint/referral_chatbot" />
+      <recent name="$PROJECT_DIR$/referral-chatbot" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-PY-243.22562.220" />
+        <option value="bundled-python-sdk-0fc6c617c4bd-9a18a617cbe4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.22562.220" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3ff7ef2e-35a7-4c4d-bd94-9b3ea7ae56b2" name="Changes" comment="" />
+      <created>1743013754292</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1743013754292</updated>
+      <workItem from="1743013755917" duration="23511000" />
+      <workItem from="1743186627994" duration="15582000" />
+      <workItem from="1743393854897" duration="30236000" />
+      <workItem from="1743631088712" duration="16371000" />
+      <workItem from="1743888634945" duration="37705000" />
+      <workItem from="1744494670109" duration="6730000" />
+      <workItem from="1744931799406" duration="10001000" />
+      <workItem from="1745367808507" duration="57016000" />
+      <workItem from="1746127095880" duration="8013000" />
+      <workItem from="1746911500180" duration="30865000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

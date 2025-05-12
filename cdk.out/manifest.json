@@ -1,0 +1,156 @@
+{
+  "version": "41.0.0",
+  "artifacts": {
+    "BrightpointStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "BrightpointStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "BrightpointStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://108782065617/us-east-1",
+      "properties": {
+        "templateFile": "BrightpointStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::108782065617:role/cdk-hnb659fds-deploy-role-108782065617-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::108782065617:role/cdk-hnb659fds-cfn-exec-role-108782065617-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-108782065617-us-east-1/c23b4a72f1b83be788f98fa29974ce3baca2644ca80ebe6ff63db7fe30043584.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "BrightpointStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::108782065617:role/cdk-hnb659fds-lookup-role-108782065617-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "BrightpointStack.assets"
+      ],
+      "metadata": {
+        "/BrightpointStack/ReferralChatbotAPIUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIUrl"
+          }
+        ],
+        "/BrightpointStack/ProcessUserRestAPIUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProcessUserRestAPIUrl"
+          }
+        ],
+        "/BrightpointStack/UserDashboardAPIUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIUrl"
+          }
+        ],
+        "/BrightpointStack/QueryAnalyticsAPI1Url": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1Url"
+          }
+        ],
+        "/BrightpointStack/QueryAnalyticsAPI2Url": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2Url"
+          }
+        ],
+        "/BrightpointStack/ReferralsApiUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiUrl"
+          }
+        ],
+        "/BrightpointStack/ReferralChatbotWebSocketUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotWebSocketUrl"
+          }
+        ],
+        "/BrightpointStack/ProcessUserWebSocketAPIUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProcessUserWebSocketAPIUrl"
+          }
+        ],
+        "/BrightpointStack/AnalyticsWebSocketAPIUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AnalyticsWebSocketAPIUrl"
+          }
+        ],
+        "/BrightpointStack/ReferralsWebSocketAPIUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIUrl"
+          }
+        ],
+        "/BrightpointStack/WebSocketConnectionsTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebSocketConnectionsTableName"
+          }
+        ],
+        "/BrightpointStack/PerplexityQueryCacheTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PerplexityQueryCacheTableName"
+          }
+        ],
+        "/BrightpointStack/QueryAnalyticsTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsTableName"
+          }
+        ],
+        "/BrightpointStack/ReferralDataTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralDataTableName"
+          }
+        ],
+        "/BrightpointStack/UserDataTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDataTableName"
+          }
+        ],
+        "/BrightpointStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/BrightpointStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/BrightpointStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "BrightpointStack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  },
+  "minimumCliVersion": "2.1005.0"
+}
