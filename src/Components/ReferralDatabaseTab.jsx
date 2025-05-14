@@ -185,7 +185,7 @@ export default function ReferralDatabase() {
             setter: setSelectedZipcodes,
             options: zipcodes
           }].map(({ label, value, setter, options }) => (
-            <Grid item xs={12} md={2} key={label}>
+            <Grid item xs={12} md={2} key={label} width={200}>
               <FormControl fullWidth>
                 <InputLabel>{label}</InputLabel>
                 <Select

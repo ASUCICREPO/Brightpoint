@@ -65,9 +65,9 @@ const UserProfile = () => {
               </>
             ) : (
               <>
-                {renderField('First Name', userData.givenName)}
-                {renderField('Last Name', userData.lastName)}
-                {renderField('Username', userData.username)}
+                {renderField('First Name', "John")}
+                {renderField('Last Name', "Doe")}
+                {renderField('Username', userData.user_id)}
                 {renderField('Email', userData.email)}
                 {renderField('ZipCode', userData.zipcode)}
                 {renderField('Phone Number', userData.phoneNumber)}

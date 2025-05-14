@@ -146,9 +146,16 @@ function ChatBody( language ) {
             <Attachment onFileUploadComplete={handleFileUploadComplete} />
           )}
         </Box>
-        <Box sx={{ flexGrow: 1, width: { xs: '100%', sm: 'auto' } }}>
-          <ChatInput onSendMessage={handleSendMessage} processing={processing} message={message} setMessage={setMessage} language />
-        </Box>
+        <Box sx={{ flexGrow: 1, width: { xs: '100%', sm: 'auto' }, p: 1 }}>
+  <ChatInput
+    onSendMessage={handleSendMessage}
+    processing={processing}
+    message={message}
+    setMessage={setMessage}
+    language
+  />
+</Box>
+
       </Box>
 
     </Box>
