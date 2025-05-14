@@ -1,12 +1,33 @@
 import React, { useState } from "react";
 import { Menu, MenuItem, Button, Box, Divider } from "@mui/material";
-import { useLanguage } from "../utilities/LanguageContext"; // Adjust path as needed
-import LanguageIcon from "../Assets/language.svg"; // Replace with icon path
-import DropdownIcon from "../Assets/dropdown_white.svg"; // Replace with icon path
+import { useNavigate, useLocation } from "react-router-dom";
+import LanguageIcon from "../Assets/language.svg";
+import DropdownIcon from "../Assets/dropdown_white.svg";
 
 function LanguageDropdown() {
   const [anchorEl, setAnchorEl] = useState(null);
-  const { language, setLanguage } = useLanguage();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Mapping URL prefix to language code
+  const pathToLangMap = {
+    "/app": "EN",
+    "/esapp": "ES",
+    "/plapp": "PL",
+  };
+
+  const langToPathMap = {
+    EN: "/app",
+    ES: "/esapp",
+    PL: "/plapp",
+  };
+
+  // Detect current language from pathname
+  const currentPath = location.pathname;
+  const currentLang =
+    Object.entries(pathToLangMap).find(([prefix]) =>
+      currentPath.startsWith(prefix)
+    )?.[1] || "EN";
 
   const allLanguages = [
     { code: "EN", label: "English" },
@@ -14,8 +35,11 @@ function LanguageDropdown() {
     { code: "PL", label: "Polish" },
   ];
 
-  const availableLanguages = allLanguages.filter((lang) => lang.code !== language);
-  const currentLangLabel = allLanguages.find((lang) => lang.code === language)?.label || "English";
+  const availableLanguages = allLanguages.filter(
+    (lang) => lang.code !== currentLang
+  );
+  const currentLangLabel =
+    allLanguages.find((lang) => lang.code === currentLang)?.label || "English";
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -26,12 +50,15 @@ function LanguageDropdown() {
   };
 
   const handleLanguageChange = (newLang) => {
-    setLanguage(newLang);
+    const newPath = langToPathMap[newLang];
+    if (newPath) {
+      navigate(newPath);
+    }
     handleClose();
   };
 
   return (
-    <Box>
+    <Box m={0} p={0}>
       <Button
         onClick={handleClick}
         sx={{
@@ -44,14 +71,20 @@ function LanguageDropdown() {
           alignItems: "center",
           minWidth: "150px",
           justifyContent: "space-between",
-          "&:hover": {
-            backgroundColor: "#1A1153",
-          },
+          margin: 0,
         }}
       >
-        <img src={LanguageIcon} alt="Language" style={{ width: 20, height: 20, marginRight: 8 }} />
+        <img
+          src={LanguageIcon}
+          alt="Language"
+          style={{ width: 20, height: 20, marginRight: 8 }}
+        />
         {currentLangLabel}
-        <img src={DropdownIcon} alt="Dropdown" style={{ width: 16, height: 16, marginLeft: 8 }} />
+        <img
+          src={DropdownIcon}
+          alt="Dropdown"
+          style={{ width: 16, height: 16, marginLeft: 8 }}
+        />
       </Button>
       <Menu
         anchorEl={anchorEl}
@@ -67,13 +100,17 @@ function LanguageDropdown() {
             borderRadius: "8px",
             boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
             width: anchorEl ? anchorEl.clientWidth : "auto",
+            padding: 0,
           },
         }}
       >
         {availableLanguages.map((lang, index) => (
           <React.Fragment key={lang.code}>
             {index > 0 && <Divider />}
-            <MenuItem onClick={() => handleLanguageChange(lang.code)} sx={{ color: "black" }}>
+            <MenuItem
+              onClick={() => handleLanguageChange(lang.code)}
+              sx={{ color: "black" }}
+            >
               {lang.label}
             </MenuItem>
           </React.Fragment>

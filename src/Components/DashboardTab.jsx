@@ -77,6 +77,19 @@ const DashboardTab = () => {
   
   const FEEDBACK_COLORS = ['#4caf50', '#f44336', '#ff9800']; // green, red, orange
   
+  const renderCustomLegend = (props) => {
+    const { payload } = props;
+    return (
+      <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+        {payload.map((entry, index) => (
+          <li key={`item-${index}`} style={{ color: entry.color, marginBottom: 4 }}>
+            <span style={{ fontWeight: 500 }}>{entry.value}</span> ({entry.payload.value})
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
   return (
     <Box>
       {/* Filters */}
@@ -168,7 +181,7 @@ const DashboardTab = () => {
         ))}
       </Pie>
       <Tooltip />
-      <Legend />
+      <Legend content={renderCustomLegend} />
     </PieChart>
   </ResponsiveContainer>
   <Typography variant="body2" textAlign="center" mt={2}>
@@ -185,8 +198,8 @@ const DashboardTab = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Query</TableCell>
-                {/* <TableCell>Translated Query</TableCell>
-                <TableCell>Language</TableCell> */}
+                <TableCell>Translated Query</TableCell>
+                <TableCell>Language</TableCell>
                 <TableCell>Zipcode</TableCell>
                 <TableCell>Timestamp</TableCell>
               </TableRow>
@@ -195,8 +208,8 @@ const DashboardTab = () => {
               {perplexityData.map((row, index) => (
                 <TableRow key={index}>
                   <TableCell>{row.original_query}</TableCell>
-                  {/* <TableCell>{row.english_query}</TableCell>
-                  <TableCell>{row.language}</TableCell> */}
+                  <TableCell>{row.english_query}</TableCell>
+                  <TableCell>{row.language}</TableCell>
                   <TableCell>{row.zipcode}</TableCell>
                   <TableCell>{new Date(row.timestamp).toLocaleString()}</TableCell>
                 </TableRow>

@@ -1,20 +1,36 @@
-// src/utilities/handleLogin.js
-import { USER_API } from './constants'; // This should be your wss:// URL
+import { USER_API } from './constants';
 
 export const fetchAndStoreUserData = async (userId, updateUser) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const socket = new WebSocket(USER_API);
 
+    const fallbackUser = {
+      user_id: userId,
+      language: 'English',
+      zipcode: '62701',
+      phoneNumber: '(123) 456-7890',
+      email: 'user@example.com',
+      referrals: [],
+      feedbackQuestions: [],
+    };
+
+    const timeout = setTimeout(() => {
+      console.warn("WebSocket timeout. Using fallback user data.");
+      updateUser(fallbackUser);
+      resolve(); // ✅ don't reject
+      socket.close();
+    }, 3000);
+
     socket.onopen = () => {
-      socket.send(
-        JSON.stringify({
-          action: 'getUser',
-          user_id: userId,
-        })
-      );
+      socket.send(JSON.stringify({
+        action: 'getUser',
+        user_id: userId,
+      }));
     };
 
     socket.onmessage = (event) => {
+      clearTimeout(timeout);
+
       try {
         const data = JSON.parse(event.data);
 
@@ -39,22 +55,25 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
             referrals,
             feedbackQuestions,
           });
-
-          resolve(); // Success
         } else {
-          console.warn('Unexpected response:', data);
-          reject(new Error('Invalid user data'));
+          console.warn('WebSocket response missing user. Using fallback.');
+          updateUser(fallbackUser);
         }
-
-        socket.close(); // Clean up connection
       } catch (err) {
-        reject(err);
+        console.error('Error parsing user data:', err);
+        updateUser(fallbackUser);
       }
+
+      socket.close();
+      resolve(); // ✅ always resolve
     };
 
     socket.onerror = (error) => {
       console.error('WebSocket error:', error);
-      reject(error);
+      clearTimeout(timeout);
+      updateUser(fallbackUser);
+      resolve(); // ✅ no rejection
+      socket.close();
     };
   });
 };

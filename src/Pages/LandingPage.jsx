@@ -35,13 +35,16 @@ const LandingPage = () => {
       // Authenticate using Cognito
       const user = await signIn({ username, password });
       console.log('Cognito login success:', user);
+      console.log('Cognito login success:', username, password);
+
 
       // Trigger API call to fetch and store user info
-      await fetchAndStoreUserData(user.username, updateUser); // Call after login
+      await fetchAndStoreUserData(username, updateUser); // Call after login
 
       navigate('/app'); // move navigation after successful data fetch
 
     } catch (error) {
+      // console.log()
       console.error('Cognito login error:', error.message || error);
       alert('Login failed: ' + (error.message || 'Unknown error'));
     }
@@ -53,7 +56,7 @@ const LandingPage = () => {
     <Box height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" bgcolor="white">
       
       {/* Logo above the container */}
-      <img src={BrightpointLogo} alt="Brightpoint Logo" height="10%" style={{ marginBottom: 10 }} />
+      <img src={BrightpointLogo} alt="Brightpoint Logo" height="6%" style={{ marginBottom: 10 }} />
 
       <Box
         width="40%"

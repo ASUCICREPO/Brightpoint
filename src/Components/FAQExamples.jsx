@@ -8,7 +8,7 @@ const shuffleArray = (array) => {
 };
 
 const FAQExamples = ({ onPromptClick }) => {
-  const { language } = useLanguage();
+  const { language } = useLanguage()||"EN";
   const [faqs, setFaqs] = useState([]);
 
   useEffect(() => {

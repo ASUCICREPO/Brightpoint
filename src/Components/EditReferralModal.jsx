@@ -1,10 +1,11 @@
-// EditReferralModal.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   TextField, Button, Grid, IconButton
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+
+const accentColor = '#1F1463';
 
 const EditReferralModal = ({ open, onClose, referralData, onUpdate }) => {
   const [formData, setFormData] = useState({ ...referralData });
@@ -25,8 +26,7 @@ const EditReferralModal = ({ open, onClose, referralData, onUpdate }) => {
       data: formData,
     };
 
-    // Replace with actual API call
-    console.log('Updating referral:', payload);
+    console.log('Updating referral:', payload); // Replace with actual API
     onUpdate(payload);
     onClose();
   };
@@ -35,7 +35,7 @@ const EditReferralModal = ({ open, onClose, referralData, onUpdate }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>
+      <DialogTitle sx={{ color: accentColor, fontSize: '1.25rem', fontWeight: 600 }}>
         Edit Referral
         <IconButton
           aria-label="close"
@@ -45,23 +45,57 @@ const EditReferralModal = ({ open, onClose, referralData, onUpdate }) => {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
+
       <DialogContent dividers>
         <Grid container spacing={2}>
           {Object.entries(formData).map(([key, value]) => (
             <Grid item xs={12} sm={6} key={key}>
               <TextField
                 label={key}
-                fullWidth
                 value={value}
+                fullWidth
+                variant="outlined"
+                size="small"
                 onChange={handleChange(key)}
+                sx={{
+                  '& label': { color: accentColor },
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
           ))}
         </Grid>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit}>Save</Button>
+
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          sx={{
+            borderColor: accentColor,
+            color: accentColor,
+            '&:hover': {
+              backgroundColor: '#f0f0ff',
+              borderColor: accentColor
+            }
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          sx={{
+            backgroundColor: accentColor,
+            '&:hover': {
+              backgroundColor: '#2e1d91'
+            }
+          }}
+        >
+          Save
+        </Button>
       </DialogActions>
     </Dialog>
   );

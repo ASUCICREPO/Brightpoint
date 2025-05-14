@@ -7,6 +7,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../utilities/UserContext'; // Import useUser
 import {signUp} from 'aws-amplify/auth';
+import { USER_API } from '../utilities/constants';
 
 
 
@@ -33,7 +34,7 @@ const NewUser = () => {
 
   const handleCompleteSignup = async () => {
     const { username, password } = userData;
-    const { givenName, lastName, email } = formData;
+    const { givenName, lastName, email, zipcode, phone } = formData;
   
     try {
       const { success, response, error } = await signUp({
@@ -42,13 +43,38 @@ const NewUser = () => {
         options: {
           userAttributes: {
             email,
-            given_name: givenName, // <-- This must exist and be non-empty
+            given_name: givenName,
           },
         },
       });
   
       if (success) {
         console.log('Cognito user created!', response);
+  
+        // === WebSocket integration ===
+        const ws = new WebSocket(USER_API); // replace with your actual URL
+  
+        ws.onopen = () => {
+          console.log("WebSocket connected, sending createUser payload...");
+  
+          const payload = {
+            action: "updateUser",
+            user_id: username,
+            Zipcode: zipcode,
+            Phone: phone,
+            Email: email,
+          };
+  
+          ws.send(JSON.stringify(payload));
+          console.log("WebSocket message sent:", payload);
+  
+          // Optional: Close socket after sending
+          ws.close();
+        };
+  
+        ws.onerror = (err) => {
+          console.error("WebSocket error:", err);
+        };
       } else {
         console.error(error);
       }
@@ -56,6 +82,7 @@ const NewUser = () => {
       console.error('SignUp Error:', err);
     }
   };
+  
 
   
   const handleNext = () => {

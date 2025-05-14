@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Grid, IconButton } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { useLanguage } from "../utilities/LanguageContext";
-import { CHAT_INPUT_PLACEHOLDER, TEXT } from "../utilities/constants";
+import { useLocation } from "react-router-dom"; // <-- Import location hook
+import { TEXT } from "../utilities/constants";
 import { useTranscript } from "../utilities/TranscriptContext";
 
 function ChatInput({ onSendMessage, processing }) {
   const [message, setMessage] = useState("");
   const [helperText, setHelperText] = useState("");
-  const { language } = useLanguage();
   const { transcript, setTranscript, isListening } = useTranscript();
+  const location = useLocation(); // <-- Get current path
+
+  // === Determine language from path ===
+  const path = location.pathname;
+  let language = "EN";
+  if (path.startsWith("/esapp")) {
+    language = "ES";
+  } else if (path.startsWith("/plapp")) {
+    language = "PL";
+  }
 
   useEffect(() => {
     if (!isListening && transcript) {
@@ -19,9 +28,7 @@ function ChatInput({ onSendMessage, processing }) {
   }, [isListening, transcript, setTranscript]);
 
   const handleTyping = (event) => {
-    if (helperText) {
-      setHelperText("");
-    }
+    if (helperText) setHelperText("");
     setMessage(event.target.value);
   };
 
@@ -30,29 +37,26 @@ function ChatInput({ onSendMessage, processing }) {
       onSendMessage(message);
       setMessage("");
     } else {
-      setHelperText(TEXT[language].HELPER_TEXT);
+      setHelperText(TEXT[language].HELPER_TEXT); // Use dynamic language
     }
   };
 
   const getMessage = (message, transcript, isListening) => {
-    if (isListening) {
-      if (transcript.length) {
-        return message.length ? `${message} ${transcript}` : transcript;
-      }
+    if (isListening && transcript.length) {
+      return message.length ? `${message} ${transcript}` : transcript;
     }
     return message;
   };
 
-
   return (
-    <Grid container item xs={12} alignItems="center" justifyContent="center" sx={{ backgroundColor: "#F9F8FF", paddingLeft: "10px" , borderRadius:"30px"}}>
-      <Grid item  sx={{ display: "flex", alignItems: "center", width: "100%", borderRadius:"30px"}}>
+    <Grid container item xs={12} alignItems="center" justifyContent="center" sx={{ backgroundColor: "#F9F8FF", paddingLeft: "10px", borderRadius: "30px" }}>
+      <Grid item sx={{ display: "flex", alignItems: "center", width: "100%", borderRadius: "30px" }}>
         <TextField
           multiline
           maxRows={4}
           fullWidth
           disabled={isListening}
-          placeholder={TEXT[language].CHAT_INPUT_PLACEHOLDER}
+          placeholder={TEXT[language].CHAT_INPUT_PLACEHOLDER} // Use dynamic language
           id="USERCHATINPUT"
           value={getMessage(message, transcript, isListening)}
           onKeyDown={(e) => {
@@ -79,10 +83,10 @@ function ChatInput({ onSendMessage, processing }) {
             borderRadius: "50%",
             backgroundColor: "#F9F8FF",
             border: "2px solid #F9F8FF",
-            color: (theme) => theme.palette.primary.main, // Set the icon color to primary color
+            color: (theme) => theme.palette.primary.main,
             "&:hover": {
               backgroundColor: "#EAE6FF",
-              color: (theme) => theme.palette.primary.dark, // Darker shade of primary on hover
+              color: (theme) => theme.palette.primary.dark,
             }
           }}
         >

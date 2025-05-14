@@ -94,7 +94,7 @@ const MainApp = () => {
               zIndex: 5,
             }}
           >
-            <LeftNav showLeftNav={true} language="EN" />
+            <LeftNav showLeftNav={true} language="PL" />
           </Grid>
         )}
 
@@ -106,7 +106,7 @@ const MainApp = () => {
             onClose={() => setLeftNav(false)}
             PaperProps={{ sx: { width: "100%" } }}
           >
-            <LeftNav showLeftNav={true} setLeftNav={setLeftNav} language="EN" />
+            <LeftNav showLeftNav={true} setLeftNav={setLeftNav} language="PL" />
           </Drawer>
         )}
 
@@ -149,7 +149,7 @@ const MainApp = () => {
             paddingBottom: "30px",
           }}
         >
-          <ChatBody language={"english"} />
+          <ChatBody language="polish" />
         </Grid>
       </Grid>
 

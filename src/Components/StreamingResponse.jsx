@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Grid, Avatar, Typography } from "@mui/material";
-import BotAvatar from "../Assets/BotAvatar.svg";
+import botAvatar from "../Assets/botAvatar.gif";
 import { CHAT_API, ALLOW_MARKDOWN_BOT } from "../utilities/constants";
 import ReactMarkdown from "react-markdown";
 
@@ -82,7 +82,7 @@ const StreamingMessage = ({ initialMessage, setProcessing }) => {
   return (
     <Grid container direction="row" justifyContent="flex-start" alignItems="flex-end">
       <Grid item>
-        <Avatar alt="Bot Avatar" src={BotAvatar} />
+        <Avatar alt="Bot Avatar" src={botAvatar} />
       </Grid>
       {ALLOW_MARKDOWN_BOT ? (
         <Grid item className="botMessage" sx={{ backgroundColor: (theme) => theme.palette.background.botMessage }}>

@@ -35,7 +35,7 @@ const MicButton = styled(IconButton)(({ theme, listening }) => ({
 }));
 
 function SpeechRecognitionComponent() {
-  const { language } = useLanguage();
+  const { language } = useLanguage()||"EN";
   const { setTranscript, isListening, setIsListening } = useTranscript();
   const recognitionRef = useRef(null);
 

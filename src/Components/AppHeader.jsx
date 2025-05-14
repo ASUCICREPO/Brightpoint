@@ -13,8 +13,10 @@ import Logo from "../Assets/Brightpoint_logo.svg";
 import accountIcon from "../Assets/account_icon.svg";
 import dropdownIcon from "../Assets/dropdown.svg";
 import { useNavigate } from "react-router-dom";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
-function AppHeader({ username }) {
+function AppHeader({ username, isCollapsed, onNavToggle }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const theme = useTheme();
@@ -57,9 +59,25 @@ function AppHeader({ username }) {
           flexWrap: "nowrap",
         }}
       >
+        {/* Collapse Toggle Icon */}
+        {/* <Grid item>
+          <IconButton onClick={onNavToggle} sx={{ padding: 0 }}>
+            {isCollapsed ? (
+              <ChevronRightIcon sx={{ fontSize: 30, color: "#1F1463" }} />
+            ) : (
+              <ChevronLeftIcon sx={{ fontSize: 30, color: "#1F1463" }} />
+            )}
+          </IconButton>
+        </Grid> */}
+
         {/* Logo */}
         <Grid item>
-          <img src={Logo} alt="App main Logo" height={40} style={{ maxWidth: "100%" }} />
+          <img
+            src={Logo}
+            alt="App main Logo"
+            height={40}
+            style={{ maxWidth: "100%" }}
+          />
         </Grid>
 
         {/* Profile Dropdown */}

@@ -2,10 +2,22 @@
 import React from 'react';
 import { Typography, Grid, Box } from '@mui/material';
 import PhoneIcon from "../Assets/phone_icon.svg"
+import { useLocation } from "react-router-dom"; // <-- Import location hook
 
-const FirstBotMessage = ({ language }) => {
+const FirstBotMessage = ({ }) => {
+  const location = useLocation(); // <-- Get current path
+
+  // === Determine language from path ===
+  const path = location.pathname;
+  let language = "EN";
+  if (path.startsWith("/esapp")) {
+    language = "ES";
+  } else if (path.startsWith("/plapp")) {
+    language = "PL";
+  }
+
   const translations = {
-    en: {
+    EN: {
       text: "Welcome to the Service Referral Agent. If this is an emergency, please contact the services listed below. Feel free to ask the bot questions about any referrals you need help with!",
       title: "Medical & Mental Health Emergency Contacts:",
       police: "Emergency Services",
@@ -23,7 +35,7 @@ const FirstBotMessage = ({ language }) => {
       activeLabor: "Active Labor",
       activeLaborInfo: "If you are in active labor, go to your local Emergency Room and call your doula.",
     },
-    es: {
+    ES: {
       text: "Bienvenido al Agente de Referencias de Servicios. Si se trata de una emergencia, comuníquese con los servicios que se indican a continuación. ¡No dude en preguntarle al bot sobre cualquier referencia con la que necesite ayuda!",
       title: "Contactos de Emergencia Médica y de Salud Mental:",
       police: "Servicios de Emergencia",
@@ -41,7 +53,7 @@ const FirstBotMessage = ({ language }) => {
       activeLabor: "Trabajo de Parto Activo",
       activeLaborInfo: "Si estás en trabajo de parto activo, acude a la sala de emergencias más cercana y llama a tu doula.",
     },
-    pl: {
+    PL: {
       text: "Witamy w Agencie Skierowań do Usług. W nagłych przypadkach skontaktuj się z poniższymi służbami. Śmiało zadawaj botowi pytania dotyczące potrzebnych skierowań!",
       title: "Kontakty alarmowe: medyczne i zdrowia psychicznego:",
       police: "Służby ratunkowe",
@@ -62,12 +74,12 @@ const FirstBotMessage = ({ language }) => {
   };
   
 
-  const messages = translations[language] || translations.en;
+  const messages = translations[language] || translations.EN;
 
   return (
     <Box sx={{ width: '100%' }}>
       <Typography
-        variant="h5"
+        variant="body1"
         sx={{
           color: (theme) => theme.palette.primary.main,
           fontWeight: 'bold',
@@ -77,7 +89,7 @@ const FirstBotMessage = ({ language }) => {
         {messages.text}
       </Typography>
       <Typography
-        variant="h5"
+        variant="body1"
         sx={{
           color: (theme) => theme.palette.primary.main,
           fontWeight: 'bold',
@@ -103,18 +115,18 @@ const FirstBotMessage = ({ language }) => {
             }}
           >
             <Box sx={{ width: '30%', paddingLeft: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="body26" sx={{ fontWeight: 'bold' }}>
                 {messages.police}
               </Typography>
               <Box display="flex" alignItems="center">
                 <img src={PhoneIcon} alt="Phone Icon" style={{ width: 20, height: 20, marginRight: 8 }} />
-                <Typography variant=" h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                   {messages.policePhone}
                 </Typography>
               </Box>
             </Box>
             <Box sx={{ width: '70%' }}>
-              <Typography variant=" h6">
+              <Typography variant=" body2">
                 {messages.policeInfo}
               </Typography>
             </Box>
@@ -128,18 +140,18 @@ const FirstBotMessage = ({ language }) => {
             }}
           >
             <Box sx={{ width: '30%', paddingLeft: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                 {messages.cares}
               </Typography>
               <Box display="flex" alignItems="center">
                 <img src={PhoneIcon} alt="Phone Icon" style={{ width: 20, height: 20, marginRight: 8 }} />
-                <Typography variant=" h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant=" body2" sx={{ fontWeight: 'bold' }}>
                 {messages.caresPhone}
                 </Typography>
               </Box>
             </Box>
             <Box sx={{ width: '70%' }}>
-              <Typography variant=" h6">
+              <Typography variant=" body2">
                 {messages.caresInfo}
               </Typography>
             </Box>
@@ -153,18 +165,18 @@ const FirstBotMessage = ({ language }) => {
             }}
           >
             <Box sx={{ width: '30%', paddingLeft: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                 {messages.sass}
               </Typography>
               <Box display="flex" alignItems="center">
                 <img src={PhoneIcon} alt="Phone Icon" style={{ width: 20, height: 20, marginRight: 8 }} />
-                <Typography variant=" h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant=" body2" sx={{ fontWeight: 'bold' }}>
                 {messages.sassPhone}
                 </Typography>
               </Box>
             </Box>
             <Box sx={{ width: '70%' }}>
-              <Typography variant=" h6">
+              <Typography variant=" body2">
                 {messages.sassInfo}
               </Typography>
             </Box>
@@ -178,18 +190,18 @@ const FirstBotMessage = ({ language }) => {
             }}
           >
             <Box sx={{ width: '30%', paddingLeft: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                 {messages.crisisCounselor}
               </Typography>
               <Box display="flex" alignItems="center">
                 <img src={PhoneIcon} alt="Phone Icon" style={{ width: 20, height: 20, marginRight: 8 }} />
-                <Typography variant=" h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant=" body2" sx={{ fontWeight: 'bold' }}>
                   {messages.crisisPhone}
                 </Typography>
               </Box>
             </Box>
             <Box sx={{ width: '70%' }}>
-              <Typography variant=" h6">
+              <Typography variant=" body2">
                 {messages.crisisInfo}
               </Typography>
             </Box>
@@ -202,12 +214,12 @@ const FirstBotMessage = ({ language }) => {
             }}
           >
             <Box sx={{ width: '30%', paddingLeft: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                 {messages.activeLabor}
               </Typography>
             </Box>
             <Box sx={{ width: '70%' }}>
-              <Typography variant=" h6">
+              <Typography variant=" body2">
                 {messages.activeLaborInfo}
               </Typography>
             </Box>
