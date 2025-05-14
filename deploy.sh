@@ -1,89 +1,62 @@
 #!/bin/bash
+# deploy.sh - Deployment script for Brightpoint Stack
 
-# Colors for output
+set -e  # Exit on error
+
+# Color codes for output
+RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}Brightpoint Referral Chatbot CDK Deployment Helper${NC}"
-echo "----------------------------------------"
+# Function to print colored output
+print_message() {
+    echo -e "${2}${1}${NC}"
+}
 
-# Check if CDK is installed
-if ! command -v cdk &> /dev/null; then
-    echo -e "${RED}AWS CDK is not installed. Please install it with: npm install -g aws-cdk${NC}"
+# Check if environment is provided
+if [ -z "$1" ]; then
+    print_message "Usage: ./deploy.sh <environment> [cdk-command]" $RED
+    print_message "Environments: dev, test, prod" $YELLOW
+    print_message "CDK Commands: synth, diff, deploy, destroy" $YELLOW
     exit 1
 fi
 
-# Check if virtual environment exists, if not create one
-if [ ! -d "venv" ]; then
-    echo -e "${YELLOW}Creating Python virtual environment...${NC}"
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-else
-    echo -e "${GREEN}Using existing virtual environment${NC}"
-    source venv/bin/activate
+ENV=$1
+CDK_COMMAND=${2:-deploy}
+
+# Validate environment
+if [[ ! "$ENV" =~ ^(dev|test|prod)$ ]]; then
+    print_message "Error: Invalid environment. Must be dev, test, or prod" $RED
+    exit 1
 fi
 
-# Ensure dependencies are installed
-echo -e "${YELLOW}Ensuring dependencies are up to date...${NC}"
-pip install -r requirements.txt
+# Set environment variables
+export CDK_ENV=$ENV
 
-# Check if CDK is bootstrapped
-echo -e "${YELLOW}Checking if CDK is bootstrapped in your account...${NC}"
-cdk doctor
+print_message "Starting deployment to $ENV environment..." $YELLOW
 
-# Display deployment options
-echo ""
-echo -e "${GREEN}Deployment Options:${NC}"
-echo "1. Check differences (cdk diff)"
-echo "2. Deploy stack (import existing resources)"
-echo "3. Deploy stack (create new resources - WARNING: may conflict with existing resources)"
-echo "4. Exit"
+# Run CDK command
+if [ "$CDK_COMMAND" == "deploy" ]; then
+    print_message "Deploying stack to $ENV..." $GREEN
+    npx cdk deploy -c env=$ENV --all --require-approval never
+elif [ "$CDK_COMMAND" == "diff" ]; then
+    print_message "Showing differences for $ENV..." $GREEN
+    npx cdk diff -c env=$ENV --all
+elif [ "$CDK_COMMAND" == "synth" ]; then
+    print_message "Synthesizing stack for $ENV..." $GREEN
+    npx cdk synth -c env=$ENV --all
+elif [ "$CDK_COMMAND" == "destroy" ]; then
+    print_message "Destroying stack in $ENV..." $RED
+    read -p "Are you sure you want to destroy the $ENV stack? (y/N): " confirm
+    if [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]]; then
+        npx cdk destroy -c env=$ENV --all --force
+    else
+        print_message "Destroy cancelled." $YELLOW
+    fi
+else
+    print_message "Unknown command: $CDK_COMMAND" $RED
+    exit 1
+fi
 
-# Get user choice
-read -p "Enter your choice (1-4): " choice
-
-case $choice in
-    1)
-        echo -e "${YELLOW}Running cdk diff to show changes...${NC}"
-        cdk diff
-        ;;
-    2)
-        echo -e "${YELLOW}Deploying stack with imported resources...${NC}"
-        # Make sure import options are uncommented and create options are commented
-        # This is currently the default in brightpoint_stack.py
-
-        echo -e "${YELLOW}Running cdk deploy...${NC}"
-        cdk deploy --require-approval never
-
-        echo -e "${GREEN}Deployment complete!${NC}"
-        ;;
-    3)
-        echo -e "${RED}WARNING: This option will create new resources that may conflict with existing ones.${NC}"
-        echo -e "${RED}You will need to manually update the stack code to uncomment the resource creation sections.${NC}"
-        read -p "Are you sure you want to continue? (y/n): " confirm
-
-        if [ "$confirm" == "y" ] || [ "$confirm" == "Y" ]; then
-            echo -e "${YELLOW}Deploying stack with new resources...${NC}"
-            echo -e "${YELLOW}Running cdk deploy...${NC}"
-            cdk deploy --require-approval never
-
-            echo -e "${GREEN}Deployment complete!${NC}"
-        else
-            echo -e "${YELLOW}Deployment canceled.${NC}"
-        fi
-        ;;
-    4)
-        echo -e "${YELLOW}Exiting without deployment.${NC}"
-        exit 0
-        ;;
-    *)
-        echo -e "${RED}Invalid choice. Exiting.${NC}"
-        exit 1
-        ;;
-esac
-
-echo ""
-echo -e "${GREEN}Deployment process completed.${NC}"
+print_message "Operation completed for $ENV!" $GREEN
