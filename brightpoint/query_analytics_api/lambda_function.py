@@ -2,13 +2,17 @@ import json
 import boto3
 from datetime import datetime, timedelta
 import logging
-
+import os
 # Set up logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # Initialize DynamoDB client
 dynamodb_client = boto3.client('dynamodb')
+ENV = os.environ.get('ENVIRONMENT', 'dev')
+USER_DATA_TABLE = f'user_data-{ENV}'
+PERPLEXITY_TABLE_NAME = f'perplexity_query_cache-{ENV}'
+QUERY_ANALYTICS_TABLE_NAME = f'query_analytics-{ENV}'
 
 def lambda_handler(event, context):
     """
@@ -221,13 +225,13 @@ def handle_rest_api_event(event, context):
 def load_user_data():
     """Load all user data from DynamoDB once to avoid multiple scans"""
     try:
-        response = dynamodb_client.scan(TableName='user_data')
+        response = dynamodb_client.scan(TableName=USER_DATA_TABLE)
         items = response.get('Items', [])
 
         # Handle pagination
         while 'LastEvaluatedKey' in response:
             response = dynamodb_client.scan(
-                TableName='user_data',
+                TableName=USER_DATA_TABLE,
                 ExclusiveStartKey=response['LastEvaluatedKey']
             )
             items.extend(response.get('Items', []))
@@ -241,13 +245,13 @@ def load_user_data():
 def load_query_analytics_data():
     """Load all query analytics data from DynamoDB once"""
     try:
-        response = dynamodb_client.scan(TableName='query_analytics')
+        response = dynamodb_client.scan(TableName=QUERY_ANALYTICS_TABLE_NAME)
         items = response.get('Items', [])
 
         # Handle pagination
         while 'LastEvaluatedKey' in response:
             response = dynamodb_client.scan(
-                TableName='query_analytics',
+                TableName=QUERY_ANALYTICS_TABLE_NAME,
                 ExclusiveStartKey=response['LastEvaluatedKey']
             )
             items.extend(response.get('Items', []))
@@ -261,13 +265,13 @@ def load_query_analytics_data():
 def load_perplexity_query_cache_data():
     """Load all perplexity query cache data from DynamoDB once"""
     try:
-        response = dynamodb_client.scan(TableName='perplexity_query_cache')
+        response = dynamodb_client.scan(TableName=PERPLEXITY_TABLE_NAME)
         items = response.get('Items', [])
 
         # Handle pagination
         while 'LastEvaluatedKey' in response:
             response = dynamodb_client.scan(
-                TableName='perplexity_query_cache',
+                TableName=PERPLEXITY_TABLE_NAME,
                 ExclusiveStartKey=response['LastEvaluatedKey']
             )
             items.extend(response.get('Items', []))

@@ -1,4 +1,5 @@
 import boto3
+import os 
 
 # Initialize AWS clients for Lambda environment
 def get_boto_clients():
@@ -11,7 +12,10 @@ def get_boto_clients():
 # Get clients
 clients = get_boto_clients()
 dynamodb = clients["dynamodb"]
-table = dynamodb.Table("referral_data")
+
+ENV = os.environ.get('ENVIRONMENT', 'dev')
+REFERRAL_TABLE_NAME = f'referral_data-{ENV}'
+table = dynamodb.Table(REFERRAL_TABLE_NAME)
 unique_categories = set()
 
 def getUniqueCategories():
@@ -32,41 +36,7 @@ def getUniqueCategories():
     except Exception as e:
         print(f"Error getting unique categories: {str(e)}")
         # Return a default list of common categories if we can't scan DynamoDB
-        return [
-            "Food Pantry",
-            "Housing",
-            "Homeless Services",
-            "Medical Services",
-            "Mental Health Services",
-            "Child Care",
-            "Children Services",
-            "Youth Programs",
-            "Education Services",
-            "Employment Services",
-            "Financial Assistance",
-            "Legal Assistance",
-            "Transportation",
-            "Utility Assistance",
-            "Crisis Assistance",
-            "Domestic Violence Services",
-            "Sexual Assault Services",
-            "Substance Use & Addiction Support",  # Updated from "Substance Abuse Services"
-            "Clothing & Household Items",
-            "WIC (Women, Infants, and Children)",
-            "Food Assistance",
-            "SNAP",
-            "Rental Assistance",
-            "Healthcare",
-            "Dental",
-            "Hospitals",
-            "Community Services",
-            "Family Services",
-            "Adult Education",
-            "Support Groups",
-            "Medical Assistance",
-            "Legal Services",
-            "Child Care Assistance"
-        ]
+        return []
 
 def get_services_by_category(service_category):
     try:

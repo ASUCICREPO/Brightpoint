@@ -12,8 +12,13 @@ import decimal
 
 # Initialize DynamoDB clients
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.environ.get('REFERRALS_TABLE_NAME', 'Referrals'))
-connections_table = dynamodb.Table(os.environ.get('CONNECTIONS_TABLE_NAME', 'WebSocketConnections'))
+
+ENV = os.environ.get('ENVIRONMENT', 'dev')
+REFERRAL_DATA_TABLE = f'referral_data-{ENV}'
+CONNECTIONS_TABLE_NAME = f'WebSocketConnections-{ENV}'
+
+table = dynamodb.Table(REFERRAL_DATA_TABLE)
+connections_table = dynamodb.Table(CONNECTIONS_TABLE_NAME)
 serializer = TypeSerializer()
 
 logger = logging.getLogger()

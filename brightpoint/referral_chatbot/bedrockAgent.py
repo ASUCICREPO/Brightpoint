@@ -9,6 +9,7 @@ import logging
 from boto3.dynamodb.conditions import Attr
 from boto3.dynamodb.types import TypeDeserializer
 import traceback
+import os
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -35,8 +36,12 @@ clients = get_boto_clients()
 bedrock = clients["bedrock"]
 dynamodb = clients["dynamodb"]
 dynamodb_client = clients["dynamodb_client"]
-table = dynamodb.Table("referral_data")
-user_data_table = dynamodb.Table("user_data")
+ENV = os.environ.get('ENVIRONMENT', 'dev')
+USER_TABLE = f'user_data-{ENV}'
+REFERRAL_TABLE_NAME = f'referral_data-{ENV}'
+QUERY_ANALYTICS_TABLE_NAME = f'query_analytics-{ENV}'
+user_data_table = dynamodb.Table(USER_TABLE)
+table = dynamodb.Table(REFERRAL_TABLE_NAME)
 inference_profile_arn = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
 def extract_categories_and_zipcode(query: str) -> Dict[str, Any]:
@@ -159,33 +164,20 @@ def query_dynamodb_for_services(service_categories: Optional[List[str]], zipcode
     try:
         print(f"DEBUG - Input parameters: service_categories={service_categories}, zipcode={zipcode}")
 
-        if not zipcode and not service_categories:
-            print("DEBUG - No filters provided, returning empty results")
+        # Return empty results if either service_categories or zipcode is missing
+        if not zipcode or not service_categories:
+            print("DEBUG - Both service_categories and zipcode are required, returning empty results")
             return []
 
-        clean_zip = 0
-        # Process zipcode filter
-        if zipcode:
-            print("Inside Zipcode IF")
-            clean_zip = int(zipcode.strip())
+        clean_zip = int(zipcode.strip())
 
-        # Create FilterExpression with appropriate conditions
-        if service_categories and zipcode:
-            filter_expr = Attr('Service Category Type').is_in(service_categories) & Attr('Service Area Zip Code').eq(clean_zip)
-        elif service_categories:
-            filter_expr = Attr('Service Category Type').is_in(service_categories)
-        elif zipcode:
-            filter_expr = Attr('Service Area Zip Code').eq(clean_zip)
-        else:
-            filter_expr = None
+        # Create FilterExpression - we know both parameters are present at this point
+        filter_expr = Attr('Service Category Type').is_in(service_categories) & Attr('Service Area Zip Code').eq(clean_zip)
 
         # Execute the scan operation
-        if filter_expr:
-            response = table.scan(
-                FilterExpression=filter_expr,
-            )
-        else:
-            response = table.scan()
+        response = table.scan(
+            FilterExpression=filter_expr,
+        )
 
         logger.info(f"DEBUG - Filter expression response: {response}")
 
@@ -194,15 +186,10 @@ def query_dynamodb_for_services(service_categories: Optional[List[str]], zipcode
 
         # Handle pagination if necessary
         while 'LastEvaluatedKey' in response:
-            if filter_expr:
-                response = table.scan(
-                    FilterExpression=filter_expr,
-                    ExclusiveStartKey=response['LastEvaluatedKey']
-                )
-            else:
-                response = table.scan(
-                    ExclusiveStartKey=response['LastEvaluatedKey']
-                )
+            response = table.scan(
+                FilterExpression=filter_expr,
+                ExclusiveStartKey=response['LastEvaluatedKey']
+            )
             all_results.extend(response.get('Items', []))
 
         # The items from DynamoDB are already in the correct format
@@ -213,7 +200,6 @@ def query_dynamodb_for_services(service_categories: Optional[List[str]], zipcode
         print(f"Error in query_dynamodb_for_services: {str(e)}")
         print(traceback.format_exc())
         return []
-
 
 def format_response(services: List[Dict[str, Any]], service_categories: Optional[List[str]],
                     zipcode: Optional[str] = None, user_id: str = None) -> Dict[str, Any]:
@@ -344,7 +330,7 @@ def add_referrals_to_user_data(user_id: str, services: List[Dict[str, Any]]) -> 
         # Check if user exists in the database
         try:
             response = dynamodb_client.get_item(
-                TableName='user_data',
+                TableName=USER_TABLE,
                 Key={
                     'user_id': {'S': user_id}
                 }
@@ -400,7 +386,7 @@ def add_referrals_to_user_data(user_id: str, services: List[Dict[str, Any]]) -> 
 
                     # Create the new user record with the referrals map
                     dynamodb_client.put_item(
-                        TableName='user_data',
+                        TableName=USER_TABLE,
                         Item=user_item
                     )
                     print(f"Successfully created new user {user_id} with {len(referrals_map['M'])} referrals")
@@ -437,7 +423,7 @@ def add_referrals_to_user_data(user_id: str, services: List[Dict[str, Any]]) -> 
 
                     # Check if referrals map already exists
                     check_response = dynamodb_client.get_item(
-                        TableName='user_data',
+                        TableName=USER_TABLE,
                         Key={
                             'user_id': {'S': user_id}
                         },
@@ -449,7 +435,7 @@ def add_referrals_to_user_data(user_id: str, services: List[Dict[str, Any]]) -> 
                     if referrals_exists:
                         # Add new referral to existing referrals map
                         dynamodb_client.update_item(
-                            TableName='user_data',
+                            TableName=USER_TABLE,
                             Key={
                                 'user_id': {'S': user_id}
                             },
@@ -464,7 +450,7 @@ def add_referrals_to_user_data(user_id: str, services: List[Dict[str, Any]]) -> 
                     else:
                         # Create new referrals map with this referral
                         dynamodb_client.update_item(
-                            TableName='user_data',
+                            TableName=USER_TABLE,
                             Key={
                                 'user_id': {'S': user_id}
                             },

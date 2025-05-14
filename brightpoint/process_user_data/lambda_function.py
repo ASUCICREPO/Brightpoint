@@ -2,11 +2,14 @@ import json
 import boto3
 from botocore.exceptions import ClientError
 from datetime import datetime
+import os
 
 # Initialize the DynamoDB client
 dynamodb_client = boto3.client('dynamodb')
 # Initialize AWS Translate client
 translate_client = boto3.client('translate')
+ENV = os.environ.get('ENVIRONMENT', 'dev')
+USER_DATA_TABLE = f'user_data-{ENV}'
 
 def lambda_handler(event, context):
     """
@@ -307,7 +310,7 @@ def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, e
 
         # Get the user to verify existence
         response = dynamodb_client.get_item(
-            TableName='user_data',
+            TableName=USER_DATA_TABLE,
             Key={
                 'user_id': {'S': user_id}
             }
@@ -355,7 +358,7 @@ def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, e
 
             # Store feedback
             dynamodb_client.update_item(
-                TableName='user_data',
+                TableName=USER_DATA_TABLE,
                 Key={
                     'user_id': {'S': user_id}
                 },
@@ -439,7 +442,7 @@ def store_referral_feedback(user_id, referral_id, feedback):
     try:
         # Check if user and referral exist
         response = dynamodb_client.get_item(
-            TableName='user_data',
+            TableName=USER_DATA_TABLE,
             Key={
                 'user_id': {'S': user_id}
             }
@@ -463,7 +466,7 @@ def store_referral_feedback(user_id, referral_id, feedback):
         current_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         dynamodb_client.update_item(
-            TableName='user_data',
+            TableName=USER_DATA_TABLE,
             Key={
                 'user_id': {'S': user_id}
             },
@@ -525,7 +528,7 @@ def get_user_with_feedback_questions(user_id, language='english'):
 
         # Get the user from DynamoDB with native format
         response = dynamodb_client.get_item(
-            TableName='user_data',
+            TableName=USER_DATA_TABLE,
             Key={
                 'user_id': {'S': user_id}
             }
@@ -653,7 +656,7 @@ def get_user_with_feedback_questions(user_id, language='english'):
         if language != 'english':
             try:
                 dynamodb_client.update_item(
-                    TableName='user_data',
+                    TableName=USER_DATA_TABLE,
                     Key={
                         'user_id': {'S': user_id}
                     },
@@ -711,7 +714,7 @@ def create_or_update_user(user_id, zipcode, phone, email):
     try:
         # Check if user exists
         response = dynamodb_client.get_item(
-            TableName='user_data',
+            TableName=USER_DATA_TABLE,
             Key={
                 'user_id': {'S': user_id}
             }
@@ -740,7 +743,7 @@ def create_or_update_user(user_id, zipcode, phone, email):
                 update_expression = "SET " + ", ".join(update_expressions)
 
                 dynamodb_client.update_item(
-                    TableName='user_data',
+                    TableName=USER_DATA_TABLE,
                     Key={
                         'user_id': {'S': user_id}
                     },
@@ -765,7 +768,7 @@ def create_or_update_user(user_id, zipcode, phone, email):
                 item['Email'] = {'S': email}
 
             dynamodb_client.put_item(
-                TableName='user_data',
+                TableName=USER_DATA_TABLE,
                 Item=item
             )
 

@@ -29,10 +29,11 @@ api_gateway_management_client = None
 translate_client = boto3.client('translate')
 # Initialize DynamoDB client
 dynamodb_client = boto3.client('dynamodb')
-
+ENV = os.environ.get('ENVIRONMENT', 'dev')
+USER_TABLE = f'user_data-{ENV}'
 # Initialize AWS Lambda client for calling Perplexity Lambda
 lambda_client = boto3.client('lambda', region_name="us-east-1")
-PERPLEXITY_LAMBDA_ARN = "arn:aws:lambda:us-east-1:108782065617:function:perplexityLambda"
+PERPLEXITY_LAMBDA_ARN = "arn:aws:lambda:us-east-1:216989103356:function:perplexityLambda"
 
 def lambda_handler(event, context):
     """
@@ -54,6 +55,10 @@ def lambda_handler(event, context):
     logger.info(f"Received event: {json.dumps(event)}")
 
     try:
+        # Check if this is an async processing event
+        if event.get('action') == 'process_query_async':
+            return process_query_async(event, context)
+
         # Determine if this is a WebSocket event or REST API event
         if 'requestContext' in event and 'connectionId' in event.get('requestContext', {}):
             return handle_websocket_event(event, context)
@@ -67,123 +72,245 @@ def lambda_handler(event, context):
             'error': str(e)
         })
 
-def update_user_query_history(user_id, user_query, original_query, response_data, zipcode=None, language='english'):
+def process_query_websocket(event, connection_id, domain_name, stage, context):
     """
-    Update the user's query history in the user_data table
-
-    Args:
-        user_id (str): The ID of the user
-        user_query (str): The query in English
-        original_query (str): The original query in its original language
-        response_data (dict): The response data
-        zipcode (str, optional): User's zipcode
-        language (str): Language of the query
+    Process a query from WebSocket with immediate acknowledgment to prevent timeouts
     """
     try:
-        timestamp = datetime.now().isoformat()
-        query_id = str(uuid.uuid4())
+        # Parse body from the WebSocket message
+        body = json.loads(event.get('body', '{}'))
 
-        # Check if user exists
-        response = dynamodb_client.get_item(
-            TableName='user_data',
-            Key={
-                'user_id': {'S': user_id}
-            }
+        # Extract parameters
+        user_id = body.get('user_id')
+        user_query = body.get('user_query', '')
+        zipcode = body.get('zipcode')
+        language = body.get('language', 'english').lower()
+
+        logger.info(f"WebSocket query - User ID: {user_id}, Query: {user_query}, Language: {language}, zipcode: {zipcode}")
+
+        # Validate input
+        if not user_id:
+            error_message = 'Missing required parameter: user_id'
+            if language != 'english':
+                target_lang = get_language_code(language)
+                error_message = translate_text(error_message, "en", target_lang)
+
+            send_to_connection(connection_id, domain_name, stage, {
+                'error': error_message,
+                'language': language
+            })
+            return {'statusCode': 200}
+
+        if not user_query:
+            error_message = "I didn't receive a question. Please provide a query about services you're looking for."
+            if language != 'english':
+                target_lang = get_language_code(language)
+                error_message = translate_text(error_message, "en", target_lang)
+
+            send_to_connection(connection_id, domain_name, stage, {
+                'user_id': user_id,
+                'zipcode': zipcode,
+                'language': language,
+                'message': error_message
+            })
+            return {'statusCode': 200}
+
+        # Send immediate acknowledgment to prevent timeout
+        processing_message = "Your request is being processed. This may take a moment, please wait..."
+        if language == 'spanish':
+            processing_message = "Su solicitud está siendo procesada. Esto puede tomar un momento, por favor espere..."
+        elif language == 'polish':
+            processing_message = "Twoje zapytanie jest przetwarzane. To może chwilę potrwać, proszę czekać..."
+
+        # Check if connection is still valid before sending
+        if not send_to_connection(connection_id, domain_name, stage, {
+            'user_id': user_id,
+            'status': 'processing',
+            'message': processing_message,
+            'language': language,
+            'zipcode': zipcode
+        }):
+            logger.warning(f"Connection {connection_id} is no longer available")
+            return {'statusCode': 200}
+
+        # Prepare payload for async processing
+        async_payload = {
+            'action': 'process_query_async',
+            'original_event': event,
+            'connection_id': connection_id,
+            'domain_name': domain_name,
+            'stage': stage,
+            'body': body
+        }
+
+        # Invoke this same Lambda function asynchronously
+        lambda_client.invoke(
+            FunctionName=context.function_name,  # Same function
+            InvocationType='Event',  # Async invocation
+            Payload=json.dumps(async_payload)
         )
 
-        user_exists = 'Item' in response
+        logger.info(f"Invoked async processing for connection {connection_id}")
 
-        if user_exists:
-            # Check if queries map already exists
-            check_response = dynamodb_client.get_item(
-                TableName='user_data',
-                Key={
-                    'user_id': {'S': user_id}
-                },
-                ProjectionExpression='queries'
-            )
-
-            queries_exists = 'Item' in check_response and 'queries' in check_response['Item']
-
-            if queries_exists:
-                # Add to existing queries map
-                dynamodb_client.update_item(
-                    TableName='user_data',
-                    Key={
-                        'user_id': {'S': user_id}
-                    },
-                    UpdateExpression="SET queries.#qid = :qdata",
-                    ExpressionAttributeNames={
-                        '#qid': query_id
-                    },
-                    ExpressionAttributeValues={
-                        ':qdata': {
-                            'M': {
-                                'query': {'S': original_query},  # Store original query
-                                'english_query': {'S': user_query},  # Store English translation
-                                'timestamp': {'S': timestamp},
-                                'source': {'S': 'bedrock-agent'},
-                                'zipcode': {'S': zipcode if zipcode else "none"},
-                                'language': {'S': language},
-                                'response': {'S': json.dumps(response_data, cls=DecimalEncoder)}
-                            }
-                        }
-                    }
-                )
-            else:
-                # Create queries map with this query
-                dynamodb_client.update_item(
-                    TableName='user_data',
-                    Key={
-                        'user_id': {'S': user_id}
-                    },
-                    UpdateExpression="SET queries = :qmap",
-                    ExpressionAttributeValues={
-                        ':qmap': {
-                            'M': {
-                                query_id: {
-                                    'M': {
-                                        'query': {'S': original_query},  # Store original query
-                                        'english_query': {'S': user_query},  # Store English translation
-                                        'timestamp': {'S': timestamp},
-                                        'source': {'S': 'bedrock-agent'},
-                                        'zipcode': {'S': zipcode if zipcode else "none"},
-                                        'language': {'S': language},
-                                        'response': {'S': json.dumps(response_data, cls=DecimalEncoder)}
-                                    }
-                                }
-                            }
-                        }
-                    }
-                )
-        else:
-            # Create new user with query history
-            dynamodb_client.put_item(
-                TableName='user_data',
-                Item={
-                    'user_id': {'S': user_id},
-                    'queries': {
-                        'M': {
-                            query_id: {
-                                'M': {
-                                    'query': {'S': original_query},  # Store original query
-                                    'english_query': {'S': user_query},  # Store English translation
-                                    'timestamp': {'S': timestamp},
-                                    'source': {'S': 'bedrock-agent'},
-                                    'zipcode': {'S': zipcode if zipcode else "none"},
-                                    'language': {'S': language},
-                                    'response': {'S': json.dumps(response_data, cls=DecimalEncoder)}
-                                }
-                            }
-                        }
-                    }
-                }
-            )
-
-        logger.info(f"Successfully updated query history for user {user_id}")
+        # Return immediately to prevent timeout
+        return {'statusCode': 200}
 
     except Exception as e:
-        logger.error(f"Error updating user query history: {str(e)}")
+        logger.error(f"Error in process_query_websocket: {str(e)}")
+        logger.error(traceback.format_exc())
+
+        error_message = "I encountered an error while processing your request. Please try again or rephrase your question."
+        if 'language' in locals() and language != 'english':
+            target_lang = get_language_code(language)
+            error_message = translate_text(error_message, "en", target_lang)
+
+        error_response = {
+            'user_id': body.get('user_id', 'unknown') if 'body' in locals() else 'unknown',
+            'status': 'error',
+            'message': error_message,
+            'error': str(e)
+        }
+
+        try:
+            send_to_connection(connection_id, domain_name, stage, error_response)
+        except:
+            pass
+
+        return {'statusCode': 200}
+
+def process_query_async(event, context):
+    """
+    Process the query asynchronously (called by async Lambda invocation)
+    """
+    try:
+        # Extract parameters from the async event
+        original_event = event['original_event']
+        connection_id = event['connection_id']
+        domain_name = event['domain_name']
+        stage = event['stage']
+        body = event['body']
+
+        # Extract parameters
+        user_id = body.get('user_id')
+        user_query = body.get('user_query', '')
+        original_query = user_query
+        zipcode = body.get('zipcode')
+        language = body.get('language', 'english').lower()
+
+        logger.info(f"Async processing - User ID: {user_id}, Query: {user_query}, Language: {language}")
+
+        # Use bedrockAgent functions to get DynamoDB results
+        extracted_data = bedrockAgent.extract_categories_and_zipcode(user_query)
+
+        logger.info(f"WebSocket query - Extracted data: {extracted_data}")
+
+        service_categories = extracted_data.get('service_categories', [])
+        detected_zipcode = extracted_data.get('zipcode')
+
+        # Use provided zipcode if available, otherwise use detected zipcode
+        actual_zipcode = zipcode if zipcode else detected_zipcode
+
+        logger.info(f"Actual Zipcode is: {actual_zipcode}")
+
+        # Query DynamoDB for matching services
+        services = bedrockAgent.query_dynamodb_for_services(service_categories, actual_zipcode)
+        logger.info(f"Found {len(services)} matching services in DynamoDB")
+
+        # If services are found in DynamoDB, format and return them
+        if services and len(services) > 0:
+            logger.info("Returning results from DynamoDB")
+            response_data = bedrockAgent.format_response(services, service_categories, actual_zipcode, user_id)
+
+            # Update user query history
+            update_user_query_history(
+                user_id=user_id,
+                user_query=user_query,
+                original_query=original_query,
+                response_data=response_data,
+                zipcode=actual_zipcode,
+                language=language
+            )
+
+            # Translate response if needed
+            if language != 'english':
+                target_lang = get_language_code(language)
+                logger.info(f"Translating response to {language} ({target_lang})")
+                response_data = translate_response_data(response_data, target_lang)
+
+            # Send formatted response through WebSocket
+            if not send_to_connection(connection_id, domain_name, stage, {
+                'user_id': user_id,
+                'zipcode': actual_zipcode,
+                'language': language,
+                'status': 'complete',
+                'response_data': response_data
+            }):
+                logger.warning(f"Failed to send results - connection {connection_id} disconnected")
+
+            return {'statusCode': 200}
+        else:
+            # No services found in DynamoDB, call Perplexity Lambda as fallback
+            logger.info("No services found in DynamoDB, calling Perplexity Lambda")
+
+            # Send a status update before calling Perplexity
+            waiting_message = "Still searching for resources. Thank you for your patience..."
+            if language == 'spanish':
+                waiting_message = "Todavía buscando recursos. Gracias por su paciencia..."
+            elif language == 'polish':
+                waiting_message = "Wciąż szukam zasobów. Dziękuję za cierpliwość..."
+
+            if not send_to_connection(connection_id, domain_name, stage, {
+                'user_id': user_id,
+                'status': 'searching',
+                'message': waiting_message,
+                'language': language,
+                'zipcode': actual_zipcode
+            }):
+                logger.warning(f"Connection {connection_id} disconnected during search")
+                return {'statusCode': 200}
+
+            perplexity_response = call_perplexity_lambda(user_query, user_id, actual_zipcode, language)
+
+            # Parse and send Perplexity response
+            if 'body' in perplexity_response and isinstance(perplexity_response['body'], str):
+                try:
+                    response_body = json.loads(perplexity_response['body'])
+                    response_body['status'] = 'complete'
+                    if not send_to_connection(connection_id, domain_name, stage, response_body):
+                        logger.warning(f"Failed to send Perplexity results - connection {connection_id} disconnected")
+                except json.JSONDecodeError:
+                    perplexity_response['status'] = 'complete'
+                    if not send_to_connection(connection_id, domain_name, stage, perplexity_response):
+                        logger.warning(f"Failed to send Perplexity results - connection {connection_id} disconnected")
+            else:
+                perplexity_response['status'] = 'complete'
+                if not send_to_connection(connection_id, domain_name, stage, perplexity_response):
+                    logger.warning(f"Failed to send Perplexity results - connection {connection_id} disconnected")
+
+            return {'statusCode': 200}
+
+    except Exception as e:
+        logger.error(f"Error in async processing: {str(e)}")
+        logger.error(traceback.format_exc())
+
+        error_message = "I encountered an error while processing your request. The connection may have been lost. Please try again."
+        language = body.get('language', 'english').lower() if 'body' in locals() else 'english'
+
+        if language != 'english':
+            target_lang = get_language_code(language)
+            error_message = translate_text(error_message, "en", target_lang)
+
+        try:
+            send_to_connection(connection_id, domain_name, stage, {
+                'user_id': user_id if 'user_id' in locals() else 'unknown',
+                'status': 'error',
+                'message': error_message,
+                'error': str(e)
+            })
+        except:
+            logger.error("Failed to send error message - connection likely closed")
+
+        return {'statusCode': 200}
 
 def handle_websocket_event(event, context):
     """
@@ -209,8 +336,8 @@ def handle_websocket_event(event, context):
             return {'statusCode': 200, 'body': 'Disconnected'}
 
         elif route_key == 'query':
-            # Process a query request similar to REST API
-            return process_query_websocket(event, connection_id, domain_name, stage)
+            # Process a query request with async handling
+            return process_query_websocket(event, connection_id, domain_name, stage, context)
 
         else:
             # Unknown route
@@ -218,7 +345,7 @@ def handle_websocket_event(event, context):
             send_to_connection(connection_id, domain_name, stage, {
                 'error': f'Unknown route: {route_key}'
             })
-            return {'statusCode': 400, 'body': 'Unknown route'}
+            return {'statusCode': 200, 'body': 'Unknown route'}
 
     except Exception as e:
         logger.error(f"Error handling WebSocket event: {str(e)}")
@@ -233,7 +360,168 @@ def handle_websocket_event(event, context):
         except Exception as send_error:
             logger.error(f"Error sending error message: {str(send_error)}")
 
-        return {'statusCode': 500, 'body': 'Internal server error'}
+        return {'statusCode': 200, 'body': 'Error handled'}
+
+def send_to_connection(connection_id, domain_name, stage, data):
+    """
+    Send a message to a WebSocket connection with proper disconnection handling
+
+    Returns:
+        bool: True if message was sent successfully, False if connection is gone
+    """
+    global api_gateway_management_client
+
+    # Convert any Decimal values before serialization
+    data = convert_decimal(data)
+
+    # Initialize the client if needed
+    if not api_gateway_management_client:
+        endpoint_url = f"https://{domain_name}/{stage}"
+        api_gateway_management_client = boto3.client(
+            'apigatewaymanagementapi',
+            endpoint_url=endpoint_url
+        )
+
+    # Send the message
+    try:
+        # Use DecimalEncoder for JSON serialization
+        api_gateway_management_client.post_to_connection(
+            ConnectionId=connection_id,
+            Data=json.dumps(data, cls=DecimalEncoder).encode('utf-8')
+        )
+        logger.info(f"Message sent to connection {connection_id}")
+        return True
+    except Exception as e:
+        # Check if connection is gone
+        if hasattr(e, 'response') and e.response.get('ResponseMetadata', {}).get('HTTPStatusCode') == 410:
+            logger.warning(f"Connection {connection_id} is gone (410)")
+            # Try to inform the client if possible
+            return False
+        elif 'GoneException' in str(type(e)):
+            logger.warning(f"Connection {connection_id} is gone (GoneException)")
+            return False
+        else:
+            logger.error(f"Error sending message to connection {connection_id}: {str(e)}")
+            # Don't re-raise to avoid Lambda errors, but return False
+            return False
+
+def update_user_query_history(user_id, user_query, original_query, response_data, zipcode=None, language='english'):
+    """
+    Update the user's query history in the user_data table
+
+    Args:
+        user_id (str): The ID of the user
+        user_query (str): The query in English
+        original_query (str): The original query in its original language
+        response_data (dict): The response data
+        zipcode (str, optional): User's zipcode
+        language (str): Language of the query
+    """
+    try:
+        timestamp = datetime.now().isoformat()
+        query_id = str(uuid.uuid4())
+
+        # Check if user exists
+        response = dynamodb_client.get_item(
+            TableName=USER_TABLE,
+            Key={
+                'user_id': {'S': user_id}
+            }
+        )
+
+        user_exists = 'Item' in response
+
+        if user_exists:
+            # Check if queries map already exists
+            check_response = dynamodb_client.get_item(
+                TableName=USER_TABLE,
+                Key={
+                    'user_id': {'S': user_id}
+                },
+                ProjectionExpression='queries'
+            )
+
+            queries_exists = 'Item' in check_response and 'queries' in check_response['Item']
+
+            if queries_exists:
+                # Add to existing queries map
+                dynamodb_client.update_item(
+                    TableName=USER_TABLE,
+                    Key={
+                        'user_id': {'S': user_id}
+                    },
+                    UpdateExpression="SET queries.#qid = :qdata",
+                    ExpressionAttributeNames={
+                        '#qid': query_id
+                    },
+                    ExpressionAttributeValues={
+                        ':qdata': {
+                            'M': {
+                                'query': {'S': original_query},  # Store original query
+                                'english_query': {'S': user_query},  # Store English translation
+                                'timestamp': {'S': timestamp},
+                                'source': {'S': 'bedrock-agent'},
+                                'zipcode': {'S': zipcode if zipcode else "none"},
+                                'language': {'S': language},
+                                'response': {'S': json.dumps(response_data, cls=DecimalEncoder)}
+                            }
+                        }
+                    }
+                )
+            else:
+                # Create queries map with this query
+                dynamodb_client.update_item(
+                    TableName=USER_TABLE,
+                    Key={
+                        'user_id': {'S': user_id}
+                    },
+                    UpdateExpression="SET queries = :qmap",
+                    ExpressionAttributeValues={
+                        ':qmap': {
+                            'M': {
+                                query_id: {
+                                    'M': {
+                                        'query': {'S': original_query},  # Store original query
+                                        'english_query': {'S': user_query},  # Store English translation
+                                        'timestamp': {'S': timestamp},
+                                        'source': {'S': 'bedrock-agent'},
+                                        'zipcode': {'S': zipcode if zipcode else "none"},
+                                        'language': {'S': language},
+                                        'response': {'S': json.dumps(response_data, cls=DecimalEncoder)}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                )
+        else:
+            # Create new user with query history
+            dynamodb_client.put_item(
+                TableName=USER_TABLE,
+                Item={
+                    'user_id': {'S': user_id},
+                    'queries': {
+                        'M': {
+                            query_id: {
+                                'M': {
+                                    'query': {'S': original_query},  # Store original query
+                                    'english_query': {'S': user_query},  # Store English translation
+                                    'timestamp': {'S': timestamp},
+                                    'source': {'S': 'bedrock-agent'},
+                                    'zipcode': {'S': zipcode if zipcode else "none"},
+                                    'language': {'S': language},
+                                    'response': {'S': json.dumps(response_data, cls=DecimalEncoder)}
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+
+        logger.info(f"Successfully updated query history for user {user_id}")
+
+    except Exception as e:
+        logger.error(f"Error updating user query history: {str(e)}")
 
 def translate_text(text, source_language, target_language):
     """
@@ -407,173 +695,6 @@ def call_perplexity_lambda(user_query, user_id, zipcode=None, language='english'
         logger.error(f"Error calling Perplexity Lambda: {str(e)}")
         logger.error(traceback.format_exc())
         return {"statusCode": 500, "body": json.dumps({"status": "error", "message": f"Error calling Perplexity service: {str(e)}"})}
-
-def process_query_websocket(event, connection_id, domain_name, stage):
-    """
-    Process a query from WebSocket and send the result back
-    """
-    try:
-        # Parse body from the WebSocket message
-        body = json.loads(event.get('body', '{}'))
-
-        # Extract parameters
-        user_id = body.get('user_id')
-        user_query = body.get('user_query', '')
-        original_query = user_query  # Save original query before any translation
-        zipcode = body.get('zipcode')
-        language = body.get('language', 'english').lower()  # Default to English
-
-        logger.info(f"WebSocket query - User ID: {user_id}, Query: {user_query}, Language: {language}")
-
-        # Validate input
-        if not user_id:
-            error_message = 'Missing required parameter: user_id'
-            if language != 'english':
-                target_lang = get_language_code(language)
-                error_message = translate_text(error_message, "en", target_lang)
-
-            send_to_connection(connection_id, domain_name, stage, {
-                'error': error_message
-            })
-            return {'statusCode': 400, 'body': 'Missing user_id'}
-
-        if not user_query:
-            error_message = "I didn't receive a question. Please provide a query about services you're looking for."
-            # Translate error message if needed
-            if language != 'english':
-                target_lang = get_language_code(language)
-                error_message = translate_text(error_message, "en", target_lang)
-
-            send_to_connection(connection_id, domain_name, stage, {
-                'user_id': user_id,
-                'zipcode': zipcode,
-                'language': language,
-                'message': error_message
-            })
-            return {'statusCode': 400, 'body': 'Missing user_query'}
-
-        # Use bedrockAgent functions to get DynamoDB results
-        extracted_data = bedrockAgent.extract_categories_and_zipcode(user_query)
-
-        logger.info(f"Extracted data: {extracted_data}")
-
-        service_categories = extracted_data.get('service_categories', [])
-        detected_zipcode = extracted_data.get('zipcode')
-
-        # Use provided zipcode if available, otherwise use detected zipcode
-        actual_zipcode = zipcode if zipcode else detected_zipcode
-
-        logger.info(f"Actual Zipcode: {actual_zipcode}")
-
-        # Ensure zipcode is in the correct format for DynamoDB queries
-        if actual_zipcode and actual_zipcode.isdigit():
-            logger.info(f"Using numeric zipcode: {actual_zipcode}")
-        else:
-            logger.info(f"Zipcode format may not be numeric: {actual_zipcode}")
-
-        # Query DynamoDB for matching services
-        services = bedrockAgent.query_dynamodb_for_services(service_categories, actual_zipcode)
-        logger.info(f"Found {len(services)} matching services in DynamoDB")
-
-        # Log a sample service for debugging
-        if services and len(services) > 0:
-            logger.info(f"Service sample (first item): {json.dumps(services[0], cls=DecimalEncoder)}")
-
-        # If services are found in DynamoDB, format and return them
-        if services and len(services) > 0:
-            logger.info("Returning results from DynamoDB")
-            response_data = bedrockAgent.format_response(services, service_categories, actual_zipcode, user_id)
-
-            # Update user query history
-            update_user_query_history(
-                user_id=user_id,
-                user_query=user_query,
-                original_query=original_query,
-                response_data=response_data,
-                zipcode=actual_zipcode,
-                language=language
-            )
-
-            # Translate response if needed
-            if language != 'english':
-                target_lang = get_language_code(language)
-                logger.info(f"Translating response to {language} ({target_lang})")
-                response_data = translate_response_data(response_data, target_lang)
-
-            # Send formatted response through WebSocket
-            send_to_connection(connection_id, domain_name, stage, {
-                'user_id': user_id,
-                'zipcode': actual_zipcode,
-                'language': language,
-                'response_data': response_data
-            })
-
-            return {'statusCode': 200, 'body': 'Query processed successfully'}
-        else:
-            # No services found in DynamoDB, call Perplexity Lambda as fallback
-            logger.info("No services found in DynamoDB, calling Perplexity Lambda")
-            perplexity_response = call_perplexity_lambda(user_query, user_id, actual_zipcode, language)
-
-            # Send Perplexity response through WebSocket
-            send_to_connection(connection_id, domain_name, stage, perplexity_response)
-
-            return {'statusCode': 200, 'body': 'Query processed successfully with Perplexity fallback'}
-
-    except Exception as e:
-        logger.error(f"Error processing WebSocket query: {str(e)}")
-        logger.error(traceback.format_exc())
-
-        error_message = 'Error processing query'
-        # Translate error message if needed
-        if 'language' in locals() and language != 'english':
-            target_lang = get_language_code(language)
-            error_message = translate_text(error_message, "en", target_lang)
-
-        send_to_connection(connection_id, domain_name, stage, {
-            'error': error_message,
-            'message': str(e)
-        })
-
-        return {'statusCode': 500, 'body': 'Error processing query'}
-
-def send_to_connection(connection_id, domain_name, stage, data):
-    """
-    Send a message to a WebSocket connection
-
-    Args:
-        connection_id (str): The connection ID
-        domain_name (str): API Gateway domain name
-        stage (str): API Gateway stage
-        data (dict): Data to send
-    """
-    global api_gateway_management_client
-
-    # Convert any Decimal values before serialization
-    data = convert_decimal(data)
-
-    # Initialize the client if needed
-    if not api_gateway_management_client:
-        endpoint_url = f"https://{domain_name}/{stage}"
-        api_gateway_management_client = boto3.client(
-            'apigatewaymanagementapi',
-            endpoint_url=endpoint_url
-        )
-
-    # Send the message
-    try:
-        # Use DecimalEncoder for JSON serialization
-        api_gateway_management_client.post_to_connection(
-            ConnectionId=connection_id,
-            Data=json.dumps(data, cls=DecimalEncoder).encode('utf-8')
-        )
-        logger.info(f"Message sent to connection {connection_id}")
-    except Exception as e:
-        # Connection might be stale
-        if hasattr(e, 'response') and e.response.get('ResponseMetadata', {}).get('HTTPStatusCode') == 410:
-            logger.warning(f"Connection {connection_id} is gone")
-        else:
-            logger.error(f"Error sending message to connection {connection_id}: {str(e)}")
-            raise e
 
 def handle_rest_event(event, context):
     """

@@ -1,0 +1,6417 @@
+{
+ "Description": "Brightpoint Referral Chatbot infrastructure - dev",
+ "Resources": {
+  "WebSocketConnectionsTable7F0028CC": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "connectionId",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "connectionId",
+      "KeyType": "HASH"
+     }
+    ],
+    "TableName": "WebSocketConnections-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/WebSocketConnectionsTable/Resource"
+   }
+  },
+  "perplexityquerycacheTable9E120D0C": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "query_id",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "query_id",
+      "KeyType": "HASH"
+     }
+    ],
+    "TableName": "perplexity_query_cache-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/perplexity_query_cacheTable/Resource"
+   }
+  },
+  "queryanalyticsTableC6CEA252": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "query_text",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "Zipcode",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "query_text",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "Zipcode",
+      "KeyType": "RANGE"
+     }
+    ],
+    "TableName": "query_analytics-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/query_analyticsTable/Resource"
+   }
+  },
+  "referraldataTable5ABDFEB4": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "referral_id",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "referral_id",
+      "KeyType": "HASH"
+     }
+    ],
+    "TableName": "referral_data-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/referral_dataTable/Resource"
+   }
+  },
+  "userdataTableB31622A0": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "user_id",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "Phone",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "Phone-index",
+      "KeySchema": [
+       {
+        "AttributeName": "Phone",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "user_id",
+      "KeyType": "HASH"
+     }
+    ],
+    "StreamSpecification": {
+     "StreamViewType": "NEW_AND_OLD_IMAGES"
+    },
+    "TableName": "user_data-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/user_dataTable/Resource"
+   }
+  },
+  "BrightpointUserPoolF24B41F9": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "AccountRecoverySetting": {
+     "RecoveryMechanisms": [
+      {
+       "Name": "verified_email",
+       "Priority": 1
+      }
+     ]
+    },
+    "AdminCreateUserConfig": {
+     "AllowAdminCreateUserOnly": false
+    },
+    "AutoVerifiedAttributes": [
+     "email"
+    ],
+    "EmailVerificationMessage": "The verification code to your new account is {####}",
+    "EmailVerificationSubject": "Verify your new account",
+    "SmsVerificationMessage": "The verification code to your new account is {####}",
+    "UserPoolName": "BrightpointUserPool-dev",
+    "UserPoolTags": {
+     "Application": "Brightpoint",
+     "Environment": "dev"
+    },
+    "UsernameAttributes": [
+     "email"
+    ],
+    "VerificationMessageTemplate": {
+     "DefaultEmailOption": "CONFIRM_WITH_CODE",
+     "EmailMessage": "The verification code to your new account is {####}",
+     "EmailSubject": "Verify your new account",
+     "SmsMessage": "The verification code to your new account is {####}"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/BrightpointUserPool/Resource"
+   }
+  },
+  "BrightpointUserPoolClient3A182275": {
+   "Type": "AWS::Cognito::UserPoolClient",
+   "Properties": {
+    "AllowedOAuthFlows": [
+     "implicit",
+     "code"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true,
+    "AllowedOAuthScopes": [
+     "profile",
+     "phone",
+     "email",
+     "openid",
+     "aws.cognito.signin.user.admin"
+    ],
+    "CallbackURLs": [
+     "https://example.com"
+    ],
+    "ClientName": "BrightpointUserPoolClient-dev",
+    "ExplicitAuthFlows": [
+     "ALLOW_USER_PASSWORD_AUTH",
+     "ALLOW_REFRESH_TOKEN_AUTH"
+    ],
+    "GenerateSecret": false,
+    "SupportedIdentityProviders": [
+     "COGNITO"
+    ],
+    "UserPoolId": {
+     "Ref": "BrightpointUserPoolF24B41F9"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/BrightpointUserPoolClient/Resource"
+   }
+  },
+  "BrightpointIdentityPool": {
+   "Type": "AWS::Cognito::IdentityPool",
+   "Properties": {
+    "AllowUnauthenticatedIdentities": false,
+    "CognitoIdentityProviders": [
+     {
+      "ClientId": {
+       "Ref": "BrightpointUserPoolClient3A182275"
+      },
+      "ProviderName": {
+       "Fn::GetAtt": [
+        "BrightpointUserPoolF24B41F9",
+        "ProviderName"
+       ]
+      }
+     }
+    ],
+    "IdentityPoolName": "BrightpointIdentityPool-dev",
+    "IdentityPoolTags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/BrightpointIdentityPool"
+   }
+  },
+  "BrightpointManualAmplifyAppRole72173ABA": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "amplify.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/BrightpointManualAmplifyApp/Role/Resource"
+   }
+  },
+  "BrightpointManualAmplifyApp4DC32DC0": {
+   "Type": "AWS::Amplify::App",
+   "Properties": {
+    "BasicAuthConfig": {
+     "EnableBasicAuth": false
+    },
+    "Description": "Amplify App for manually deployed frontend - dev",
+    "EnableBranchAutoDeletion": false,
+    "IAMServiceRole": {
+     "Fn::GetAtt": [
+      "BrightpointManualAmplifyAppRole72173ABA",
+      "Arn"
+     ]
+    },
+    "Name": "brightpoint-dev-app",
+    "Platform": "WEB",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/BrightpointManualAmplifyApp/Resource"
+   }
+  },
+  "BrightpointManualAmplifyAppfrontendcode98B96F52": {
+   "Type": "AWS::Amplify::Branch",
+   "Properties": {
+    "AppId": {
+     "Fn::GetAtt": [
+      "BrightpointManualAmplifyApp4DC32DC0",
+      "AppId"
+     ]
+    },
+    "BranchName": "frontend-code",
+    "EnableAutoBuild": true,
+    "EnablePullRequestPreview": true,
+    "EnvironmentVariables": [
+     {
+      "Name": "REACT_APP_ENVIRONMENT",
+      "Value": "dev"
+     },
+     {
+      "Name": "REACT_APP_USER_POOL_ID",
+      "Value": {
+       "Ref": "BrightpointUserPoolF24B41F9"
+      }
+     },
+     {
+      "Name": "REACT_APP_USER_POOL_CLIENT_ID",
+      "Value": {
+       "Ref": "BrightpointUserPoolClient3A182275"
+      }
+     },
+     {
+      "Name": "REACT_APP_IDENTITY_POOL_ID",
+      "Value": {
+       "Ref": "BrightpointIdentityPool"
+      }
+     },
+     {
+      "Name": "REACT_APP_REGION",
+      "Value": "us-east-1"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/BrightpointManualAmplifyApp/frontend-code/Resource"
+   }
+  },
+  "ReferralChatbotRoleDD6FC688": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Role for Brightpoint Referral Chatbot Lambda function - dev",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "RoleName": "referralChatbotLambda-role-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotRole/Resource"
+   }
+  },
+  "ReferralChatbotRoleDefaultPolicyA7AF46B4": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "bedrock:InvokeModel",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "comprehend:DetectDominantLanguage",
+        "iam:GetRole",
+        "iam:ListRoles",
+        "s3:GetBucketLocation",
+        "s3:ListAllMyBuckets",
+        "s3:ListBucket",
+        "translate:*"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        "arn:aws:dynamodb:us-east-1:216989103356:table/referral_data*",
+        "arn:aws:dynamodb:us-east-1:216989103356:table/user_data*"
+       ]
+      },
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": "arn:aws:lambda:us-east-1:216989103356:function:perplexityLambda*"
+      },
+      {
+       "Action": "execute-api:ManageConnections",
+       "Effect": "Allow",
+       "Resource": "arn:aws:execute-api:*:*:*/*/POST/@connections/*"
+      },
+      {
+       "Action": "logs:CreateLogGroup",
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/referralChatbotLambda*:*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ReferralChatbotRoleDefaultPolicyA7AF46B4",
+    "Roles": [
+     {
+      "Ref": "ReferralChatbotRoleDD6FC688"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotRole/DefaultPolicy/Resource"
+   }
+  },
+  "PerplexityLambdaRoleF29E6D66": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Role for Perplexity Lambda function - dev",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "RoleName": "perplexityLambda-role-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/PerplexityLambdaRole/Resource"
+   }
+  },
+  "PerplexityLambdaRoleDefaultPolicyAE238026": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "comprehend:DetectDominantLanguage",
+        "dax:*",
+        "dynamodb:*",
+        "iam:GetRole",
+        "iam:ListRoles",
+        "s3:GetBucketLocation",
+        "s3:ListAllMyBuckets",
+        "s3:ListBucket",
+        "translate:*"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "logs:CreateLogGroup",
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/perplexityLambda*:*"
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:secretsmanager:us-east-1:216989103356:secret:perplexity_api_key-??????"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PerplexityLambdaRoleDefaultPolicyAE238026",
+    "Roles": [
+     {
+      "Ref": "PerplexityLambdaRoleF29E6D66"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/PerplexityLambdaRole/DefaultPolicy/Resource"
+   }
+  },
+  "ProcessUserDataRole3CAFEF38": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Role for Process User Data Lambda function - dev",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "RoleName": "LambdaUserDynamoDBRole-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ProcessUserDataRole/Resource"
+   }
+  },
+  "ProcessUserDataRoleDefaultPolicy552F74C9": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "comprehend:DetectDominantLanguage",
+        "dax:*",
+        "dynamodb:*",
+        "iam:GetRole",
+        "iam:ListRoles",
+        "s3:GetBucketLocation",
+        "s3:ListAllMyBuckets",
+        "s3:ListBucket",
+        "translate:*"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "execute-api:ManageConnections",
+       "Effect": "Allow",
+       "Resource": "arn:aws:execute-api:*:*:*/*/POST/@connections/*"
+      },
+      {
+       "Action": "logs:CreateLogGroup",
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/ProcessUserData*:*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ProcessUserDataRoleDefaultPolicy552F74C9",
+    "Roles": [
+     {
+      "Ref": "ProcessUserDataRole3CAFEF38"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ProcessUserDataRole/DefaultPolicy/Resource"
+   }
+  },
+  "QueryAnalyticsBackfillRole4F8F73C6": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Role for Query Analytics Backfill Lambda function - dev",
+    "RoleName": "query-analytics-backfill-role-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsBackfillRole/Resource"
+   }
+  },
+  "QueryAnalyticsBackfillRoleDefaultPolicy3EAE125F": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "application-autoscaling:DeleteScalingPolicy",
+        "application-autoscaling:DeregisterScalableTarget",
+        "application-autoscaling:DescribeScalableTargets",
+        "application-autoscaling:DescribeScalingActivities",
+        "application-autoscaling:DescribeScalingPolicies",
+        "application-autoscaling:PutScalingPolicy",
+        "application-autoscaling:RegisterScalableTarget",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:DescribeAlarmHistory",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DescribeAlarmsForMetric",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:PutMetricAlarm",
+        "datapipeline:ActivatePipeline",
+        "datapipeline:CreatePipeline",
+        "datapipeline:DeletePipeline",
+        "datapipeline:DescribeObjects",
+        "datapipeline:DescribePipelines",
+        "datapipeline:GetPipelineDefinition",
+        "datapipeline:ListPipelines",
+        "datapipeline:PutPipelineDefinition",
+        "datapipeline:QueryObjects",
+        "dax:*",
+        "dynamodb:*",
+        "dynamodb:DescribeStream",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:ListStreams",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "iam:GetRole",
+        "iam:ListRoles",
+        "kinesis:DescribeStream",
+        "kinesis:DescribeStreamSummary",
+        "kinesis:ListStreams",
+        "kms:DescribeKey",
+        "kms:ListAliases",
+        "lambda:CreateEventSourceMapping",
+        "lambda:CreateFunction",
+        "lambda:DeleteEventSourceMapping",
+        "lambda:DeleteFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:ListEventSourceMappings",
+        "lambda:ListFunctions",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "resource-groups:CreateGroup",
+        "resource-groups:DeleteGroup",
+        "resource-groups:GetGroup",
+        "resource-groups:GetGroupQuery",
+        "resource-groups:ListGroupResources",
+        "resource-groups:ListGroups",
+        "sns:CreateTopic",
+        "sns:DeleteTopic",
+        "sns:ListSubscriptions",
+        "sns:ListSubscriptionsByTopic",
+        "sns:ListTopics",
+        "sns:SetTopicAttributes",
+        "sns:Subscribe",
+        "sns:Unsubscribe",
+        "tag:GetResources"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "cloudwatch:GetInsightRuleReport",
+       "Effect": "Allow",
+       "Resource": "arn:aws:cloudwatch:*:*:insight-rule/DynamoDBContributorInsights*"
+      },
+      {
+       "Action": "iam:PassRole",
+       "Condition": {
+        "StringLike": {
+         "iam:PassedToService": [
+          "application-autoscaling.amazonaws.com",
+          "application-autoscaling.amazonaws.com.cn",
+          "dax.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "iam:CreateServiceLinkedRole",
+       "Condition": {
+        "StringEquals": {
+         "iam:AWSServiceName": [
+          "replication.dynamodb.amazonaws.com",
+          "dax.amazonaws.com",
+          "dynamodb.application-autoscaling.amazonaws.com",
+          "contributorinsights.dynamodb.amazonaws.com",
+          "kinesisreplication.dynamodb.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "logs:CreateLogGroup",
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/query-analytics-backfill*:*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "QueryAnalyticsBackfillRoleDefaultPolicy3EAE125F",
+    "Roles": [
+     {
+      "Ref": "QueryAnalyticsBackfillRole4F8F73C6"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsBackfillRole/DefaultPolicy/Resource"
+   }
+  },
+  "QueryAnalyticsApiRole4843455A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Role for Query Analytics API Lambda function - dev",
+    "RoleName": "query-analytics-api-role-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsApiRole/Resource"
+   }
+  },
+  "QueryAnalyticsApiRoleDefaultPolicy554AC0DA": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "application-autoscaling:DeleteScalingPolicy",
+        "application-autoscaling:DeregisterScalableTarget",
+        "application-autoscaling:DescribeScalableTargets",
+        "application-autoscaling:DescribeScalingActivities",
+        "application-autoscaling:DescribeScalingPolicies",
+        "application-autoscaling:PutScalingPolicy",
+        "application-autoscaling:RegisterScalableTarget",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:DescribeAlarmHistory",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DescribeAlarmsForMetric",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:PutMetricAlarm",
+        "datapipeline:ActivatePipeline",
+        "datapipeline:CreatePipeline",
+        "datapipeline:DeletePipeline",
+        "datapipeline:DescribeObjects",
+        "datapipeline:DescribePipelines",
+        "datapipeline:GetPipelineDefinition",
+        "datapipeline:ListPipelines",
+        "datapipeline:PutPipelineDefinition",
+        "datapipeline:QueryObjects",
+        "dax:*",
+        "dynamodb:*",
+        "dynamodb:DescribeStream",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:ListStreams",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "iam:GetRole",
+        "iam:ListRoles",
+        "kinesis:DescribeStream",
+        "kinesis:DescribeStreamSummary",
+        "kinesis:ListStreams",
+        "kms:DescribeKey",
+        "kms:ListAliases",
+        "lambda:CreateEventSourceMapping",
+        "lambda:CreateFunction",
+        "lambda:DeleteEventSourceMapping",
+        "lambda:DeleteFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:ListEventSourceMappings",
+        "lambda:ListFunctions",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "resource-groups:CreateGroup",
+        "resource-groups:DeleteGroup",
+        "resource-groups:GetGroup",
+        "resource-groups:GetGroupQuery",
+        "resource-groups:ListGroupResources",
+        "resource-groups:ListGroups",
+        "sns:CreateTopic",
+        "sns:DeleteTopic",
+        "sns:ListSubscriptions",
+        "sns:ListSubscriptionsByTopic",
+        "sns:ListTopics",
+        "sns:SetTopicAttributes",
+        "sns:Subscribe",
+        "sns:Unsubscribe",
+        "tag:GetResources"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "cloudwatch:GetInsightRuleReport",
+       "Effect": "Allow",
+       "Resource": "arn:aws:cloudwatch:*:*:insight-rule/DynamoDBContributorInsights*"
+      },
+      {
+       "Action": "iam:PassRole",
+       "Condition": {
+        "StringLike": {
+         "iam:PassedToService": [
+          "application-autoscaling.amazonaws.com",
+          "application-autoscaling.amazonaws.com.cn",
+          "dax.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "iam:CreateServiceLinkedRole",
+       "Condition": {
+        "StringEquals": {
+         "iam:AWSServiceName": [
+          "replication.dynamodb.amazonaws.com",
+          "dax.amazonaws.com",
+          "dynamodb.application-autoscaling.amazonaws.com",
+          "contributorinsights.dynamodb.amazonaws.com",
+          "kinesisreplication.dynamodb.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "logs:CreateLogGroup",
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/query-analytics-api*:*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "QueryAnalyticsApiRoleDefaultPolicy554AC0DA",
+    "Roles": [
+     {
+      "Ref": "QueryAnalyticsApiRole4843455A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsApiRole/DefaultPolicy/Resource"
+   }
+  },
+  "ReferralsApiHandlerRoleEF1D513A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Role for Referrals API Handler Lambda function - dev",
+    "RoleName": "ReferralsApiHandler-role-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApiHandlerRole/Resource"
+   }
+  },
+  "ReferralsApiHandlerRoleDefaultPolicy33785ED8": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "cloudwatch:GenerateQuery",
+        "logs:*"
+       ],
+       "Effect": "Allow",
+       "Resource": "*",
+       "Sid": "CloudWatchLogsFullAccess"
+      },
+      {
+       "Action": [
+        "application-autoscaling:DeleteScalingPolicy",
+        "application-autoscaling:DeregisterScalableTarget",
+        "application-autoscaling:DescribeScalableTargets",
+        "application-autoscaling:DescribeScalingActivities",
+        "application-autoscaling:DescribeScalingPolicies",
+        "application-autoscaling:PutScalingPolicy",
+        "application-autoscaling:RegisterScalableTarget",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:DescribeAlarmHistory",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DescribeAlarmsForMetric",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:PutMetricAlarm",
+        "datapipeline:ActivatePipeline",
+        "datapipeline:CreatePipeline",
+        "datapipeline:DeletePipeline",
+        "datapipeline:DescribeObjects",
+        "datapipeline:DescribePipelines",
+        "datapipeline:GetPipelineDefinition",
+        "datapipeline:ListPipelines",
+        "datapipeline:PutPipelineDefinition",
+        "datapipeline:QueryObjects",
+        "dax:*",
+        "dynamodb:*",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "iam:GetRole",
+        "iam:ListRoles",
+        "kinesis:DescribeStream",
+        "kinesis:DescribeStreamSummary",
+        "kinesis:ListStreams",
+        "kms:DescribeKey",
+        "kms:ListAliases",
+        "lambda:CreateEventSourceMapping",
+        "lambda:CreateFunction",
+        "lambda:DeleteEventSourceMapping",
+        "lambda:DeleteFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:ListEventSourceMappings",
+        "lambda:ListFunctions",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "resource-groups:CreateGroup",
+        "resource-groups:DeleteGroup",
+        "resource-groups:GetGroup",
+        "resource-groups:GetGroupQuery",
+        "resource-groups:ListGroupResources",
+        "resource-groups:ListGroups",
+        "sns:CreateTopic",
+        "sns:DeleteTopic",
+        "sns:ListSubscriptions",
+        "sns:ListSubscriptionsByTopic",
+        "sns:ListTopics",
+        "sns:SetTopicAttributes",
+        "sns:Subscribe",
+        "sns:Unsubscribe",
+        "tag:GetResources"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "cloudwatch:GetInsightRuleReport",
+       "Effect": "Allow",
+       "Resource": "arn:aws:cloudwatch:*:*:insight-rule/DynamoDBContributorInsights*"
+      },
+      {
+       "Action": "iam:PassRole",
+       "Condition": {
+        "StringLike": {
+         "iam:PassedToService": [
+          "application-autoscaling.amazonaws.com",
+          "application-autoscaling.amazonaws.com.cn",
+          "dax.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "iam:CreateServiceLinkedRole",
+       "Condition": {
+        "StringEquals": {
+         "iam:AWSServiceName": [
+          "replication.dynamodb.amazonaws.com",
+          "dax.amazonaws.com",
+          "dynamodb.application-autoscaling.amazonaws.com",
+          "contributorinsights.dynamodb.amazonaws.com",
+          "kinesisreplication.dynamodb.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:*:*:*"
+      },
+      {
+       "Action": [
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        "arn:aws:dynamodb:*:*:table/Referrals*",
+        "arn:aws:dynamodb:*:*:table/referral_data*"
+       ]
+      },
+      {
+       "Action": "execute-api:ManageConnections",
+       "Effect": "Allow",
+       "Resource": "arn:aws:execute-api:*:*:*/*/POST/@connections/*"
+      },
+      {
+       "Action": [
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:dynamodb:*:*:table/WebSocketConnections*"
+      },
+      {
+       "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:dynamodb:us-east-1:216989103356:table/referral_data*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ReferralsApiHandlerRoleDefaultPolicy33785ED8",
+    "Roles": [
+     {
+      "Ref": "ReferralsApiHandlerRoleEF1D513A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApiHandlerRole/DefaultPolicy/Resource"
+   }
+  },
+  "SmsChatIntegrationRoleDDE00F4D": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Role for SMS Chat Integration Lambda function - dev",
+    "RoleName": "smsChatIntegration-role-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/SmsChatIntegrationRole/Resource"
+   }
+  },
+  "SmsChatIntegrationRoleDefaultPolicy28D66DB5": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "apigateway:*",
+       "Effect": "Allow",
+       "Resource": "arn:aws:apigateway:*::/*"
+      },
+      {
+       "Action": "sns:*",
+       "Effect": "Allow",
+       "Resource": "*",
+       "Sid": "SNSFullAccess"
+      },
+      {
+       "Action": [
+        "sms-voice:CreateVerifiedDestinationNumber",
+        "sms-voice:DeleteOptedOutNumber",
+        "sms-voice:DeleteVerifiedDestinationNumber",
+        "sms-voice:DescribeAccountAttributes",
+        "sms-voice:DescribeOptedOutNumbers",
+        "sms-voice:DescribePhoneNumbers",
+        "sms-voice:DescribeSpendLimits",
+        "sms-voice:DescribeVerifiedDestinationNumbers",
+        "sms-voice:SendDestinationNumberVerificationCode",
+        "sms-voice:SendTextMessage",
+        "sms-voice:SetTextMessageSpendLimitOverride",
+        "sms-voice:VerifyDestinationNumber"
+       ],
+       "Condition": {
+        "StringEquals": {
+         "aws:CalledViaLast": "sns.amazonaws.com"
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*",
+       "Sid": "SMSAccessViaSNS"
+      },
+      {
+       "Action": [
+        "execute-api:Invoke",
+        "execute-api:ManageConnections"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:execute-api:*:*:*"
+      },
+      {
+       "Action": [
+        "application-autoscaling:DeleteScalingPolicy",
+        "application-autoscaling:DeregisterScalableTarget",
+        "application-autoscaling:DescribeScalableTargets",
+        "application-autoscaling:DescribeScalingActivities",
+        "application-autoscaling:DescribeScalingPolicies",
+        "application-autoscaling:PutScalingPolicy",
+        "application-autoscaling:RegisterScalableTarget",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:DescribeAlarmHistory",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DescribeAlarmsForMetric",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:PutMetricAlarm",
+        "datapipeline:ActivatePipeline",
+        "datapipeline:CreatePipeline",
+        "datapipeline:DeletePipeline",
+        "datapipeline:DescribeObjects",
+        "datapipeline:DescribePipelines",
+        "datapipeline:GetPipelineDefinition",
+        "datapipeline:ListPipelines",
+        "datapipeline:PutPipelineDefinition",
+        "datapipeline:QueryObjects",
+        "dax:*",
+        "dynamodb:*",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "iam:GetRole",
+        "iam:ListRoles",
+        "kinesis:DescribeStream",
+        "kinesis:DescribeStreamSummary",
+        "kinesis:ListStreams",
+        "kms:DescribeKey",
+        "kms:ListAliases",
+        "lambda:CreateEventSourceMapping",
+        "lambda:CreateFunction",
+        "lambda:DeleteEventSourceMapping",
+        "lambda:DeleteFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:ListEventSourceMappings",
+        "lambda:ListFunctions",
+        "resource-groups:CreateGroup",
+        "resource-groups:DeleteGroup",
+        "resource-groups:GetGroup",
+        "resource-groups:GetGroupQuery",
+        "resource-groups:ListGroupResources",
+        "resource-groups:ListGroups",
+        "sns:CreateTopic",
+        "sns:DeleteTopic",
+        "sns:ListSubscriptions",
+        "sns:ListSubscriptionsByTopic",
+        "sns:ListTopics",
+        "sns:SetTopicAttributes",
+        "sns:Subscribe",
+        "sns:Unsubscribe",
+        "tag:GetResources"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "cloudwatch:GetInsightRuleReport",
+       "Effect": "Allow",
+       "Resource": "arn:aws:cloudwatch:*:*:insight-rule/DynamoDBContributorInsights*"
+      },
+      {
+       "Action": "iam:PassRole",
+       "Condition": {
+        "StringLike": {
+         "iam:PassedToService": [
+          "application-autoscaling.amazonaws.com",
+          "application-autoscaling.amazonaws.com.cn",
+          "dax.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "iam:CreateServiceLinkedRole",
+       "Condition": {
+        "StringEquals": {
+         "iam:AWSServiceName": [
+          "replication.dynamodb.amazonaws.com",
+          "dax.amazonaws.com",
+          "dynamodb.application-autoscaling.amazonaws.com",
+          "contributorinsights.dynamodb.amazonaws.com",
+          "kinesisreplication.dynamodb.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "logs:CreateLogGroup",
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/smsChatIntegration*:*"
+      },
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Resource": "arn:aws:iam::514811724234:role/crossAccountPinpointAccess"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SmsChatIntegrationRoleDefaultPolicy28D66DB5",
+    "Roles": [
+     {
+      "Ref": "SmsChatIntegrationRoleDDE00F4D"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/SmsChatIntegrationRole/DefaultPolicy/Resource"
+   }
+  },
+  "QueryAnalyticsStreamProcessorRole29A40FE9": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "Role for Query Analytics Stream Processor Lambda function - dev",
+    "RoleName": "query-analytics-stream-processor-role-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsStreamProcessorRole/Resource"
+   }
+  },
+  "QueryAnalyticsStreamProcessorRoleDefaultPolicyC96B9CD2": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "application-autoscaling:DeleteScalingPolicy",
+        "application-autoscaling:DeregisterScalableTarget",
+        "application-autoscaling:DescribeScalableTargets",
+        "application-autoscaling:DescribeScalingActivities",
+        "application-autoscaling:DescribeScalingPolicies",
+        "application-autoscaling:PutScalingPolicy",
+        "application-autoscaling:RegisterScalableTarget",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:DescribeAlarmHistory",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DescribeAlarmsForMetric",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:PutMetricAlarm",
+        "datapipeline:ActivatePipeline",
+        "datapipeline:CreatePipeline",
+        "datapipeline:DeletePipeline",
+        "datapipeline:DescribeObjects",
+        "datapipeline:DescribePipelines",
+        "datapipeline:GetPipelineDefinition",
+        "datapipeline:ListPipelines",
+        "datapipeline:PutPipelineDefinition",
+        "datapipeline:QueryObjects",
+        "dax:*",
+        "dynamodb:*",
+        "dynamodb:DescribeStream",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:ListStreams",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "iam:GetRole",
+        "iam:ListRoles",
+        "kinesis:DescribeStream",
+        "kinesis:DescribeStreamSummary",
+        "kinesis:ListStreams",
+        "kms:DescribeKey",
+        "kms:ListAliases",
+        "lambda:CreateEventSourceMapping",
+        "lambda:CreateFunction",
+        "lambda:DeleteEventSourceMapping",
+        "lambda:DeleteFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:ListEventSourceMappings",
+        "lambda:ListFunctions",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "resource-groups:CreateGroup",
+        "resource-groups:DeleteGroup",
+        "resource-groups:GetGroup",
+        "resource-groups:GetGroupQuery",
+        "resource-groups:ListGroupResources",
+        "resource-groups:ListGroups",
+        "sns:CreateTopic",
+        "sns:DeleteTopic",
+        "sns:ListSubscriptions",
+        "sns:ListSubscriptionsByTopic",
+        "sns:ListTopics",
+        "sns:SetTopicAttributes",
+        "sns:Subscribe",
+        "sns:Unsubscribe",
+        "tag:GetResources"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "cloudwatch:GetInsightRuleReport",
+       "Effect": "Allow",
+       "Resource": "arn:aws:cloudwatch:*:*:insight-rule/DynamoDBContributorInsights*"
+      },
+      {
+       "Action": "iam:PassRole",
+       "Condition": {
+        "StringLike": {
+         "iam:PassedToService": [
+          "application-autoscaling.amazonaws.com",
+          "application-autoscaling.amazonaws.com.cn",
+          "dax.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "iam:CreateServiceLinkedRole",
+       "Condition": {
+        "StringEquals": {
+         "iam:AWSServiceName": [
+          "replication.dynamodb.amazonaws.com",
+          "dax.amazonaws.com",
+          "dynamodb.application-autoscaling.amazonaws.com",
+          "contributorinsights.dynamodb.amazonaws.com",
+          "kinesisreplication.dynamodb.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "logs:CreateLogGroup",
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/query-analytics-stream-processor*:*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "QueryAnalyticsStreamProcessorRoleDefaultPolicyC96B9CD2",
+    "Roles": [
+     {
+      "Ref": "QueryAnalyticsStreamProcessorRole29A40FE9"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsStreamProcessorRole/DefaultPolicy/Resource"
+   }
+  },
+  "ReferralChatbotLambdaFnC2AC6930": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Key": "ed3ffbae2324b7f0929729cca1a38a80673761240be0618ce10fba5669fc0014.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "ENVIRONMENT": "dev",
+      "REFERRAL_TABLE": "referral_data-dev",
+      "USER_TABLE": "user_data-dev"
+     }
+    },
+    "FunctionName": "referralChatbotLambda-dev",
+    "Handler": "referralChatbotLambda.lambda_handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "ReferralChatbotRoleDD6FC688",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ],
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "ReferralChatbotRoleDefaultPolicyA7AF46B4",
+    "ReferralChatbotRoleDD6FC688"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotLambdaFn/Resource",
+    "aws:asset:path": "asset.ed3ffbae2324b7f0929729cca1a38a80673761240be0618ce10fba5669fc0014",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ReferralChatbotLambdaFnAllowReferralChatbotAPIInvoke70FB3B94": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralChatbotLambdaFnC2AC6930",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralChatbotAPI978B0CF6"
+       },
+       "/*/POST/chat"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotLambdaFn/AllowReferralChatbotAPIInvoke"
+   }
+  },
+  "ReferralChatbotLambdaFnAllowReferralChatbotWebSocketInvoke7F09DE1A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralChatbotLambdaFnC2AC6930",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralChatbotWebSocket4AF2CD48"
+       },
+       "/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotLambdaFn/AllowReferralChatbotWebSocketInvoke"
+   }
+  },
+  "PerplexityLambdaFn263EE720": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Key": "314287476f1e775a638942dca09224acce80f83077242c864041548a74bb2d64.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "ENVIRONMENT": "dev",
+      "PERPLEXITY_API_KEY_SECRET_ARN": "arn:aws:secretsmanager:us-east-1:216989103356:secret:perplexity_api_key",
+      "CACHE_TABLE": "perplexity_query_cache-dev"
+     }
+    },
+    "FunctionName": "perplexityLambda-dev",
+    "Handler": "lambda_function.lambda_handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "PerplexityLambdaRoleF29E6D66",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ],
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "PerplexityLambdaRoleDefaultPolicyAE238026",
+    "PerplexityLambdaRoleF29E6D66"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/PerplexityLambdaFn/Resource",
+    "aws:asset:path": "asset.314287476f1e775a638942dca09224acce80f83077242c864041548a74bb2d64",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ProcessUserDataFn7B28A59E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Key": "e08596de10af3779e084603dfb5e8aed5da3c5db189d1d1e6be2c4f46893aa30.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "ENVIRONMENT": "dev",
+      "USER_TABLE": "user_data-dev",
+      "WEBSOCKET_TABLE": "WebSocketConnections-dev"
+     }
+    },
+    "FunctionName": "ProcessUserData-dev",
+    "Handler": "lambda_function.lambda_handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "ProcessUserDataRole3CAFEF38",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ],
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "ProcessUserDataRoleDefaultPolicy552F74C9",
+    "ProcessUserDataRole3CAFEF38"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ProcessUserDataFn/Resource",
+    "aws:asset:path": "asset.e08596de10af3779e084603dfb5e8aed5da3c5db189d1d1e6be2c4f46893aa30",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ProcessUserDataFnAllowCreateUserAPIInvoke7D4B1E51": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProcessUserDataFn7B28A59E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "createUserC6ED88E6"
+       },
+       "/*/POST/addUser"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ProcessUserDataFn/AllowCreateUserAPIInvoke"
+   }
+  },
+  "ProcessUserDataFnAllowUserFeedbackWebSocketInvoke5A8F919B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProcessUserDataFn7B28A59E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
+       },
+       "/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ProcessUserDataFn/AllowUserFeedbackWebSocketInvoke"
+   }
+  },
+  "QueryAnalyticsApiFn482A67B8": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Key": "d163344f845ef5794d840052bf02c3ab330d47d8a96945012b437979381f4119.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "ENVIRONMENT": "dev",
+      "ANALYTICS_TABLE": "query_analytics-dev"
+     }
+    },
+    "FunctionName": "query-analytics-api-dev",
+    "Handler": "lambda_function.lambda_handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsApiRole4843455A",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ],
+    "Timeout": 120
+   },
+   "DependsOn": [
+    "QueryAnalyticsApiRoleDefaultPolicy554AC0DA",
+    "QueryAnalyticsApiRole4843455A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsApiFn/Resource",
+    "aws:asset:path": "asset.d163344f845ef5794d840052bf02c3ab330d47d8a96945012b437979381f4119",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "QueryAnalyticsApiFnAllowQueryAnalyticsAPI1Invoke3DE1AA3B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsApiFn482A67B8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "QueryAnalyticsAPI12288DAE3"
+       },
+       "/*/POST/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsApiFn/AllowQueryAnalyticsAPI1Invoke"
+   }
+  },
+  "QueryAnalyticsApiFnAllowQueryAnalyticsAPI2InvokeD5541736": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsApiFn482A67B8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "QueryAnalyticsAPI2645EC6E1"
+       },
+       "/*/POST/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsApiFn/AllowQueryAnalyticsAPI2Invoke"
+   }
+  },
+  "QueryAnalyticsApiFnAllowAnalyticsWebSocketInvoke209CEE7C": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsApiFn482A67B8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "AnalyticsWebSocketAPI8F36832A"
+       },
+       "/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsApiFn/AllowAnalyticsWebSocketInvoke"
+   }
+  },
+  "ReferralsApiHandlerFn3A709788": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Key": "2bb799a09384f665dc5c9eff9ba628f979826d9477c82850b2d0504b925bdec0.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "ENVIRONMENT": "dev",
+      "REFERRAL_TABLE": "referral_data-dev",
+      "WEBSOCKET_TABLE": "WebSocketConnections-dev"
+     }
+    },
+    "FunctionName": "ReferralsApiHandler-dev",
+    "Handler": "lambda_function.lambda_handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerRoleEF1D513A",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ],
+    "Timeout": 120
+   },
+   "DependsOn": [
+    "ReferralsApiHandlerRoleDefaultPolicy33785ED8",
+    "ReferralsApiHandlerRoleEF1D513A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApiHandlerFn/Resource",
+    "aws:asset:path": "asset.2bb799a09384f665dc5c9eff9ba628f979826d9477c82850b2d0504b925bdec0",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ReferralsApiHandlerFnAllowReferralsAPIInvokeC339AA31": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApiHandlerFn/AllowReferralsAPIInvoke"
+   }
+  },
+  "ReferralsApiHandlerFnAllowReferralsWebSocketInvokeC5473DE4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsWebSocketAPI16F9DC58"
+       },
+       "/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApiHandlerFn/AllowReferralsWebSocketInvoke"
+   }
+  },
+  "QueryAnalyticsBackfillFn3DEFB3EC": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Key": "1e2ea28dd1059b4d8690844db5bf6ff9413bbb84b5866f14d5d2a750ab4869bf.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "ENVIRONMENT": "dev"
+     }
+    },
+    "FunctionName": "query-analytics-backfill-dev",
+    "Handler": "lambda_function.lambda_handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsBackfillRole4F8F73C6",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ],
+    "Timeout": 900
+   },
+   "DependsOn": [
+    "QueryAnalyticsBackfillRoleDefaultPolicy3EAE125F",
+    "QueryAnalyticsBackfillRole4F8F73C6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsBackfillFn/Resource",
+    "aws:asset:path": "asset.1e2ea28dd1059b4d8690844db5bf6ff9413bbb84b5866f14d5d2a750ab4869bf",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SmsChatIntegrationFnE64E832B": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Key": "b2570e986ae8444382bf03b67a0dc58732795289d4e7ca54affbfb1083783ea0.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "ENVIRONMENT": "dev",
+      "USER_TABLE_NAME": "user_data-dev",
+      "LOGIN_URL": "https://www.google.com/",
+      "PINPOINT_APPLICATION_ID": "38a47a3f1a734353a4621a2cf90ada0c",
+      "API_GATEWAY_URL": "https://pncxzrq0r9.execute-api.us-east-1.amazonaws.com/dev/chat",
+      "HTTP_TIMEOUT": "60",
+      "REGISTRATION_URL": "https://www.google.com/"
+     }
+    },
+    "FunctionName": "smsChatIntegration-dev",
+    "Handler": "lambda_function.lambda_handler",
+    "MemorySize": 2048,
+    "Role": {
+     "Fn::GetAtt": [
+      "SmsChatIntegrationRoleDDE00F4D",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ],
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "SmsChatIntegrationRoleDefaultPolicy28D66DB5",
+    "SmsChatIntegrationRoleDDE00F4D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/SmsChatIntegrationFn/Resource",
+    "aws:asset:path": "asset.b2570e986ae8444382bf03b67a0dc58732795289d4e7ca54affbfb1083783ea0",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SmsChatIntegrationFnAllowSNSInvokeE20E0893": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SmsChatIntegrationFnE64E832B",
+      "Arn"
+     ]
+    },
+    "Principal": "sns.amazonaws.com",
+    "SourceArn": "arn:aws:sns:us-east-1:514811724234:PinpointV3Stack-responselambdatwoWaySMStopicC0D976B7-ntcREJoZGzuH"
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/SmsChatIntegrationFn/AllowSNSInvoke"
+   }
+  },
+  "QueryAnalyticsStreamProcessorFnD029B018": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Key": "f6d58c19f005adbbb598da50bb467caf7ff24936d25d81f163c0afb7029eb5ee.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "ENVIRONMENT": "dev"
+     }
+    },
+    "FunctionName": "query-analytics-stream-processor-dev",
+    "Handler": "lambda_function.lambda_handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsStreamProcessorRole29A40FE9",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ],
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "QueryAnalyticsStreamProcessorRoleDefaultPolicyC96B9CD2",
+    "QueryAnalyticsStreamProcessorRole29A40FE9"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsStreamProcessorFn/Resource",
+    "aws:asset:path": "asset.f6d58c19f005adbbb598da50bb467caf7ff24936d25d81f163c0afb7029eb5ee",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "QueryAnalyticsStreamProcessorFnUserDataStreamMapping1704D309": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "BatchSize": 100,
+    "EventSourceArn": {
+     "Fn::GetAtt": [
+      "userdataTableB31622A0",
+      "StreamArn"
+     ]
+    },
+    "FunctionName": {
+     "Ref": "QueryAnalyticsStreamProcessorFnD029B018"
+    },
+    "MaximumRetryAttempts": 0,
+    "ParallelizationFactor": 1,
+    "StartingPosition": "LATEST",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsStreamProcessorFn/UserDataStreamMapping/Resource"
+   }
+  },
+  "UserDashboardAPIAB9DEF4E": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "User Dashboard API - dev",
+    "Name": "UserDashboardAPI-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserDashboardAPI/Resource"
+   }
+  },
+  "UserDashboardAPIDeployment08723AE8b25811d7eff89a40d359f95cd3dc2a28": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "User Dashboard API - dev",
+    "RestApiId": {
+     "Ref": "UserDashboardAPIAB9DEF4E"
+    }
+   },
+   "DependsOn": [
+    "UserDashboardAPIdashboardGETF7865FD6",
+    "UserDashboardAPIdashboardOPTIONSF14C5D41",
+    "UserDashboardAPIdashboard666C7B40",
+    "UserDashboardAPIOPTIONS71B2EA2B"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserDashboardAPI/Deployment/Resource"
+   }
+  },
+  "UserDashboardAPIDeploymentStagedev64521116": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "UserDashboardAPIDeployment08723AE8b25811d7eff89a40d359f95cd3dc2a28"
+    },
+    "MethodSettings": [
+     {
+      "DataTraceEnabled": true,
+      "HttpMethod": "*",
+      "LoggingLevel": "INFO",
+      "MetricsEnabled": true,
+      "ResourcePath": "/*"
+     }
+    ],
+    "RestApiId": {
+     "Ref": "UserDashboardAPIAB9DEF4E"
+    },
+    "StageName": "dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserDashboardAPI/DeploymentStage.dev/Resource"
+   }
+  },
+  "UserDashboardAPIOPTIONS71B2EA2B": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "UserDashboardAPIAB9DEF4E",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "UserDashboardAPIAB9DEF4E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserDashboardAPI/Default/OPTIONS/Resource"
+   }
+  },
+  "UserDashboardAPIdashboard666C7B40": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "UserDashboardAPIAB9DEF4E",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "dashboard",
+    "RestApiId": {
+     "Ref": "UserDashboardAPIAB9DEF4E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserDashboardAPI/Default/dashboard/Resource"
+   }
+  },
+  "UserDashboardAPIdashboardOPTIONSF14C5D41": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "UserDashboardAPIdashboard666C7B40"
+    },
+    "RestApiId": {
+     "Ref": "UserDashboardAPIAB9DEF4E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserDashboardAPI/Default/dashboard/OPTIONS/Resource"
+   }
+  },
+  "UserDashboardAPIdashboardGETApiPermissionBrightpointStackdevUserDashboardAPIC6386083GETdashboard90B5F4C3": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProcessUserDataFn7B28A59E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "UserDashboardAPIAB9DEF4E"
+       },
+       "/",
+       {
+        "Ref": "UserDashboardAPIDeploymentStagedev64521116"
+       },
+       "/GET/dashboard"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserDashboardAPI/Default/dashboard/GET/ApiPermission.BrightpointStackdevUserDashboardAPIC6386083.GET..dashboard"
+   }
+  },
+  "UserDashboardAPIdashboardGETApiPermissionTestBrightpointStackdevUserDashboardAPIC6386083GETdashboardEC13C230": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProcessUserDataFn7B28A59E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "UserDashboardAPIAB9DEF4E"
+       },
+       "/test-invoke-stage/GET/dashboard"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserDashboardAPI/Default/dashboard/GET/ApiPermission.Test.BrightpointStackdevUserDashboardAPIC6386083.GET..dashboard"
+   }
+  },
+  "UserDashboardAPIdashboardGETF7865FD6": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ProcessUserDataFn7B28A59E",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "UserDashboardAPIdashboard666C7B40"
+    },
+    "RestApiId": {
+     "Ref": "UserDashboardAPIAB9DEF4E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserDashboardAPI/Default/dashboard/GET/Resource"
+   }
+  },
+  "QueryAnalyticsAPI12288DAE3": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "Query Analytics API - All - dev",
+    "Name": "QueryAnalyticsAPI-All-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/Resource"
+   }
+  },
+  "QueryAnalyticsAPI1Deployment9BBE6C31094a17458519f1df1c997ab7f581295a": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Query Analytics API - All - dev",
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI12288DAE3"
+    }
+   },
+   "DependsOn": [
+    "QueryAnalyticsAPI1analyticsallOPTIONS366A897D",
+    "QueryAnalyticsAPI1analyticsallPOST19C61C9E",
+    "QueryAnalyticsAPI1analyticsall1EAB5259",
+    "QueryAnalyticsAPI1analyticsOPTIONSFC6165D4",
+    "QueryAnalyticsAPI1analytics225CDDD9",
+    "QueryAnalyticsAPI1OPTIONSE69B27B3"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/Deployment/Resource"
+   }
+  },
+  "QueryAnalyticsAPI1DeploymentStagedev1A1FE02C": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "QueryAnalyticsAPI1Deployment9BBE6C31094a17458519f1df1c997ab7f581295a"
+    },
+    "MethodSettings": [
+     {
+      "DataTraceEnabled": true,
+      "HttpMethod": "*",
+      "LoggingLevel": "INFO",
+      "MetricsEnabled": true,
+      "ResourcePath": "/*"
+     }
+    ],
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI12288DAE3"
+    },
+    "StageName": "dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/DeploymentStage.dev/Resource"
+   }
+  },
+  "QueryAnalyticsAPI1OPTIONSE69B27B3": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsAPI12288DAE3",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI12288DAE3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/Default/OPTIONS/Resource"
+   }
+  },
+  "QueryAnalyticsAPI1analytics225CDDD9": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsAPI12288DAE3",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "analytics",
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI12288DAE3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/Default/analytics/Resource"
+   }
+  },
+  "QueryAnalyticsAPI1analyticsOPTIONSFC6165D4": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "QueryAnalyticsAPI1analytics225CDDD9"
+    },
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI12288DAE3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/Default/analytics/OPTIONS/Resource"
+   }
+  },
+  "QueryAnalyticsAPI1analyticsall1EAB5259": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "QueryAnalyticsAPI1analytics225CDDD9"
+    },
+    "PathPart": "all",
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI12288DAE3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/Default/analytics/all/Resource"
+   }
+  },
+  "QueryAnalyticsAPI1analyticsallOPTIONS366A897D": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "QueryAnalyticsAPI1analyticsall1EAB5259"
+    },
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI12288DAE3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/Default/analytics/all/OPTIONS/Resource"
+   }
+  },
+  "QueryAnalyticsAPI1analyticsallPOSTApiPermissionBrightpointStackdevQueryAnalyticsAPI12F4386ABPOSTanalyticsall21B68955": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsApiFn482A67B8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "QueryAnalyticsAPI12288DAE3"
+       },
+       "/",
+       {
+        "Ref": "QueryAnalyticsAPI1DeploymentStagedev1A1FE02C"
+       },
+       "/POST/analytics/all"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/Default/analytics/all/POST/ApiPermission.BrightpointStackdevQueryAnalyticsAPI12F4386AB.POST..analytics.all"
+   }
+  },
+  "QueryAnalyticsAPI1analyticsallPOSTApiPermissionTestBrightpointStackdevQueryAnalyticsAPI12F4386ABPOSTanalyticsall53A270A4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsApiFn482A67B8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "QueryAnalyticsAPI12288DAE3"
+       },
+       "/test-invoke-stage/POST/analytics/all"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/Default/analytics/all/POST/ApiPermission.Test.BrightpointStackdevQueryAnalyticsAPI12F4386AB.POST..analytics.all"
+   }
+  },
+  "QueryAnalyticsAPI1analyticsallPOST19C61C9E": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "QueryAnalyticsApiFn482A67B8",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "QueryAnalyticsAPI1analyticsall1EAB5259"
+    },
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI12288DAE3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI1/Default/analytics/all/POST/Resource"
+   }
+  },
+  "QueryAnalyticsAPI2645EC6E1": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "Query Analytics API - Queries - dev",
+    "Name": "QueryAnalyticsAPI-Queries-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/Resource"
+   }
+  },
+  "QueryAnalyticsAPI2Deployment458DEAB483aab36d075c580583582e0a517c4f31": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Query Analytics API - Queries - dev",
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI2645EC6E1"
+    }
+   },
+   "DependsOn": [
+    "QueryAnalyticsAPI2analyticsOPTIONS3EAA0234",
+    "QueryAnalyticsAPI2analyticsqueriesOPTIONS383E974A",
+    "QueryAnalyticsAPI2analyticsqueriesPOSTEFD9A8C7",
+    "QueryAnalyticsAPI2analyticsqueries99C84E2D",
+    "QueryAnalyticsAPI2analytics0FAD754F",
+    "QueryAnalyticsAPI2OPTIONSED42EE57"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/Deployment/Resource"
+   }
+  },
+  "QueryAnalyticsAPI2DeploymentStagedev3CEBBE56": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "QueryAnalyticsAPI2Deployment458DEAB483aab36d075c580583582e0a517c4f31"
+    },
+    "MethodSettings": [
+     {
+      "DataTraceEnabled": true,
+      "HttpMethod": "*",
+      "LoggingLevel": "INFO",
+      "MetricsEnabled": true,
+      "ResourcePath": "/*"
+     }
+    ],
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI2645EC6E1"
+    },
+    "StageName": "dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/DeploymentStage.dev/Resource"
+   }
+  },
+  "QueryAnalyticsAPI2OPTIONSED42EE57": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsAPI2645EC6E1",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI2645EC6E1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/Default/OPTIONS/Resource"
+   }
+  },
+  "QueryAnalyticsAPI2analytics0FAD754F": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsAPI2645EC6E1",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "analytics",
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI2645EC6E1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/Default/analytics/Resource"
+   }
+  },
+  "QueryAnalyticsAPI2analyticsOPTIONS3EAA0234": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "QueryAnalyticsAPI2analytics0FAD754F"
+    },
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI2645EC6E1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/Default/analytics/OPTIONS/Resource"
+   }
+  },
+  "QueryAnalyticsAPI2analyticsqueries99C84E2D": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "QueryAnalyticsAPI2analytics0FAD754F"
+    },
+    "PathPart": "queries",
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI2645EC6E1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/Default/analytics/queries/Resource"
+   }
+  },
+  "QueryAnalyticsAPI2analyticsqueriesOPTIONS383E974A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "QueryAnalyticsAPI2analyticsqueries99C84E2D"
+    },
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI2645EC6E1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/Default/analytics/queries/OPTIONS/Resource"
+   }
+  },
+  "QueryAnalyticsAPI2analyticsqueriesPOSTApiPermissionBrightpointStackdevQueryAnalyticsAPI25DC5C108POSTanalyticsqueriesBA43F3B8": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsApiFn482A67B8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "QueryAnalyticsAPI2645EC6E1"
+       },
+       "/",
+       {
+        "Ref": "QueryAnalyticsAPI2DeploymentStagedev3CEBBE56"
+       },
+       "/POST/analytics/queries"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/Default/analytics/queries/POST/ApiPermission.BrightpointStackdevQueryAnalyticsAPI25DC5C108.POST..analytics.queries"
+   }
+  },
+  "QueryAnalyticsAPI2analyticsqueriesPOSTApiPermissionTestBrightpointStackdevQueryAnalyticsAPI25DC5C108POSTanalyticsqueriesF1E975C0": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsApiFn482A67B8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "QueryAnalyticsAPI2645EC6E1"
+       },
+       "/test-invoke-stage/POST/analytics/queries"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/Default/analytics/queries/POST/ApiPermission.Test.BrightpointStackdevQueryAnalyticsAPI25DC5C108.POST..analytics.queries"
+   }
+  },
+  "QueryAnalyticsAPI2analyticsqueriesPOSTEFD9A8C7": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "QueryAnalyticsApiFn482A67B8",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "QueryAnalyticsAPI2analyticsqueries99C84E2D"
+    },
+    "RestApiId": {
+     "Ref": "QueryAnalyticsAPI2645EC6E1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/QueryAnalyticsAPI2/Default/analytics/queries/POST/Resource"
+   }
+  },
+  "createUserC6ED88E6": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "Create User API - dev",
+    "Name": "createUser-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/createUser/Resource"
+   }
+  },
+  "createUserDeployment294A82B4a31647d1c81a96e0a371105e57337208": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Create User API - dev",
+    "RestApiId": {
+     "Ref": "createUserC6ED88E6"
+    }
+   },
+   "DependsOn": [
+    "createUseraddUserOPTIONSC13FE992",
+    "createUseraddUserPOSTB281B83C",
+    "createUseraddUser409049C7",
+    "createUserOPTIONS2ACEF464"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/createUser/Deployment/Resource"
+   }
+  },
+  "createUserDeploymentStagedev7349550C": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "createUserDeployment294A82B4a31647d1c81a96e0a371105e57337208"
+    },
+    "MethodSettings": [
+     {
+      "DataTraceEnabled": true,
+      "HttpMethod": "*",
+      "LoggingLevel": "INFO",
+      "MetricsEnabled": true,
+      "ResourcePath": "/*"
+     }
+    ],
+    "RestApiId": {
+     "Ref": "createUserC6ED88E6"
+    },
+    "StageName": "dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/createUser/DeploymentStage.dev/Resource"
+   }
+  },
+  "createUserOPTIONS2ACEF464": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "createUserC6ED88E6",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "createUserC6ED88E6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/createUser/Default/OPTIONS/Resource"
+   }
+  },
+  "createUseraddUser409049C7": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "createUserC6ED88E6",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "addUser",
+    "RestApiId": {
+     "Ref": "createUserC6ED88E6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/createUser/Default/addUser/Resource"
+   }
+  },
+  "createUseraddUserOPTIONSC13FE992": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "createUseraddUser409049C7"
+    },
+    "RestApiId": {
+     "Ref": "createUserC6ED88E6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/createUser/Default/addUser/OPTIONS/Resource"
+   }
+  },
+  "createUseraddUserPOSTApiPermissionBrightpointStackdevcreateUserE1E7718BPOSTaddUser12F1B2E8": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProcessUserDataFn7B28A59E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "createUserC6ED88E6"
+       },
+       "/",
+       {
+        "Ref": "createUserDeploymentStagedev7349550C"
+       },
+       "/POST/addUser"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/createUser/Default/addUser/POST/ApiPermission.BrightpointStackdevcreateUserE1E7718B.POST..addUser"
+   }
+  },
+  "createUseraddUserPOSTApiPermissionTestBrightpointStackdevcreateUserE1E7718BPOSTaddUserE028E8B2": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProcessUserDataFn7B28A59E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "createUserC6ED88E6"
+       },
+       "/test-invoke-stage/POST/addUser"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/createUser/Default/addUser/POST/ApiPermission.Test.BrightpointStackdevcreateUserE1E7718B.POST..addUser"
+   }
+  },
+  "createUseraddUserPOSTB281B83C": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ProcessUserDataFn7B28A59E",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "createUseraddUser409049C7"
+    },
+    "RestApiId": {
+     "Ref": "createUserC6ED88E6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/createUser/Default/addUser/POST/Resource"
+   }
+  },
+  "ReferralChatbotAPI978B0CF6": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "Referral Chatbot API - dev",
+    "Name": "ReferralChatbotAPI-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotAPI/Resource"
+   }
+  },
+  "ReferralChatbotAPIDeployment8513055E5bd9c1941bd50a301681b9e482881c31": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Referral Chatbot API - dev",
+    "RestApiId": {
+     "Ref": "ReferralChatbotAPI978B0CF6"
+    }
+   },
+   "DependsOn": [
+    "ReferralChatbotAPIchatOPTIONS4EC29376",
+    "ReferralChatbotAPIchatPOST91996584",
+    "ReferralChatbotAPIchat9ADE8AE5",
+    "ReferralChatbotAPIOPTIONSE67E5B0D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotAPI/Deployment/Resource"
+   }
+  },
+  "ReferralChatbotAPIDeploymentStagedev1E454630": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "ReferralChatbotAPIDeployment8513055E5bd9c1941bd50a301681b9e482881c31"
+    },
+    "MethodSettings": [
+     {
+      "DataTraceEnabled": true,
+      "HttpMethod": "*",
+      "LoggingLevel": "INFO",
+      "MetricsEnabled": true,
+      "ResourcePath": "/*"
+     }
+    ],
+    "RestApiId": {
+     "Ref": "ReferralChatbotAPI978B0CF6"
+    },
+    "StageName": "dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotAPI/DeploymentStage.dev/Resource"
+   }
+  },
+  "ReferralChatbotAPIOPTIONSE67E5B0D": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "ReferralChatbotAPI978B0CF6",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "ReferralChatbotAPI978B0CF6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotAPI/Default/OPTIONS/Resource"
+   }
+  },
+  "ReferralChatbotAPIchat9ADE8AE5": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "ReferralChatbotAPI978B0CF6",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "chat",
+    "RestApiId": {
+     "Ref": "ReferralChatbotAPI978B0CF6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotAPI/Default/chat/Resource"
+   }
+  },
+  "ReferralChatbotAPIchatOPTIONS4EC29376": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "ReferralChatbotAPIchat9ADE8AE5"
+    },
+    "RestApiId": {
+     "Ref": "ReferralChatbotAPI978B0CF6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotAPI/Default/chat/OPTIONS/Resource"
+   }
+  },
+  "ReferralChatbotAPIchatPOSTApiPermissionBrightpointStackdevReferralChatbotAPI175662FEPOSTchatCCF3DE44": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralChatbotLambdaFnC2AC6930",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralChatbotAPI978B0CF6"
+       },
+       "/",
+       {
+        "Ref": "ReferralChatbotAPIDeploymentStagedev1E454630"
+       },
+       "/POST/chat"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotAPI/Default/chat/POST/ApiPermission.BrightpointStackdevReferralChatbotAPI175662FE.POST..chat"
+   }
+  },
+  "ReferralChatbotAPIchatPOSTApiPermissionTestBrightpointStackdevReferralChatbotAPI175662FEPOSTchat9715BB57": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralChatbotLambdaFnC2AC6930",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralChatbotAPI978B0CF6"
+       },
+       "/test-invoke-stage/POST/chat"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotAPI/Default/chat/POST/ApiPermission.Test.BrightpointStackdevReferralChatbotAPI175662FE.POST..chat"
+   }
+  },
+  "ReferralChatbotAPIchatPOST91996584": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ReferralChatbotLambdaFnC2AC6930",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "ReferralChatbotAPIchat9ADE8AE5"
+    },
+    "RestApiId": {
+     "Ref": "ReferralChatbotAPI978B0CF6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotAPI/Default/chat/POST/Resource"
+   }
+  },
+  "ReferralsApi2C829B6C": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "Referrals API - dev",
+    "Name": "ReferralsApi-dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Resource"
+   }
+  },
+  "ReferralsApiDeploymentA431722E158278e973aeff772b7fe8fafa6fefc2": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Referrals API - dev",
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "DependsOn": [
+    "ReferralsApiOPTIONS8AC6CF1A",
+    "ReferralsApireferralsreferralidDELETE835878DD",
+    "ReferralsApireferralsreferralidGET56872033",
+    "ReferralsApireferralsreferralidOPTIONSBA49BC3A",
+    "ReferralsApireferralsreferralidPOSTD840CDC0",
+    "ReferralsApireferralsreferralidPUT484F166A",
+    "ReferralsApireferralsreferralid9613265A",
+    "ReferralsApireferralsDELETE5952DBE9",
+    "ReferralsApireferralsGET7252075C",
+    "ReferralsApireferralsOPTIONS0134053C",
+    "ReferralsApireferralsPOST8D1840E1",
+    "ReferralsApireferralsPUTEF7CAA7B",
+    "ReferralsApireferrals474AEC2E",
+    "ReferralsApireferralssearchOPTIONS3AF616CC",
+    "ReferralsApireferralssearchPOSTFDD98591",
+    "ReferralsApireferralssearch49B1FEDC"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Deployment/Resource"
+   }
+  },
+  "ReferralsApiDeploymentStagedevB7A09FAC": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "ReferralsApiDeploymentA431722E158278e973aeff772b7fe8fafa6fefc2"
+    },
+    "MethodSettings": [
+     {
+      "DataTraceEnabled": true,
+      "HttpMethod": "*",
+      "LoggingLevel": "INFO",
+      "MetricsEnabled": true,
+      "ResourcePath": "/*"
+     }
+    ],
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    },
+    "StageName": "dev",
+    "Tags": [
+     {
+      "Key": "Application",
+      "Value": "Brightpoint"
+     },
+     {
+      "Key": "Environment",
+      "Value": "dev"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/DeploymentStage.dev/Resource"
+   }
+  },
+  "ReferralsApiOPTIONS8AC6CF1A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "ReferralsApi2C829B6C",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/OPTIONS/Resource"
+   }
+  },
+  "ReferralsApireferrals474AEC2E": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "ReferralsApi2C829B6C",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "referrals",
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/Resource"
+   }
+  },
+  "ReferralsApireferralsOPTIONS0134053C": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "ReferralsApireferrals474AEC2E"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/OPTIONS/Resource"
+   }
+  },
+  "ReferralsApireferralsDELETEApiPermissionBrightpointStackdevReferralsApiFF8918E5DELETEreferralsDF566657": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/",
+       {
+        "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+       },
+       "/DELETE/referrals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/DELETE/ApiPermission.BrightpointStackdevReferralsApiFF8918E5.DELETE..referrals"
+   }
+  },
+  "ReferralsApireferralsDELETEApiPermissionTestBrightpointStackdevReferralsApiFF8918E5DELETEreferrals81A3B535": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/test-invoke-stage/DELETE/referrals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/DELETE/ApiPermission.Test.BrightpointStackdevReferralsApiFF8918E5.DELETE..referrals"
+   }
+  },
+  "ReferralsApireferralsDELETE5952DBE9": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "DELETE",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ReferralsApiHandlerFn3A709788",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "ReferralsApireferrals474AEC2E"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/DELETE/Resource"
+   }
+  },
+  "ReferralsApireferralsGETApiPermissionBrightpointStackdevReferralsApiFF8918E5GETreferrals5A57D678": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/",
+       {
+        "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+       },
+       "/GET/referrals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/GET/ApiPermission.BrightpointStackdevReferralsApiFF8918E5.GET..referrals"
+   }
+  },
+  "ReferralsApireferralsGETApiPermissionTestBrightpointStackdevReferralsApiFF8918E5GETreferrals650B8996": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/test-invoke-stage/GET/referrals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/GET/ApiPermission.Test.BrightpointStackdevReferralsApiFF8918E5.GET..referrals"
+   }
+  },
+  "ReferralsApireferralsGET7252075C": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ReferralsApiHandlerFn3A709788",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "ReferralsApireferrals474AEC2E"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/GET/Resource"
+   }
+  },
+  "ReferralsApireferralsPOSTApiPermissionBrightpointStackdevReferralsApiFF8918E5POSTreferrals1D5ABD40": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/",
+       {
+        "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+       },
+       "/POST/referrals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/POST/ApiPermission.BrightpointStackdevReferralsApiFF8918E5.POST..referrals"
+   }
+  },
+  "ReferralsApireferralsPOSTApiPermissionTestBrightpointStackdevReferralsApiFF8918E5POSTreferralsBEBADB0C": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/test-invoke-stage/POST/referrals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/POST/ApiPermission.Test.BrightpointStackdevReferralsApiFF8918E5.POST..referrals"
+   }
+  },
+  "ReferralsApireferralsPOST8D1840E1": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ReferralsApiHandlerFn3A709788",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "ReferralsApireferrals474AEC2E"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/POST/Resource"
+   }
+  },
+  "ReferralsApireferralsPUTApiPermissionBrightpointStackdevReferralsApiFF8918E5PUTreferrals3226EC42": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/",
+       {
+        "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+       },
+       "/PUT/referrals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/PUT/ApiPermission.BrightpointStackdevReferralsApiFF8918E5.PUT..referrals"
+   }
+  },
+  "ReferralsApireferralsPUTApiPermissionTestBrightpointStackdevReferralsApiFF8918E5PUTreferralsDF99CC2D": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/test-invoke-stage/PUT/referrals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/PUT/ApiPermission.Test.BrightpointStackdevReferralsApiFF8918E5.PUT..referrals"
+   }
+  },
+  "ReferralsApireferralsPUTEF7CAA7B": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "PUT",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ReferralsApiHandlerFn3A709788",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "ReferralsApireferrals474AEC2E"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/PUT/Resource"
+   }
+  },
+  "ReferralsApireferralsreferralid9613265A": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "ReferralsApireferrals474AEC2E"
+    },
+    "PathPart": "{referral_id}",
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/Resource"
+   }
+  },
+  "ReferralsApireferralsreferralidOPTIONSBA49BC3A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "ReferralsApireferralsreferralid9613265A"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/OPTIONS/Resource"
+   }
+  },
+  "ReferralsApireferralsreferralidDELETEApiPermissionBrightpointStackdevReferralsApiFF8918E5DELETEreferralsreferralid37C6579D": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/",
+       {
+        "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+       },
+       "/DELETE/referrals/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/DELETE/ApiPermission.BrightpointStackdevReferralsApiFF8918E5.DELETE..referrals.{referral_id}"
+   }
+  },
+  "ReferralsApireferralsreferralidDELETEApiPermissionTestBrightpointStackdevReferralsApiFF8918E5DELETEreferralsreferralid4603278E": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/test-invoke-stage/DELETE/referrals/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/DELETE/ApiPermission.Test.BrightpointStackdevReferralsApiFF8918E5.DELETE..referrals.{referral_id}"
+   }
+  },
+  "ReferralsApireferralsreferralidDELETE835878DD": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "DELETE",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ReferralsApiHandlerFn3A709788",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "ReferralsApireferralsreferralid9613265A"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/DELETE/Resource"
+   }
+  },
+  "ReferralsApireferralsreferralidGETApiPermissionBrightpointStackdevReferralsApiFF8918E5GETreferralsreferralidCAE518D4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/",
+       {
+        "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+       },
+       "/GET/referrals/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/GET/ApiPermission.BrightpointStackdevReferralsApiFF8918E5.GET..referrals.{referral_id}"
+   }
+  },
+  "ReferralsApireferralsreferralidGETApiPermissionTestBrightpointStackdevReferralsApiFF8918E5GETreferralsreferralidF85ED2AE": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/test-invoke-stage/GET/referrals/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/GET/ApiPermission.Test.BrightpointStackdevReferralsApiFF8918E5.GET..referrals.{referral_id}"
+   }
+  },
+  "ReferralsApireferralsreferralidGET56872033": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ReferralsApiHandlerFn3A709788",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "ReferralsApireferralsreferralid9613265A"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/GET/Resource"
+   }
+  },
+  "ReferralsApireferralsreferralidPOSTApiPermissionBrightpointStackdevReferralsApiFF8918E5POSTreferralsreferralidB1F91D85": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/",
+       {
+        "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+       },
+       "/POST/referrals/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/POST/ApiPermission.BrightpointStackdevReferralsApiFF8918E5.POST..referrals.{referral_id}"
+   }
+  },
+  "ReferralsApireferralsreferralidPOSTApiPermissionTestBrightpointStackdevReferralsApiFF8918E5POSTreferralsreferralidF927D3C2": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/test-invoke-stage/POST/referrals/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/POST/ApiPermission.Test.BrightpointStackdevReferralsApiFF8918E5.POST..referrals.{referral_id}"
+   }
+  },
+  "ReferralsApireferralsreferralidPOSTD840CDC0": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ReferralsApiHandlerFn3A709788",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "ReferralsApireferralsreferralid9613265A"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/POST/Resource"
+   }
+  },
+  "ReferralsApireferralsreferralidPUTApiPermissionBrightpointStackdevReferralsApiFF8918E5PUTreferralsreferralid24C6AA7E": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/",
+       {
+        "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+       },
+       "/PUT/referrals/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/PUT/ApiPermission.BrightpointStackdevReferralsApiFF8918E5.PUT..referrals.{referral_id}"
+   }
+  },
+  "ReferralsApireferralsreferralidPUTApiPermissionTestBrightpointStackdevReferralsApiFF8918E5PUTreferralsreferralid85B1B2BF": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/test-invoke-stage/PUT/referrals/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/PUT/ApiPermission.Test.BrightpointStackdevReferralsApiFF8918E5.PUT..referrals.{referral_id}"
+   }
+  },
+  "ReferralsApireferralsreferralidPUT484F166A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "PUT",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ReferralsApiHandlerFn3A709788",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "ReferralsApireferralsreferralid9613265A"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/{referral_id}/PUT/Resource"
+   }
+  },
+  "ReferralsApireferralssearch49B1FEDC": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "ReferralsApireferrals474AEC2E"
+    },
+    "PathPart": "search",
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/search/Resource"
+   }
+  },
+  "ReferralsApireferralssearchOPTIONS3AF616CC": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "ReferralsApireferralssearch49B1FEDC"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/search/OPTIONS/Resource"
+   }
+  },
+  "ReferralsApireferralssearchPOSTApiPermissionBrightpointStackdevReferralsApiFF8918E5POSTreferralssearch9373AD10": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/",
+       {
+        "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+       },
+       "/POST/referrals/search"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/search/POST/ApiPermission.BrightpointStackdevReferralsApiFF8918E5.POST..referrals.search"
+   }
+  },
+  "ReferralsApireferralssearchPOSTApiPermissionTestBrightpointStackdevReferralsApiFF8918E5POSTreferralssearch896D5661": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsApi2C829B6C"
+       },
+       "/test-invoke-stage/POST/referrals/search"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/search/POST/ApiPermission.Test.BrightpointStackdevReferralsApiFF8918E5.POST..referrals.search"
+   }
+  },
+  "ReferralsApireferralssearchPOSTFDD98591": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ReferralsApiHandlerFn3A709788",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "ReferralsApireferralssearch49B1FEDC"
+    },
+    "RestApiId": {
+     "Ref": "ReferralsApi2C829B6C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsApi/Default/referrals/search/POST/Resource"
+   }
+  },
+  "AnalyticsWebSocketAPI8F36832A": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "Description": "Analytics WebSocket API - dev",
+    "Name": "AnalyticsWebSocketAPI-dev",
+    "ProtocolType": "WEBSOCKET",
+    "RouteSelectionExpression": "$request.body.action",
+    "Tags": {
+     "Application": "Brightpoint",
+     "Environment": "dev"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/AnalyticsWebSocketAPI/Resource"
+   }
+  },
+  "AnalyticsWebSocketAPIdefaultRouteAnalyticsWebSocketAPIIntegrationPermission4ACE18C1": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "QueryAnalyticsApiFn482A67B8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "AnalyticsWebSocketAPI8F36832A"
+       },
+       "/*$default"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/AnalyticsWebSocketAPI/$default-Route/AnalyticsWebSocketAPIIntegration-Permission"
+   }
+  },
+  "AnalyticsWebSocketAPIdefaultRouteAnalyticsWebSocketAPIIntegration144B87CC": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "AnalyticsWebSocketAPI8F36832A"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "QueryAnalyticsApiFn482A67B8",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/AnalyticsWebSocketAPI/$default-Route/AnalyticsWebSocketAPIIntegration/Resource"
+   }
+  },
+  "AnalyticsWebSocketAPIdefaultRoute50828D5C": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "AnalyticsWebSocketAPI8F36832A"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$default",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "AnalyticsWebSocketAPIdefaultRouteAnalyticsWebSocketAPIIntegration144B87CC"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/AnalyticsWebSocketAPI/$default-Route/Resource"
+   }
+  },
+  "AnalyticsWebSocketAPIconnectRouteC2AEBBD1": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "AnalyticsWebSocketAPI8F36832A"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$connect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "AnalyticsWebSocketAPIdefaultRouteAnalyticsWebSocketAPIIntegration144B87CC"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/AnalyticsWebSocketAPI/$connect-Route/Resource"
+   }
+  },
+  "AnalyticsWebSocketAPIgetAnalyticsRouteCC3BBB2A": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "AnalyticsWebSocketAPI8F36832A"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "getAnalytics",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "AnalyticsWebSocketAPIdefaultRouteAnalyticsWebSocketAPIIntegration144B87CC"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/AnalyticsWebSocketAPI/getAnalytics-Route/Resource"
+   }
+  },
+  "AnalyticsWebSocketAPIdisconnectRoute2F99D150": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "AnalyticsWebSocketAPI8F36832A"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$disconnect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "AnalyticsWebSocketAPIdefaultRouteAnalyticsWebSocketAPIIntegration144B87CC"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/AnalyticsWebSocketAPI/$disconnect-Route/Resource"
+   }
+  },
+  "AnalyticsWebSocketAPIStage1986798F": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "AnalyticsWebSocketAPI8F36832A"
+    },
+    "AutoDeploy": true,
+    "StageName": "dev",
+    "Tags": {
+     "Application": "Brightpoint",
+     "Environment": "dev"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/AnalyticsWebSocketAPIStage/Resource"
+   }
+  },
+  "ReferralChatbotWebSocket4AF2CD48": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "Description": "Referral Chatbot WebSocket API - dev",
+    "Name": "ReferralChatbotWebSocket-dev",
+    "ProtocolType": "WEBSOCKET",
+    "RouteSelectionExpression": "$request.body.action",
+    "Tags": {
+     "Application": "Brightpoint",
+     "Environment": "dev"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotWebSocket/Resource"
+   }
+  },
+  "ReferralChatbotWebSocketconnectRouteReferralChatbotWebSocketIntegrationPermission6E6266AE": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralChatbotLambdaFnC2AC6930",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralChatbotWebSocket4AF2CD48"
+       },
+       "/*$connect"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotWebSocket/$connect-Route/ReferralChatbotWebSocketIntegration-Permission"
+   }
+  },
+  "ReferralChatbotWebSocketconnectRouteReferralChatbotWebSocketIntegration775808E2": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralChatbotWebSocket4AF2CD48"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "ReferralChatbotLambdaFnC2AC6930",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotWebSocket/$connect-Route/ReferralChatbotWebSocketIntegration/Resource"
+   }
+  },
+  "ReferralChatbotWebSocketconnectRoute03BAA996": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralChatbotWebSocket4AF2CD48"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$connect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralChatbotWebSocketconnectRouteReferralChatbotWebSocketIntegration775808E2"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotWebSocket/$connect-Route/Resource"
+   }
+  },
+  "ReferralChatbotWebSocketqueryRoute794307B9": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralChatbotWebSocket4AF2CD48"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "query",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralChatbotWebSocketconnectRouteReferralChatbotWebSocketIntegration775808E2"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotWebSocket/query-Route/Resource"
+   }
+  },
+  "ReferralChatbotWebSocketdisconnectRoute85C7C19F": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralChatbotWebSocket4AF2CD48"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$disconnect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralChatbotWebSocketconnectRouteReferralChatbotWebSocketIntegration775808E2"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotWebSocket/$disconnect-Route/Resource"
+   }
+  },
+  "ReferralChatbotWebSocketStageDFA7809E": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralChatbotWebSocket4AF2CD48"
+    },
+    "AutoDeploy": true,
+    "StageName": "dev",
+    "Tags": {
+     "Application": "Brightpoint",
+     "Environment": "dev"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotWebSocketStage/Resource"
+   }
+  },
+  "UserFeedbackWebSocketAPIAC8C1AA7": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "Description": "User Feedback WebSocket API - dev",
+    "Name": "UserFeedbackWebSocketAPI-dev",
+    "ProtocolType": "WEBSOCKET",
+    "RouteSelectionExpression": "$request.body.action",
+    "Tags": {
+     "Application": "Brightpoint",
+     "Environment": "dev"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserFeedbackWebSocketAPI/Resource"
+   }
+  },
+  "UserFeedbackWebSocketAPIdisconnectRouteUserFeedbackWebSocketAPIIntegrationPermissionCE35B8E0": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProcessUserDataFn7B28A59E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
+       },
+       "/*$disconnect"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserFeedbackWebSocketAPI/$disconnect-Route/UserFeedbackWebSocketAPIIntegration-Permission"
+   }
+  },
+  "UserFeedbackWebSocketAPIdisconnectRouteUserFeedbackWebSocketAPIIntegration60BE7FA5": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "ProcessUserDataFn7B28A59E",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserFeedbackWebSocketAPI/$disconnect-Route/UserFeedbackWebSocketAPIIntegration/Resource"
+   }
+  },
+  "UserFeedbackWebSocketAPIdisconnectRoute804B2C8D": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$disconnect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "UserFeedbackWebSocketAPIdisconnectRouteUserFeedbackWebSocketAPIIntegration60BE7FA5"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserFeedbackWebSocketAPI/$disconnect-Route/Resource"
+   }
+  },
+  "UserFeedbackWebSocketAPIsendFeedbackRoute20CA2685": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "sendFeedback",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "UserFeedbackWebSocketAPIdisconnectRouteUserFeedbackWebSocketAPIIntegration60BE7FA5"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserFeedbackWebSocketAPI/sendFeedback-Route/Resource"
+   }
+  },
+  "UserFeedbackWebSocketAPIupdateUserRoute3D06DBCE": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "updateUser",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "UserFeedbackWebSocketAPIdisconnectRouteUserFeedbackWebSocketAPIIntegration60BE7FA5"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserFeedbackWebSocketAPI/updateUser-Route/Resource"
+   }
+  },
+  "UserFeedbackWebSocketAPIgetUserRoute8AD42F0A": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "getUser",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "UserFeedbackWebSocketAPIdisconnectRouteUserFeedbackWebSocketAPIIntegration60BE7FA5"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserFeedbackWebSocketAPI/getUser-Route/Resource"
+   }
+  },
+  "UserFeedbackWebSocketAPIconnectRoute86B2CC12": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$connect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "UserFeedbackWebSocketAPIdisconnectRouteUserFeedbackWebSocketAPIIntegration60BE7FA5"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserFeedbackWebSocketAPI/$connect-Route/Resource"
+   }
+  },
+  "UserFeedbackWebSocketAPIStageB2561EC0": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
+    },
+    "AutoDeploy": true,
+    "StageName": "dev",
+    "Tags": {
+     "Application": "Brightpoint",
+     "Environment": "dev"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/UserFeedbackWebSocketAPIStage/Resource"
+   }
+  },
+  "ReferralsWebSocketAPI16F9DC58": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "Description": "Referrals WebSocket API - dev",
+    "Name": "ReferralsWebSocketAPI-dev",
+    "ProtocolType": "WEBSOCKET",
+    "RouteSelectionExpression": "$request.body.action",
+    "Tags": {
+     "Application": "Brightpoint",
+     "Environment": "dev"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationPermission18593FB8": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ReferralsApiHandlerFn3A709788",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:216989103356:",
+       {
+        "Ref": "ReferralsWebSocketAPI16F9DC58"
+       },
+       "/*getReferrals"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/getReferrals-Route/ReferralsWebSocketAPIIntegration-Permission"
+   }
+  },
+  "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "ReferralsApiHandlerFn3A709788",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/getReferrals-Route/ReferralsWebSocketAPIIntegration/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIgetReferralsRoute836E7A4F": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "getReferrals",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/getReferrals-Route/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIconnectRoute11251B98": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$connect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/$connect-Route/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIcreateReferralRoute43444E49": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "createReferral",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/createReferral-Route/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIsearchReferralsRoute55186394": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "searchReferrals",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/searchReferrals-Route/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIdefaultRouteD510CF0A": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$default",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/$default-Route/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIupdateReferralRoute53E4FD77": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "updateReferral",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/updateReferral-Route/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIdisconnectRoute21707849": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$disconnect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/$disconnect-Route/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIdeleteReferralRoute4D249A16": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "deleteReferral",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/deleteReferral-Route/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIgetReferralRouteFE5843E1": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "getReferral",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPI/getReferral-Route/Resource"
+   }
+  },
+  "ReferralsWebSocketAPIStage1053224E": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "ReferralsWebSocketAPI16F9DC58"
+    },
+    "AutoDeploy": true,
+    "StageName": "dev",
+    "Tags": {
+     "Application": "Brightpoint",
+     "Environment": "dev"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/ReferralsWebSocketAPIStage/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2VSy27CMBD8Fu7GvFSpvRVoK3FARUmrHtEmWYKLY1vxBhRZ/vfKiaEpPc3Mzsr78pzPnh64m47gYsd5cRpLkXGXEuQnlqDVTZ0jg4vdu6JVUOki4+4DMolsfVAd8SzXpRKkufu0WO+0lsG78StZS4GKhtZvZFOgIkFtiHomoOIu0X2NDndairwNsmeeQWWkOLTcrQ9qaUywVjWo/OiZhCorgLu3RuUktArekO+wroS1Qb2eUVHaDbkFY4QqQ8L/qGd2sQdrkSxfBmB2wVdNfkJagUUGRpRAeIGWuwQtLY3oeo/0BY3UbRWHHaiUoOym7Ml14d2bW6SjLoIZ2e0c/csd94PS5zl3X5ilOrQVOwhwiyW6IfyVG0VY1nBdy528S/7bqfesW0MQcWnvDZmGPJuOQZoj8OnoOX6pScB4r2i6cLJ4L892LR21miz4bM4fR99WiHHdKBIV8qTHH1ZOD7umAgAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "BrightpointStack-dev/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "UserDashboardAPIEndpoint7C069EF1": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "UserDashboardAPIAB9DEF4E"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "UserDashboardAPIDeploymentStagedev64521116"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "QueryAnalyticsAPI1Endpoint64CAB9AF": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "QueryAnalyticsAPI12288DAE3"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "QueryAnalyticsAPI1DeploymentStagedev1A1FE02C"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "QueryAnalyticsAPI2Endpoint2E21B3D5": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "QueryAnalyticsAPI2645EC6E1"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "QueryAnalyticsAPI2DeploymentStagedev3CEBBE56"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "createUserEndpoint779A5A75": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "createUserC6ED88E6"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "createUserDeploymentStagedev7349550C"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "ReferralChatbotAPIEndpoint19B05A23": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "ReferralChatbotAPI978B0CF6"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "ReferralChatbotAPIDeploymentStagedev1E454630"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "ReferralsApiEndpoint954CB844": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "ReferralsApi2C829B6C"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "AmplifyAppId": {
+   "Description": "Amplify App ID for dev",
+   "Value": {
+    "Fn::GetAtt": [
+     "BrightpointManualAmplifyApp4DC32DC0",
+     "AppId"
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-AmplifyAppId"
+   }
+  },
+  "AmplifyAppUrl": {
+   "Description": "URL of the Amplify App for dev",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://frontend-code.",
+      {
+       "Fn::GetAtt": [
+        "BrightpointManualAmplifyApp4DC32DC0",
+        "AppId"
+       ]
+      },
+      ".amplifyapp.com"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-AmplifyAppUrl"
+   }
+  },
+  "AmplifyConsoleUrl": {
+   "Description": "Amplify Console URL for dev",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://us-east-1.console.aws.amazon.com/amplify/apps/",
+      {
+       "Fn::GetAtt": [
+        "BrightpointManualAmplifyApp4DC32DC0",
+        "AppId"
+       ]
+      }
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-AmplifyConsoleUrl"
+   }
+  },
+  "CognitoUserPoolId": {
+   "Description": "Cognito User Pool ID for dev",
+   "Value": {
+    "Ref": "BrightpointUserPoolF24B41F9"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-UserPoolId"
+   }
+  },
+  "CognitoUserPoolClientId": {
+   "Description": "Cognito User Pool Client ID for dev",
+   "Value": {
+    "Ref": "BrightpointUserPoolClient3A182275"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-UserPoolClientId"
+   }
+  },
+  "CognitoIdentityPoolId": {
+   "Description": "Cognito Identity Pool ID for dev",
+   "Value": {
+    "Ref": "BrightpointIdentityPool"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-IdentityPoolId"
+   }
+  },
+  "CognitoUserPoolDomain": {
+   "Description": "Cognito User Pool Domain for dev",
+   "Value": "https://brightpoint-dev.auth.us-east-1.amazoncognito.com",
+   "Export": {
+    "Name": "BrightpointStack-dev-UserPoolDomain"
+   }
+  },
+  "UserDashboardAPIUrl": {
+   "Description": "URL of the UserDashboardAPI REST API for dev",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "UserDashboardAPIAB9DEF4E"
+      },
+      ".execute-api.us-east-1.amazonaws.com/",
+      {
+       "Ref": "UserDashboardAPIDeploymentStagedev64521116"
+      },
+      "/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-UserDashboardAPIUrl"
+   }
+  },
+  "UserDashboardAPIId": {
+   "Description": "API Gateway ID for UserDashboardAPI in dev",
+   "Value": {
+    "Ref": "UserDashboardAPIAB9DEF4E"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-UserDashboardAPIId"
+   }
+  },
+  "QueryAnalyticsAPI1Url": {
+   "Description": "URL of the QueryAnalyticsAPI1 REST API for dev",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "QueryAnalyticsAPI12288DAE3"
+      },
+      ".execute-api.us-east-1.amazonaws.com/",
+      {
+       "Ref": "QueryAnalyticsAPI1DeploymentStagedev1A1FE02C"
+      },
+      "/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-QueryAnalyticsAPI1Url"
+   }
+  },
+  "QueryAnalyticsAPI1Id": {
+   "Description": "API Gateway ID for QueryAnalyticsAPI1 in dev",
+   "Value": {
+    "Ref": "QueryAnalyticsAPI12288DAE3"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-QueryAnalyticsAPI1Id"
+   }
+  },
+  "QueryAnalyticsAPI2Url": {
+   "Description": "URL of the QueryAnalyticsAPI2 REST API for dev",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "QueryAnalyticsAPI2645EC6E1"
+      },
+      ".execute-api.us-east-1.amazonaws.com/",
+      {
+       "Ref": "QueryAnalyticsAPI2DeploymentStagedev3CEBBE56"
+      },
+      "/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-QueryAnalyticsAPI2Url"
+   }
+  },
+  "QueryAnalyticsAPI2Id": {
+   "Description": "API Gateway ID for QueryAnalyticsAPI2 in dev",
+   "Value": {
+    "Ref": "QueryAnalyticsAPI2645EC6E1"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-QueryAnalyticsAPI2Id"
+   }
+  },
+  "createUserUrl": {
+   "Description": "URL of the createUser REST API for dev",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "createUserC6ED88E6"
+      },
+      ".execute-api.us-east-1.amazonaws.com/",
+      {
+       "Ref": "createUserDeploymentStagedev7349550C"
+      },
+      "/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-createUserUrl"
+   }
+  },
+  "createUserId": {
+   "Description": "API Gateway ID for createUser in dev",
+   "Value": {
+    "Ref": "createUserC6ED88E6"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-createUserId"
+   }
+  },
+  "ReferralChatbotAPIUrl": {
+   "Description": "URL of the ReferralChatbotAPI REST API for dev",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "ReferralChatbotAPI978B0CF6"
+      },
+      ".execute-api.us-east-1.amazonaws.com/",
+      {
+       "Ref": "ReferralChatbotAPIDeploymentStagedev1E454630"
+      },
+      "/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-ReferralChatbotAPIUrl"
+   }
+  },
+  "ReferralChatbotAPIId": {
+   "Description": "API Gateway ID for ReferralChatbotAPI in dev",
+   "Value": {
+    "Ref": "ReferralChatbotAPI978B0CF6"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-ReferralChatbotAPIId"
+   }
+  },
+  "ReferralsApiUrl": {
+   "Description": "URL of the ReferralsApi REST API for dev",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "ReferralsApi2C829B6C"
+      },
+      ".execute-api.us-east-1.amazonaws.com/",
+      {
+       "Ref": "ReferralsApiDeploymentStagedevB7A09FAC"
+      },
+      "/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-ReferralsApiUrl"
+   }
+  },
+  "ReferralsApiId": {
+   "Description": "API Gateway ID for ReferralsApi in dev",
+   "Value": {
+    "Ref": "ReferralsApi2C829B6C"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-ReferralsApiId"
+   }
+  },
+  "FrontendConfigSummary": {
+   "Description": "Frontend configuration summary for dev",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "{\n  \"environment\": \"dev\",\n  \"region\": \"us-east-1\",\n  \"amplifyAppId\": \"",
+      {
+       "Fn::GetAtt": [
+        "BrightpointManualAmplifyApp4DC32DC0",
+        "AppId"
+       ]
+      },
+      "\",\n  \"userPoolId\": \"",
+      {
+       "Ref": "BrightpointUserPoolF24B41F9"
+      },
+      "\",\n  \"userPoolClientId\": \"",
+      {
+       "Ref": "BrightpointUserPoolClient3A182275"
+      },
+      "\",\n  \"identityPoolId\": \"",
+      {
+       "Ref": "BrightpointIdentityPool"
+      },
+      "\"\n}"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-ConfigSummary"
+   }
+  },
+  "WebSocketConnectionsTableName": {
+   "Description": "WebSocket Connections Table Name",
+   "Value": {
+    "Ref": "WebSocketConnectionsTable7F0028CC"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-WebSocketTableName"
+   }
+  },
+  "PerplexityQueryCacheTableName": {
+   "Description": "Perplexity Query Cache Table Name",
+   "Value": {
+    "Ref": "perplexityquerycacheTable9E120D0C"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-CacheTableName"
+   }
+  },
+  "QueryAnalyticsTableName": {
+   "Description": "Query Analytics Table Name",
+   "Value": {
+    "Ref": "queryanalyticsTableC6CEA252"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-AnalyticsTableName"
+   }
+  },
+  "ReferralDataTableName": {
+   "Description": "Referral Data Table Name",
+   "Value": {
+    "Ref": "referraldataTable5ABDFEB4"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-ReferralTableName"
+   }
+  },
+  "UserDataTableName": {
+   "Description": "User Data Table Name",
+   "Value": {
+    "Ref": "userdataTableB31622A0"
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-UserTableName"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

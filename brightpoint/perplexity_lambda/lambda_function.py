@@ -9,6 +9,8 @@ import os
 import re
 import copy
 
+_cached_secret = None
+
 # Initialize AWS clients with Lambda environment in mind
 def get_boto_clients():
     try:
@@ -28,12 +30,35 @@ def get_boto_clients():
 clients = get_boto_clients()
 dynamodb = clients["dynamodb"]
 dynamodb_client = clients["dynamodb_client"]
-translate_client = clients["translate"]  # AWS Translate client
-query_cache_table = dynamodb.Table("perplexity_query_cache")  # Table to store Perplexity query results
-user_data_table = dynamodb.Table("user_data")  # For user history
+translate_client = clients["translate"]
+ENV = os.environ.get('ENVIRONMENT', 'dev')
+PERPLEXITY_TABLE_NAME = f'perplexity_query_cache-{ENV}'
+USER_DATA_TABLE = f'user_data-{ENV}'
+query_cache_table = dynamodb.Table(PERPLEXITY_TABLE_NAME)
+
+def get_perplexity_api_key():
+    """Retrieve the Perplexity API key from AWS Secrets Manager with caching"""
+    global _cached_secret
+
+    if _cached_secret is not None:
+        return _cached_secret
+
+    secret_arn = os.environ['PERPLEXITY_API_KEY_SECRET_ARN']
+    secrets_client = boto3.client('secretsmanager')
+
+    try:
+        response = secrets_client.get_secret_value(SecretId=secret_arn)
+        # If it's a plain text secret
+        _cached_secret = response['SecretString']
+        # If it's a JSON secret, uncomment the next line:
+        # _cached_secret = json.loads(response['SecretString'])['PERPLEXITY_API_KEY']
+        return _cached_secret
+    except Exception as e:
+        print(f"Error retrieving secret: {str(e)}")
+        raise
 
 # Perplexity API configuration
-PERPLEXITY_API_KEY = os.environ.get('PERPLEXITY_API_KEY')
+PERPLEXITY_API_KEY = get_perplexity_api_key()
 PERPLEXITY_API_URL = "https://api.perplexity.ai/chat/completions"
 
 def get_language_code(provided_language: str) -> str:
@@ -688,7 +713,7 @@ def update_user_query_history(user_id: str, user_query: str, original_query: str
 
         # Check if user exists
         response = dynamodb_client.get_item(
-            TableName='user_data',
+            TableName=USER_DATA_TABLE,
             Key={
                 'user_id': {'S': user_id}
             }
@@ -699,7 +724,7 @@ def update_user_query_history(user_id: str, user_query: str, original_query: str
         if user_exists:
             # Check if queries map already exists
             check_response = dynamodb_client.get_item(
-                TableName='user_data',
+                TableName=USER_DATA_TABLE,
                 Key={
                     'user_id': {'S': user_id}
                 },
@@ -711,7 +736,7 @@ def update_user_query_history(user_id: str, user_query: str, original_query: str
             if queries_exists:
                 # Add to existing queries map
                 dynamodb_client.update_item(
-                    TableName='user_data',
+                    TableName=USER_DATA_TABLE,
                     Key={
                         'user_id': {'S': user_id}
                     },
@@ -736,7 +761,7 @@ def update_user_query_history(user_id: str, user_query: str, original_query: str
             else:
                 # Create queries map with this query
                 dynamodb_client.update_item(
-                    TableName='user_data',
+                    TableName=USER_DATA_TABLE,
                     Key={
                         'user_id': {'S': user_id}
                     },
@@ -762,7 +787,7 @@ def update_user_query_history(user_id: str, user_query: str, original_query: str
         else:
             # Create new user with query history
             dynamodb_client.put_item(
-                TableName='user_data',
+                TableName=USER_DATA_TABLE,
                 Item={
                     'user_id': {'S': user_id},
                     'queries': {

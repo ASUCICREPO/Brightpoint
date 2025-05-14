@@ -3,355 +3,826 @@ from aws_cdk import (
     aws_lambda as lambda_,
     aws_dynamodb as dynamodb,
     aws_apigateway as apigateway,
-    aws_apigatewayv2 as apigatewayv2,
     aws_iam as iam,
     CfnOutput,
     RemovalPolicy,
-    Duration
+    Duration,
+    aws_amplify_alpha as amplify,
+    aws_cognito as cognito,
+    aws_s3_assets as s3_assets,
+    aws_apigatewayv2 as apigatewayv2,
+    aws_apigatewayv2_integrations as integrations,
+    Tags,
+    SecretValue,
+    aws_secretsmanager as secretsmanager,
+    aws_codebuild as codebuild,
+    RemovalPolicy,
 )
 from constructs import Construct
 import os
+from .config import EnvironmentConfig
+from aws_cdk.aws_amplify_alpha import App, GitHubSourceCodeProvider
+import json
+from aws_cdk import aws_secretsmanager as secretsmanager
+
+
+class ApiGatewayComplete:
+    """Complete API Gateway configuration for BrightpointStack"""
+
+    def __init__(self, scope: Stack, account_id: str, lambda_functions: dict, env_name: str):
+        self.scope = scope
+        self.account_id = account_id
+        self.lambda_functions = lambda_functions
+        self.env_name = env_name
+
+        # Get environment-specific configuration
+        self.config = EnvironmentConfig.get_config(env_name)
+
+        # Store API references
+        self.rest_apis = {}
+        self.websocket_apis = {}
+
+        # Create all APIs
+        self.create_all_apis()
+
+    def create_all_apis(self):
+        """Create all REST and WebSocket APIs"""
+        self.create_rest_apis()
+        self.create_websocket_apis()
+        # self.create_outputs()
+
+    def create_rest_apis(self):
+        """Create all REST APIs with complete configuration"""
+
+        # UserDashboardAPI - Original ID: 329yd7xxm0
+        UserDashboardAPI_api = apigateway.RestApi(
+            self.scope, "UserDashboardAPI",
+            rest_api_name=f"UserDashboardAPI-{self.env_name}",
+            description=f"User Dashboard API - {self.env_name}",
+            deploy_options=apigateway.StageOptions(
+                stage_name=self.env_name,
+                logging_level=self.config['api_settings']['logging_level'],
+                data_trace_enabled=self.config['api_settings']['data_trace_enabled'],
+                metrics_enabled=self.config['api_settings']['metrics_enabled']
+            ),
+            default_cors_preflight_options=apigateway.CorsOptions(
+                allow_origins=apigateway.Cors.ALL_ORIGINS,
+                allow_methods=apigateway.Cors.ALL_METHODS,
+                allow_headers=["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
+            )
+        )
+        self.rest_apis['UserDashboardAPI'] = UserDashboardAPI_api
+
+        # Resource: /dashboard
+        UserDashboardAPI__dashboard = UserDashboardAPI_api.root.add_resource("dashboard")
+        UserDashboardAPI__dashboard.add_method(
+            "GET",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ProcessUserData'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+
+        # QueryAnalyticsAPI1 - Original ID: adt0bzrd3e
+        QueryAnalyticsAPI1_api = apigateway.RestApi(
+            self.scope, "QueryAnalyticsAPI1",
+            rest_api_name=f"QueryAnalyticsAPI-All-{self.env_name}",
+            description=f"Query Analytics API - All - {self.env_name}",
+            deploy_options=apigateway.StageOptions(
+                stage_name=self.env_name,
+                logging_level=self.config['api_settings']['logging_level'],
+                data_trace_enabled=self.config['api_settings']['data_trace_enabled'],
+                metrics_enabled=self.config['api_settings']['metrics_enabled']
+            ),
+            default_cors_preflight_options=apigateway.CorsOptions(
+                allow_origins=apigateway.Cors.ALL_ORIGINS,
+                allow_methods=apigateway.Cors.ALL_METHODS,
+                allow_headers=["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
+            )
+        )
+        self.rest_apis['QueryAnalyticsAPI1'] = QueryAnalyticsAPI1_api
+
+        # Resource: /analytics
+        QueryAnalyticsAPI1__analytics = QueryAnalyticsAPI1_api.root.add_resource("analytics")
+        # Resource: /analytics/all
+        QueryAnalyticsAPI1__analytics_all = QueryAnalyticsAPI1__analytics.add_resource("all")
+        QueryAnalyticsAPI1__analytics_all.add_method(
+            "POST",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('query-analytics-api'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+
+        # QueryAnalyticsAPI2 - Original ID: ite99ljw0b
+        QueryAnalyticsAPI2_api = apigateway.RestApi(
+            self.scope, "QueryAnalyticsAPI2",
+            rest_api_name=f"QueryAnalyticsAPI-Queries-{self.env_name}",
+            description=f"Query Analytics API - Queries - {self.env_name}",
+            deploy_options=apigateway.StageOptions(
+                stage_name=self.env_name,
+                logging_level=self.config['api_settings']['logging_level'],
+                data_trace_enabled=self.config['api_settings']['data_trace_enabled'],
+                metrics_enabled=self.config['api_settings']['metrics_enabled']
+            ),
+            default_cors_preflight_options=apigateway.CorsOptions(
+                allow_origins=apigateway.Cors.ALL_ORIGINS,
+                allow_methods=apigateway.Cors.ALL_METHODS,
+                allow_headers=["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
+            )
+        )
+        self.rest_apis['QueryAnalyticsAPI2'] = QueryAnalyticsAPI2_api
+
+        # Resource: /analytics
+        QueryAnalyticsAPI2__analytics = QueryAnalyticsAPI2_api.root.add_resource("analytics")
+        # Resource: /analytics/queries
+        QueryAnalyticsAPI2__analytics_queries = QueryAnalyticsAPI2__analytics.add_resource("queries")
+        QueryAnalyticsAPI2__analytics_queries.add_method(
+            "POST",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('query-analytics-api'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+
+        # createUser - Original ID: kahgke45yd
+        createUser_api = apigateway.RestApi(
+            self.scope, "createUser",
+            rest_api_name=f"createUser-{self.env_name}",
+            description=f"Create User API - {self.env_name}",
+            deploy_options=apigateway.StageOptions(
+                stage_name=self.env_name,
+                logging_level=self.config['api_settings']['logging_level'],
+                data_trace_enabled=self.config['api_settings']['data_trace_enabled'],
+                metrics_enabled=self.config['api_settings']['metrics_enabled']
+            ),
+            default_cors_preflight_options=apigateway.CorsOptions(
+                allow_origins=apigateway.Cors.ALL_ORIGINS,
+                allow_methods=apigateway.Cors.ALL_METHODS,
+                allow_headers=["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
+            )
+        )
+        self.rest_apis['createUser'] = createUser_api
+
+        # Resource: /addUser
+        createUser__addUser = createUser_api.root.add_resource("addUser")
+        createUser__addUser.add_method(
+            "POST",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ProcessUserData'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+
+        # ReferralChatbotAPI - Original ID: pncxzrq0r9
+        ReferralChatbotAPI_api = apigateway.RestApi(
+            self.scope, "ReferralChatbotAPI",
+            rest_api_name=f"ReferralChatbotAPI-{self.env_name}",
+            description=f"Referral Chatbot API - {self.env_name}",
+            deploy_options=apigateway.StageOptions(
+                stage_name=self.env_name,
+                logging_level=self.config['api_settings']['logging_level'],
+                data_trace_enabled=self.config['api_settings']['data_trace_enabled'],
+                metrics_enabled=self.config['api_settings']['metrics_enabled']
+            ),
+            default_cors_preflight_options=apigateway.CorsOptions(
+                allow_origins=apigateway.Cors.ALL_ORIGINS,
+                allow_methods=apigateway.Cors.ALL_METHODS,
+                allow_headers=["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
+            )
+        )
+        self.rest_apis['ReferralChatbotAPI'] = ReferralChatbotAPI_api
+
+        # Resource: /chat
+        ReferralChatbotAPI__chat = ReferralChatbotAPI_api.root.add_resource("chat")
+        ReferralChatbotAPI__chat.add_method(
+            "POST",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('referralChatbotLambda'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+
+        # ReferralsApi - Original ID: twi9ghqfhl
+        ReferralsApi_api = apigateway.RestApi(
+            self.scope, "ReferralsApi",
+            rest_api_name=f"ReferralsApi-{self.env_name}",
+            description=f"Referrals API - {self.env_name}",
+            deploy_options=apigateway.StageOptions(
+                stage_name=self.env_name,
+                logging_level=self.config['api_settings']['logging_level'],
+                data_trace_enabled=self.config['api_settings']['data_trace_enabled'],
+                metrics_enabled=self.config['api_settings']['metrics_enabled']
+            ),
+            default_cors_preflight_options=apigateway.CorsOptions(
+                allow_origins=apigateway.Cors.ALL_ORIGINS,
+                allow_methods=apigateway.Cors.ALL_METHODS,
+                allow_headers=["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
+            )
+        )
+        self.rest_apis['ReferralsApi'] = ReferralsApi_api
+
+        # Resource: /referrals
+        ReferralsApi__referrals = ReferralsApi_api.root.add_resource("referrals")
+
+        # Add methods to /referrals
+        ReferralsApi__referrals.add_method(
+            "DELETE",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ReferralsApiHandler'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+        ReferralsApi__referrals.add_method(
+            "GET",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ReferralsApiHandler'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+        ReferralsApi__referrals.add_method(
+            "POST",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ReferralsApiHandler'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+        ReferralsApi__referrals.add_method(
+            "PUT",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ReferralsApiHandler'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+
+        # Resource: /referrals/{referral_id}
+        ReferralsApi__referrals__referral_id_ = ReferralsApi__referrals.add_resource("{referral_id}")
+        ReferralsApi__referrals__referral_id_.add_method(
+            "DELETE",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ReferralsApiHandler'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+        ReferralsApi__referrals__referral_id_.add_method(
+            "GET",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ReferralsApiHandler'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+        ReferralsApi__referrals__referral_id_.add_method(
+            "POST",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ReferralsApiHandler'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+        ReferralsApi__referrals__referral_id_.add_method(
+            "PUT",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ReferralsApiHandler'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+
+        # Resource: /referrals/search
+        ReferralsApi__referrals_search = ReferralsApi__referrals.add_resource("search")
+        ReferralsApi__referrals_search.add_method(
+            "POST",
+            apigateway.LambdaIntegration(
+                self.lambda_functions.get('ReferralsApiHandler'),
+                proxy=True
+            ),
+            authorization_type=apigateway.AuthorizationType.NONE
+        )
+
+    def create_websocket_apis(self):
+        """Create all WebSocket APIs with complete configuration"""
+
+        # AnalyticsWebSocketAPI - Original ID: duqhouj11e
+        AnalyticsWebSocketAPI_api = apigatewayv2.WebSocketApi(
+            self.scope, "AnalyticsWebSocketAPI",
+            api_name=f"AnalyticsWebSocketAPI-{self.env_name}",
+            description=f"Analytics WebSocket API - {self.env_name}",
+        )
+
+        AnalyticsWebSocketAPI_stage = apigatewayv2.WebSocketStage(
+            self.scope, "AnalyticsWebSocketAPIStage",
+            web_socket_api=AnalyticsWebSocketAPI_api,
+            stage_name=self.env_name,
+            auto_deploy=True
+        )
+        self.websocket_apis['AnalyticsWebSocketAPI'] = (AnalyticsWebSocketAPI_api, AnalyticsWebSocketAPI_stage)
+
+        # Lambda integration
+        AnalyticsWebSocketAPI_integration = integrations.WebSocketLambdaIntegration(
+            "AnalyticsWebSocketAPIIntegration",
+            handler=self.lambda_functions.get('query-analytics-api')
+        )
+
+        # Routes
+        AnalyticsWebSocketAPI_api.add_route(
+            "$default",
+            integration=AnalyticsWebSocketAPI_integration
+        )
+        AnalyticsWebSocketAPI_api.add_route(
+            "$connect",
+            integration=AnalyticsWebSocketAPI_integration
+        )
+        AnalyticsWebSocketAPI_api.add_route(
+            "getAnalytics",
+            integration=AnalyticsWebSocketAPI_integration
+        )
+        AnalyticsWebSocketAPI_api.add_route(
+            "$disconnect",
+            integration=AnalyticsWebSocketAPI_integration
+        )
+
+        # ReferralChatbotWebSocket - Original ID: lajngh4a22
+        ReferralChatbotWebSocket_api = apigatewayv2.WebSocketApi(
+            self.scope, "ReferralChatbotWebSocket",
+            api_name=f"ReferralChatbotWebSocket-{self.env_name}",
+            description=f"Referral Chatbot WebSocket API - {self.env_name}",
+        )
+
+        ReferralChatbotWebSocket_stage = apigatewayv2.WebSocketStage(
+            self.scope, "ReferralChatbotWebSocketStage",
+            web_socket_api=ReferralChatbotWebSocket_api,
+            stage_name=self.env_name,
+            auto_deploy=True
+        )
+        self.websocket_apis['ReferralChatbotWebSocket'] = (ReferralChatbotWebSocket_api, ReferralChatbotWebSocket_stage)
+
+        # Lambda integration
+        ReferralChatbotWebSocket_integration = integrations.WebSocketLambdaIntegration(
+            "ReferralChatbotWebSocketIntegration",
+            handler=self.lambda_functions.get('referralChatbotLambda')
+        )
+
+        # Routes
+        ReferralChatbotWebSocket_api.add_route(
+            "$connect",
+            integration=ReferralChatbotWebSocket_integration
+        )
+        ReferralChatbotWebSocket_api.add_route(
+            "query",
+            integration=ReferralChatbotWebSocket_integration
+        )
+        ReferralChatbotWebSocket_api.add_route(
+            "$disconnect",
+            integration=ReferralChatbotWebSocket_integration
+        )
+
+        # UserFeedbackWebSocketAPI - Original ID: p8ea1v23i0
+        UserFeedbackWebSocketAPI_api = apigatewayv2.WebSocketApi(
+            self.scope, "UserFeedbackWebSocketAPI",
+            api_name=f"UserFeedbackWebSocketAPI-{self.env_name}",
+            description=f"User Feedback WebSocket API - {self.env_name}",
+        )
+
+        UserFeedbackWebSocketAPI_stage = apigatewayv2.WebSocketStage(
+            self.scope, "UserFeedbackWebSocketAPIStage",
+            web_socket_api=UserFeedbackWebSocketAPI_api,
+            stage_name=self.env_name,
+            auto_deploy=True
+        )
+        self.websocket_apis['UserFeedbackWebSocketAPI'] = (UserFeedbackWebSocketAPI_api, UserFeedbackWebSocketAPI_stage)
+
+        # Lambda integration
+        UserFeedbackWebSocketAPI_integration = integrations.WebSocketLambdaIntegration(
+            "UserFeedbackWebSocketAPIIntegration",
+            handler=self.lambda_functions.get('ProcessUserData')
+        )
+
+        # Routes
+        UserFeedbackWebSocketAPI_api.add_route(
+            "$disconnect",
+            integration=UserFeedbackWebSocketAPI_integration
+        )
+        UserFeedbackWebSocketAPI_api.add_route(
+            "sendFeedback",
+            integration=UserFeedbackWebSocketAPI_integration
+        )
+        UserFeedbackWebSocketAPI_api.add_route(
+            "updateUser",
+            integration=UserFeedbackWebSocketAPI_integration
+        )
+        UserFeedbackWebSocketAPI_api.add_route(
+            "getUser",
+            integration=UserFeedbackWebSocketAPI_integration
+        )
+        UserFeedbackWebSocketAPI_api.add_route(
+            "$connect",
+            integration=UserFeedbackWebSocketAPI_integration
+        )
+
+        # ReferralsWebSocketAPI - Original ID: z0ebrmmyd0
+        ReferralsWebSocketAPI_api = apigatewayv2.WebSocketApi(
+            self.scope, "ReferralsWebSocketAPI",
+            api_name=f"ReferralsWebSocketAPI-{self.env_name}",
+            description=f"Referrals WebSocket API - {self.env_name}",
+        )
+
+        ReferralsWebSocketAPI_stage = apigatewayv2.WebSocketStage(
+            self.scope, "ReferralsWebSocketAPIStage",
+            web_socket_api=ReferralsWebSocketAPI_api,
+            stage_name=self.env_name,
+            auto_deploy=True
+        )
+        self.websocket_apis['ReferralsWebSocketAPI'] = (ReferralsWebSocketAPI_api, ReferralsWebSocketAPI_stage)
+
+        # Lambda integration
+        ReferralsWebSocketAPI_integration = integrations.WebSocketLambdaIntegration(
+            "ReferralsWebSocketAPIIntegration",
+            handler=self.lambda_functions.get('ReferralsApiHandler')
+        )
+
+        # Routes
+        ReferralsWebSocketAPI_api.add_route(
+            "getReferrals",
+            integration=ReferralsWebSocketAPI_integration
+        )
+        ReferralsWebSocketAPI_api.add_route(
+            "$connect",
+            integration=ReferralsWebSocketAPI_integration
+        )
+        ReferralsWebSocketAPI_api.add_route(
+            "createReferral",
+            integration=ReferralsWebSocketAPI_integration
+        )
+        ReferralsWebSocketAPI_api.add_route(
+            "searchReferrals",
+            integration=ReferralsWebSocketAPI_integration
+        )
+        ReferralsWebSocketAPI_api.add_route(
+            "$default",
+            integration=ReferralsWebSocketAPI_integration
+        )
+        ReferralsWebSocketAPI_api.add_route(
+            "updateReferral",
+            integration=ReferralsWebSocketAPI_integration
+        )
+        ReferralsWebSocketAPI_api.add_route(
+            "$disconnect",
+            integration=ReferralsWebSocketAPI_integration
+        )
+        ReferralsWebSocketAPI_api.add_route(
+            "deleteReferral",
+            integration=ReferralsWebSocketAPI_integration
+        )
+        ReferralsWebSocketAPI_api.add_route(
+            "getReferral",
+            integration=ReferralsWebSocketAPI_integration
+        )
+
+    # def create_outputs(self):
+    #     """Create CloudFormation outputs for all APIs"""
+
+    #     # REST API outputs
+    #     for api_name, api in self.rest_apis.items():
+    #         CfnOutput(self.scope, f"{api_name}Url",
+    #             value=f"https://{api.rest_api_id}.execute-api.{self.scope.region}.amazonaws.com/{api.deployment_stage.stage_name}/",
+    #             description=f"URL of the {api_name} REST API"
+    #         )
+
+    #     # WebSocket API outputs
+    #     for api_name, (api, stage) in self.websocket_apis.items():
+    #         CfnOutput(self.scope, f"{api_name}Url",
+    #             value=f"wss://{api.api_id}.execute-api.{self.scope.region}.amazonaws.com/{stage.stage_name}/",
+    #             description=f"URL of the {api_name} WebSocket API"
+    #         )
+
 
 class BrightpointStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, env_name: str = "dev", **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        account_id = "108782065617"
+        self.env_name = env_name
+        self.account_id = "216989103356"
 
-        # Import existing DynamoDB tables
-        referral_data_table = dynamodb.Table.from_table_name(
-            self, "ReferralDataTable", "referral_data"
+        perplexity_secret = secretsmanager.Secret.from_secret_name_v2(
+            self, "PerplexityApiKeySecret",
+            secret_name="perplexity_api_key"
         )
 
-        user_data_table = dynamodb.Table.from_table_name(
-            self, "UserDataTable", "user_data"
+        # Get environment-specific configuration
+        self.config = EnvironmentConfig.get_config(env_name)
+
+        github_token_secret = secretsmanager.Secret.from_secret_name_v2(
+            self, "GitHubTokenSecret", "github-token"
         )
 
-        websocket_connections_table = dynamodb.Table.from_table_name(
-            self, "WebSocketConnectionsTable", "WebSocketConnections"
-        )
+        # Get the plaintext secret value
+        github_token = github_token_secret.secret_value
 
-        perplexity_query_cache_table = dynamodb.Table.from_table_name(
-            self, "perplexity_query_cacheTable", "perplexity_query_cache"
-        )
+        # Add tags to all resources in this stack
+        Tags.of(self).add("Environment", self.env_name)
+        Tags.of(self).add("Application", "Brightpoint")
 
-        query_analytics_table = dynamodb.Table.from_table_name(
-            self, "query_analyticsTable", "query_analytics"
-        )
-
-        # DynamoDB Tables CDK Configuration for New Environment
-
+        # DynamoDB Tables Creation with environment prefix
         # Table: WebSocketConnections
-        # websocket_connections_table = dynamodb.Table(
-        #     self, 'WebSocketConnectionsTable',
-        #     table_name='WebSocketConnections',
-        #     partition_key=dynamodb.Attribute(name='connectionId', type=dynamodb.AttributeType.STRING),
-        #     billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-        #     removal_policy=RemovalPolicy.RETAIN,  # Change as needed
-        # )
+        websocket_connections_table = dynamodb.Table(
+            self, 'WebSocketConnectionsTable',
+            table_name=f'WebSocketConnections-{self.env_name}',
+            partition_key=dynamodb.Attribute(name='connectionId', type=dynamodb.AttributeType.STRING),
+            billing_mode=self.config['table_settings']['billing_mode'],
+            removal_policy=self.config['table_settings']['removal_policy'],
+        )
 
         # Table: perplexity_query_cache
-        # perplexity_query_cache_table = dynamodb.Table(
-        #     self, 'perplexity_query_cacheTable',
-        #     table_name='perplexity_query_cache',
-        #     partition_key=dynamodb.Attribute(name='query_id', type=dynamodb.AttributeType.STRING),
-        #     billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-        #     removal_policy=RemovalPolicy.RETAIN,  # Change as needed
-        # )
+        perplexity_query_cache_table = dynamodb.Table(
+            self, 'perplexity_query_cacheTable',
+            table_name=f'perplexity_query_cache-{self.env_name}',
+            partition_key=dynamodb.Attribute(name='query_id', type=dynamodb.AttributeType.STRING),
+            billing_mode=self.config['table_settings']['billing_mode'],
+            removal_policy=self.config['table_settings']['removal_policy'],
+        )
 
         # Table: query_analytics
-        # query_analytics_table = dynamodb.Table(
-        #     self, 'query_analyticsTable',
-        #     table_name='query_analytics',
-        #     partition_key=dynamodb.Attribute(name='query_text', type=dynamodb.AttributeType.STRING),
-        #     sort_key=dynamodb.Attribute(name='Zipcode', type=dynamodb.AttributeType.STRING),
-        #     billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-        #     removal_policy=RemovalPolicy.RETAIN,  # Change as needed
-        # )
+        query_analytics_table = dynamodb.Table(
+            self, 'query_analyticsTable',
+            table_name=f'query_analytics-{self.env_name}',
+            partition_key=dynamodb.Attribute(name='query_text', type=dynamodb.AttributeType.STRING),
+            sort_key=dynamodb.Attribute(name='Zipcode', type=dynamodb.AttributeType.STRING),
+            billing_mode=self.config['table_settings']['billing_mode'],
+            removal_policy=self.config['table_settings']['removal_policy'],
+        )
 
         # Table: referral_data
-        # referral_data_table = dynamodb.Table(
-        #     self, 'referral_dataTable',
-        #     table_name='referral_data',
-        #     partition_key=dynamodb.Attribute(name='referral_id', type=dynamodb.AttributeType.STRING),
-        #     billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-        #     removal_policy=RemovalPolicy.RETAIN,  # Change as needed
-        # )
+        referral_data_table = dynamodb.Table(
+            self, 'referral_dataTable',
+            table_name=f'referral_data-{self.env_name}',
+            partition_key=dynamodb.Attribute(name='referral_id', type=dynamodb.AttributeType.STRING),
+            billing_mode=self.config['table_settings']['billing_mode'],
+            removal_policy=self.config['table_settings']['removal_policy'],
+        )
 
         # Table: user_data
-        # user_data_table = dynamodb.Table(
-        #     self, 'user_dataTable',
-        #     table_name='user_data',
-        #     partition_key=dynamodb.Attribute(name='user_id', type=dynamodb.AttributeType.STRING),
-        #     billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-        #     stream=dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
-        #     removal_policy=RemovalPolicy.RETAIN,  # Change as needed
-        # )
-
-        # Global Secondary Indexes for user_data
-        # user_data_table.add_global_secondary_index(
-        #     index_name='Phone-index',
-        #     partition_key=dynamodb.Attribute(name='Phone', type=dynamodb.AttributeType.STRING),
-        #     projection_type=dynamodb.ProjectionType.ALL,
-        # )
-
-
-        # Import existing API Gateways - REST APIs
-        rest_api_ids = {
-            "ReferralChatbotAPI": "pncxzrq0r9",
-            "ProcessUserRestAPI": "kahgke45yd",  # Also known as createUser
-            "UserDashboardAPI": "329yd7xxm0",
-            "QueryAnalyticsAPI1": "adt0bzrd3e",
-            "QueryAnalyticsAPI2": "ite99ljw0b",
-            "ReferralsApi": "twi9ghqfhl"
-        }
-
-        rest_apis = {}
-
-        # Import REST APIs
-        for api_name, api_id in rest_api_ids.items():
-            rest_apis[api_name] = apigateway.RestApi.from_rest_api_id(
-                self, f"{api_name}Id",
-                rest_api_id=api_id
-            )
-
-        # Import existing API Gateways - WebSocket APIs
-        websocket_api_ids = {
-            "ReferralChatbotWebSocket": "lajngh4a22",
-            "ProcessUserWebSocketAPI": "p8ea1v23i0",  # Also known as UserFeedbackWebSocketAPI
-            "AnalyticsWebSocketAPI": "duqhouj11e",
-            "ReferralsWebSocketAPI": "z0ebrmmyd0"
-        }
-
-        # Import existing Lambda functions
-        referral_chatbot_fn = lambda_.Function.from_function_name(
-            self, "ReferralChatbotLambdaFn", "referralChatbotLambda"
+        user_data_table = dynamodb.Table(
+            self, 'user_dataTable',
+            table_name=f'user_data-{self.env_name}',
+            partition_key=dynamodb.Attribute(name='user_id', type=dynamodb.AttributeType.STRING),
+            billing_mode=self.config['table_settings']['billing_mode'],
+            stream=dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
+            removal_policy=self.config['table_settings']['removal_policy'],
         )
 
-        perplexity_lambda_fn = lambda_.Function.from_function_name(
-            self, "PerplexityLambdaFn", "perplexityLambda"
+        # Global Secondary Index for user_data
+        user_data_table.add_global_secondary_index(
+            index_name='Phone-index',
+            partition_key=dynamodb.Attribute(name='Phone', type=dynamodb.AttributeType.STRING),
+            projection_type=dynamodb.ProjectionType.ALL,
         )
 
-        process_user_data_fn = lambda_.Function.from_function_name(
-            self, "ProcessUserDataFn", "ProcessUserData"
+        # --- Cognito User Pool ---
+        user_pool = cognito.UserPool(
+            self, "BrightpointUserPool",
+            user_pool_name=f"BrightpointUserPool-{self.env_name}",
+            self_sign_up_enabled=True,
+            sign_in_aliases=cognito.SignInAliases(email=True),
+            auto_verify=cognito.AutoVerifiedAttrs(email=True),
+            account_recovery=cognito.AccountRecovery.EMAIL_ONLY
         )
 
-        query_analytics_backfill_fn = lambda_.Function.from_function_name(
-            self, "QueryAnalyticsBackfillFn", "query-analytics-backfill"
+        user_pool_client = cognito.UserPoolClient(
+            self, "BrightpointUserPoolClient",
+            user_pool_client_name=f"BrightpointUserPoolClient-{self.env_name}",
+            user_pool=user_pool,
+            generate_secret=False,
+            auth_flows=cognito.AuthFlow(user_password=True)
         )
 
-        query_analytics_api_fn = lambda_.Function.from_function_name(
-            self, "QueryAnalyticsApiFn", "query-analytics-api"
+        identity_pool = cognito.CfnIdentityPool(
+            self, "BrightpointIdentityPool",
+            identity_pool_name=f"BrightpointIdentityPool-{self.env_name}",
+            allow_unauthenticated_identities=False,
+            cognito_identity_providers=[{
+                "clientId": user_pool_client.user_pool_client_id,
+                "providerName": user_pool.user_pool_provider_name,
+            }]
         )
 
-        referrals_api_handler_fn = lambda_.Function.from_function_name(
-            self, "ReferralsApiHandlerFn", "ReferralsApiHandler"
-        )
+        # --- Amplify Hosting ---
+        amplify_app = amplify.App(
+            self, "BrightpointManualAmplifyApp",
+            app_name=f"brightpoint-{self.env_name}-app",
+            description=f"Amplify App for manually deployed frontend - {self.env_name}",
+            auto_branch_deletion=False
+            # Note: No build_spec or source_code_provider needed for manual deployment
+        ) 
 
-        sms_chat_integration_fn = lambda_.Function.from_function_name(
-            self, "SmsChatIntegrationFn", "smsChatIntegration"
-        )
+        # Connect to frontend-code branch
+        env_branch = amplify_app.add_branch("frontend-code")
 
-        query_analytics_stream_processor_fn = lambda_.Function.from_function_name(
-            self, "QueryAnalyticsStreamProcessorFn", "query-analytics-stream-processor"
-        )
+        env_branch.add_environment("REACT_APP_ENVIRONMENT", self.env_name)
+        env_branch.add_environment("REACT_APP_USER_POOL_ID", user_pool.user_pool_id)
+        env_branch.add_environment("REACT_APP_USER_POOL_CLIENT_ID", user_pool_client.user_pool_client_id)
+        env_branch.add_environment("REACT_APP_IDENTITY_POOL_ID", identity_pool.ref)
+        env_branch.add_environment("REACT_APP_REGION", self.region)
 
-
-        # Option to create new Lambda functions (commented out as we're using existing ones)
-        """
-        # Create Lambda execution roles
+        # Create Lambda execution roles with environment-specific names
         referral_chatbot_role = iam.Role(
             self, "ReferralChatbotRole",
-            role_name="referralChatbotLambda-role",
+            role_name=f"referralChatbotLambda-role-{self.env_name}",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Role for Brightpoint Referral Chatbot Lambda function"
+            description=f"Role for Brightpoint Referral Chatbot Lambda function - {self.env_name}"
         )
-        
-        # Add policies for referralChatbotLambda role
-        self.add_referral_chatbot_role_policies(referral_chatbot_role, account_id)
-        
-        # Create perplexityLambda role
+        self.add_referral_chatbot_role_policies(referral_chatbot_role, self.account_id)
+
         perplexity_lambda_role = iam.Role(
             self, "PerplexityLambdaRole",
-            role_name="perplexityLambda-role",
+            role_name=f"perplexityLambda-role-{self.env_name}",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Role for Perplexity Lambda function"
+            description=f"Role for Perplexity Lambda function - {self.env_name}"
         )
-        
-        # Add policies for perplexityLambda role
-        self.add_perplexity_lambda_role_policies(perplexity_lambda_role, account_id)
-        
-        # Create ProcessUserData Lambda role
+        self.add_perplexity_lambda_role_policies(perplexity_lambda_role, self.account_id)
+
         process_user_data_role = iam.Role(
             self, "ProcessUserDataRole",
-            role_name="LambdaUserDynamoDBRole",
+            role_name=f"LambdaUserDynamoDBRole-{self.env_name}",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Role for Process User Data Lambda function"
+            description=f"Role for Process User Data Lambda function - {self.env_name}"
         )
-        
-        # Add policies for ProcessUserData role
-        self.add_process_user_data_role_policies(process_user_data_role, account_id)
-        
-        # Create query-analytics-backfill Lambda role
+        self.add_process_user_data_role_policies(process_user_data_role, self.account_id)
+
         query_analytics_backfill_role = iam.Role(
             self, "QueryAnalyticsBackfillRole",
-            role_name="query-analytics-backfill-role-1osb4uwf",
+            role_name=f"query-analytics-backfill-role-{self.env_name}",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Role for Query Analytics Backfill Lambda function"
+            description=f"Role for Query Analytics Backfill Lambda function - {self.env_name}"
         )
-        
-        # Add policies for query-analytics-backfill role
-        self.add_query_analytics_backfill_role_policies(query_analytics_backfill_role, account_id)
-        
-        # Create query-analytics-api Lambda role
+        self.add_query_analytics_backfill_role_policies(query_analytics_backfill_role, self.account_id)
+
         query_analytics_api_role = iam.Role(
             self, "QueryAnalyticsApiRole",
-            role_name="query-analytics-api-role",
+            role_name=f"query-analytics-api-role-{self.env_name}",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Role for Query Analytics API Lambda function"
+            description=f"Role for Query Analytics API Lambda function - {self.env_name}"
         )
-        
-        # Add policies for query-analytics-api role
-        self.add_query_analytics_api_role_policies(query_analytics_api_role, account_id)
-        
-        # Create ReferralsApiHandler Lambda role
+        self.add_query_analytics_api_role_policies(query_analytics_api_role, self.account_id)
+
         referrals_api_handler_role = iam.Role(
             self, "ReferralsApiHandlerRole",
-            role_name="ReferralsApiHandler-role",
+            role_name=f"ReferralsApiHandler-role-{self.env_name}",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Role for Referrals API Handler Lambda function"
+            description=f"Role for Referrals API Handler Lambda function - {self.env_name}"
         )
-        
-        # Add policies for ReferralsApiHandler role
-        self.add_referrals_api_handler_role_policies(referrals_api_handler_role, account_id)
-        
-        # Create smsChatIntegration Lambda role
+        self.add_referrals_api_handler_role_policies(referrals_api_handler_role, self.account_id)
+
         sms_chat_integration_role = iam.Role(
             self, "SmsChatIntegrationRole",
-            role_name="smsChatIntegration-role-ihkg71ku",
+            role_name=f"smsChatIntegration-role-{self.env_name}",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Role for SMS Chat Integration Lambda function"
+            description=f"Role for SMS Chat Integration Lambda function - {self.env_name}"
         )
-        
-        # Add policies for smsChatIntegration role
-        self.add_sms_chat_integration_role_policies(sms_chat_integration_role, account_id)
-        
-        # Create query-analytics-stream-processor Lambda role
+        self.add_sms_chat_integration_role_policies(sms_chat_integration_role, self.account_id)
+
         query_analytics_stream_processor_role = iam.Role(
             self, "QueryAnalyticsStreamProcessorRole",
-            role_name="query-analytics-stream-processor-role-ipnlblc1",
+            role_name=f"query-analytics-stream-processor-role-{self.env_name}",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            description="Role for Query Analytics Stream Processor Lambda function"
+            description=f"Role for Query Analytics Stream Processor Lambda function - {self.env_name}"
         )
-        
-        # Add policies for query-analytics-stream-processor role
-        self.add_query_analytics_stream_processor_role_policies(query_analytics_stream_processor_role, account_id)
+        self.add_query_analytics_stream_processor_role_policies(query_analytics_stream_processor_role, self.account_id)
 
-                
-        # Create the referralChatbotLambda function
-        # This function includes bedrockAgent.py and getServiceCategories.py as helper modules
+        # Create Lambda functions with environment-specific names
         referral_chatbot_fn = lambda_.Function(
             self, "ReferralChatbotLambdaFn",
-            function_name="referralChatbotLambda",
+            function_name=f"referralChatbotLambda-{self.env_name}",
             runtime=lambda_.Runtime.PYTHON_3_12,
             code=lambda_.Code.from_asset("brightpoint/referral_chatbot"),
             handler="referralChatbotLambda.lambda_handler",
             role=referral_chatbot_role,
-            timeout=Duration.seconds(900),  # 15 minutes
-            memory_size=1024,
-            architecture=lambda_.Architecture.X86_64
+            timeout=Duration.seconds(self.config['timeout']['referralChatbotLambda']),
+            memory_size=self.config['memory_size']['referralChatbotLambda'],
+            architecture=lambda_.Architecture.X86_64,
+            environment={
+                "ENVIRONMENT": self.env_name,
+                "REFERRAL_TABLE": f"referral_data-{self.env_name}",
+                "USER_TABLE": f"user_data-{self.env_name}"
+            }
         )
-        
-        # Create the perplexityLambda function
+
         perplexity_lambda_fn = lambda_.Function(
             self, "PerplexityLambdaFn",
-            function_name="perplexityLambda",
+            function_name=f"perplexityLambda-{self.env_name}",
             runtime=lambda_.Runtime.PYTHON_3_12,
             code=lambda_.Code.from_asset("brightpoint/perplexity_lambda"),
             handler="lambda_function.lambda_handler",
             role=perplexity_lambda_role,
-            timeout=Duration.seconds(900),  # 15 minutes
-            memory_size=2048,
+            timeout=Duration.seconds(self.config['timeout']['perplexityLambda']),
+            memory_size=self.config['memory_size']['perplexityLambda'],
             architecture=lambda_.Architecture.X86_64,
             environment={
-                "PERPLEXITY_API_KEY": "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"
+                "ENVIRONMENT": self.env_name,
+                "PERPLEXITY_API_KEY_SECRET_ARN": perplexity_secret.secret_arn,
+                "CACHE_TABLE": f"perplexity_query_cache-{self.env_name}"
             }
         )
-        
-        # Create the ProcessUserData function
+
+        perplexity_secret.grant_read(perplexity_lambda_fn)
+
         process_user_data_fn = lambda_.Function(
             self, "ProcessUserDataFn",
-            function_name="ProcessUserData",
+            function_name=f"ProcessUserData-{self.env_name}",
             runtime=lambda_.Runtime.PYTHON_3_12,
             code=lambda_.Code.from_asset("brightpoint/process_user_data"),
             handler="lambda_function.lambda_handler",
             role=process_user_data_role,
-            timeout=Duration.seconds(900),  # 15 minutes
-            memory_size=1024,
-            architecture=lambda_.Architecture.X86_64
+            timeout=Duration.seconds(self.config['timeout']['ProcessUserData']),
+            memory_size=self.config['memory_size']['ProcessUserData'],
+            architecture=lambda_.Architecture.X86_64,
+            environment={
+                "ENVIRONMENT": self.env_name,
+                "USER_TABLE": f"user_data-{self.env_name}",
+                "WEBSOCKET_TABLE": f"WebSocketConnections-{self.env_name}"
+            }
         )
-        
-        # Create the query-analytics-api function
+
         query_analytics_api_fn = lambda_.Function(
             self, "QueryAnalyticsApiFn",
-            function_name="query-analytics-api",
+            function_name=f"query-analytics-api-{self.env_name}",
             runtime=lambda_.Runtime.PYTHON_3_12,
             code=lambda_.Code.from_asset("brightpoint/query_analytics_api"),
             handler="lambda_function.lambda_handler",
             role=query_analytics_api_role,
-            timeout=Duration.seconds(300),  # 5 minutes
-            memory_size=1024,
-            architecture=lambda_.Architecture.X86_64
+            timeout=Duration.seconds(self.config['timeout']['query-analytics-api']),
+            memory_size=self.config['memory_size']['query-analytics-api'],
+            architecture=lambda_.Architecture.X86_64,
+            environment={
+                "ENVIRONMENT": self.env_name,
+                "ANALYTICS_TABLE": f"query_analytics-{self.env_name}"
+            }
         )
-        
-        # Create the ReferralsApiHandler function
+
         referrals_api_handler_fn = lambda_.Function(
             self, "ReferralsApiHandlerFn",
-            function_name="ReferralsApiHandler",
+            function_name=f"ReferralsApiHandler-{self.env_name}",
             runtime=lambda_.Runtime.PYTHON_3_12,
             code=lambda_.Code.from_asset("brightpoint/referrals_api_handler"),
             handler="lambda_function.lambda_handler",
             role=referrals_api_handler_role,
-            timeout=Duration.seconds(300),  # 5 minutes
-            memory_size=1024,
-            architecture=lambda_.Architecture.X86_64
+            timeout=Duration.seconds(self.config['timeout']['ReferralsApiHandler']),
+            memory_size=self.config['memory_size']['ReferralsApiHandler'],
+            architecture=lambda_.Architecture.X86_64,
+            environment={
+                "ENVIRONMENT": self.env_name,
+                "REFERRAL_TABLE": f"referral_data-{self.env_name}",
+                "WEBSOCKET_TABLE": f"WebSocketConnections-{self.env_name}"
+            }
         )
-        
-        # Create the query-analytics-backfill function
+
         query_analytics_backfill_fn = lambda_.Function(
             self, "QueryAnalyticsBackfillFn",
-            function_name="query-analytics-backfill",
+            function_name=f"query-analytics-backfill-{self.env_name}",
             runtime=lambda_.Runtime.PYTHON_3_12,
             code=lambda_.Code.from_asset("brightpoint/query_analytics_backfill"),
             handler="lambda_function.lambda_handler",
             role=query_analytics_backfill_role,
-            timeout=Duration.seconds(900),  # 15 minutes
+            timeout=Duration.seconds(900),
             memory_size=512,
-            architecture=lambda_.Architecture.X86_64
+            architecture=lambda_.Architecture.X86_64,
+            environment={
+                "ENVIRONMENT": self.env_name
+            }
         )
-        
-        # Create the smsChatIntegration function
+
         sms_chat_integration_fn = lambda_.Function(
             self, "SmsChatIntegrationFn",
-            function_name="smsChatIntegration",
+            function_name=f"smsChatIntegration-{self.env_name}",
             runtime=lambda_.Runtime.PYTHON_3_12,
             code=lambda_.Code.from_asset("brightpoint/sms_chat_integration"),
             handler="lambda_function.lambda_handler",
             role=sms_chat_integration_role,
-            timeout=Duration.seconds(300),  # 5 minutes
+            timeout=Duration.seconds(300),
             memory_size=2048,
             architecture=lambda_.Architecture.X86_64,
             environment={
-                "USER_TABLE_NAME": "user_data",
+                "ENVIRONMENT": self.env_name,
+                "USER_TABLE_NAME": f"user_data-{self.env_name}",
                 "LOGIN_URL": "https://www.google.com/",
                 "PINPOINT_APPLICATION_ID": "38a47a3f1a734353a4621a2cf90ada0c",
-                "API_GATEWAY_URL": "https://pncxzrq0r9.execute-api.us-east-1.amazonaws.com/dev/chat",
+                "API_GATEWAY_URL": f"https://pncxzrq0r9.execute-api.us-east-1.amazonaws.com/{self.env_name}/chat",
                 "HTTP_TIMEOUT": "60",
                 "REGISTRATION_URL": "https://www.google.com/"
             }
         )
-        
+
         # Add SNS trigger permission (cross-account)
         sms_chat_integration_fn.add_permission(
             "AllowSNSInvoke",
@@ -359,238 +830,237 @@ class BrightpointStack(Stack):
             action="lambda:InvokeFunction",
             source_arn="arn:aws:sns:us-east-1:514811724234:PinpointV3Stack-responselambdatwoWaySMStopicC0D976B7-ntcREJoZGzuH"
         )
-        
-        # Create the query-analytics-stream-processor function
+
         query_analytics_stream_processor_fn = lambda_.Function(
             self, "QueryAnalyticsStreamProcessorFn",
-            function_name="query-analytics-stream-processor",
+            function_name=f"query-analytics-stream-processor-{self.env_name}",
             runtime=lambda_.Runtime.PYTHON_3_12,
             code=lambda_.Code.from_asset("brightpoint/query_analytics_stream_processor"),
             handler="lambda_function.lambda_handler",
             role=query_analytics_stream_processor_role,
-            timeout=Duration.seconds(300),  # 5 minutes
-            memory_size=512,  # Rounded up from 511
-            architecture=lambda_.Architecture.X86_64
+            timeout=Duration.seconds(300),
+            memory_size=512,
+            architecture=lambda_.Architecture.X86_64,
+            environment={
+                "ENVIRONMENT": self.env_name
+            }
         )
-        
+
         # Add DynamoDB stream event source mapping
         query_analytics_stream_processor_fn.add_event_source_mapping(
             "UserDataStreamMapping",
-            event_source_arn=user_data_table.stream_arn,  # Assuming user_data_table is already defined
+            event_source_arn=user_data_table.table_stream_arn,
             starting_position=lambda_.StartingPosition.LATEST,
             batch_size=100,
-            max_batching_window_in_seconds=0,
             parallelization_factor=1,
-            maximum_record_age_in_seconds=-1,
-            bisect_batch_on_function_error=False,
-            maximum_retry_attempts=-1,
-            tumbling_window_in_seconds=0
+            retry_attempts=0,
         )
-        
-        ### API GW Triggers for Lambda
-        referral_chatbot_fn.add_permission(
-            "AllowRestApiPost",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:pncxzrq0r9/*/POST/chat"
-        )
-        
-        # Add WebSocket API trigger permissions
-        referral_chatbot_fn.add_permission(
-            "AllowWebSocketConnect",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:lajngh4a22/*/$connect"
-        )
-        
-        referral_chatbot_fn.add_permission(
-            "AllowWebSocketDisconnect",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:lajngh4a22/*/$disconnect"
-        )
-        
-        referral_chatbot_fn.add_permission(
-            "AllowWebSocketQuery",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:lajngh4a22/*/query"
-        )
-        
-        # Add REST API trigger permissions
-        query_analytics_api_fn.add_permission(
-            "AllowQueryAnalyticsApi1",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:adt0bzrd3e/*/POST/analytics/all"
-        )
-        
-        query_analytics_api_fn.add_permission(
-            "AllowQueryAnalyticsApi2",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:ite99ljw0b/*/POST/analytics/queries"
-        )
-        
-        # Add WebSocket API trigger permissions
-        query_analytics_api_fn.add_permission(
-            "AllowAnalyticsWebSocketConnect",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:duqhouj11e/*/$connect"
-        )
-        
-        query_analytics_api_fn.add_permission(
-            "AllowAnalyticsWebSocketDisconnect",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:duqhouj11e/*/$disconnect"
-        )
-        
-        query_analytics_api_fn.add_permission(
-            "AllowAnalyticsWebSocketDefault",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:duqhouj11e/*/$default"
-        )
-        
-        query_analytics_api_fn.add_permission(
-            "AllowAnalyticsWebSocketGetAnalytics",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:duqhouj11e/*/getAnalytics"
-        )
-        
-        # Add REST API trigger permissions
-        referrals_api_methods = [
-            ("GET", "/referrals"),
-            ("POST", "/referrals"),
-            ("PUT", "/referrals"),
-            ("DELETE", "/referrals"),
-            ("GET", "/referrals/*"),
-            ("POST", "/referrals/*"),
-            ("PUT", "/referrals/*"),
-            ("DELETE", "/referrals/*"),
-            ("POST", "/referrals/search")
-        ]
-        
-        for method, path in referrals_api_methods:
-            permission_id = f"AllowReferralsApi{method}{path.replace('/', '').replace('*', 'Id')}"
-            referrals_api_handler_fn.add_permission(
-                permission_id,
-                principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-                action="lambda:InvokeFunction",
-                source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:twi9ghqfhl/*/{method}{path}"
-            )
-        
-        # Add WebSocket API trigger permissions
-        referrals_websocket_routes = [
-            "$connect",
-            "$disconnect",
-            "$default",
-            "getReferral",
-            "createReferral",
-            "updateReferral",
-            "getReferrals",
-            "deleteReferral",
-            "searchReferrals"
-        ]
-        
-        for route in referrals_websocket_routes:
-            permission_id = f"AllowReferralsWebSocket{route.replace('$', '')}"
-            referrals_api_handler_fn.add_permission(
-                permission_id,
-                principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-                action="lambda:InvokeFunction",
-                source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:z0ebrmmyd0/*/{route}"
-            )
-            
-        # Add REST API trigger permission
-        process_user_data_fn.add_permission(
-            "AllowCreateUserApi",
-            principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            action="lambda:InvokeFunction",
-            source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:kahgke45yd/*/POST/addUser"
-        )
-        
-        # Add WebSocket API trigger permissions
-        user_feedback_routes = [
-            "$connect",
-            "$disconnect",
-            "getUser",
-            "updateUser",
-            "sendFeedback"
-        ]
-        
-        for route in user_feedback_routes:
-            permission_id = f"AllowUserFeedbackWebSocket{route.replace('$', '')}"
-            process_user_data_fn.add_permission(
-                permission_id,
-                principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
-                action="lambda:InvokeFunction",
-                source_arn=f"arn:aws:execute-api:{self.region}:{account_id}:p8ea1v23i0/*/{route}"
-            )
 
-        """
+        # Create dictionary of Lambda functions for API Gateway
+        lambda_functions = {
+            'referralChatbotLambda': referral_chatbot_fn,
+            'perplexityLambda': perplexity_lambda_fn,
+            'ProcessUserData': process_user_data_fn,
+            'query-analytics-api': query_analytics_api_fn,
+            'ReferralsApiHandler': referrals_api_handler_fn,
+        }
 
-        # Output the REST API URLs
-        for api_name, api_id in rest_api_ids.items():
-            output_stage = "dev" if api_name not in ["ReferralChatbotAPI", "ProcessUserRestAPI"] else "prod"
-            CfnOutput(
-                self, f"{api_name}Url",
-                value=f"https://{api_id}.execute-api.{self.region}.amazonaws.com/{output_stage}/",
-                description=f"URL of the {api_name} REST API"
-            )
+        # Create API Gateway configuration
+        api_config = ApiGatewayComplete(self, self.account_id, lambda_functions, self.env_name)
 
-        # Output the WebSocket API URLs
-        for api_name, api_id in websocket_api_ids.items():
-            output_stage = "dev" if api_name not in ["ReferralChatbotWebSocket", "ProcessUserWebSocketAPI"] else "prod"
-            CfnOutput(
-                self, f"{api_name}Url",
-                value=f"wss://{api_id}.execute-api.{self.region}.amazonaws.com/{output_stage}/",
-                description=f"URL of the {api_name} WebSocket API"
-            )
+        # Add Lambda permissions for API Gateway invocations
+        # REST API permissions
+        for api_name, api in api_config.rest_apis.items():
+            if api_name == 'ReferralChatbotAPI':
+                referral_chatbot_fn.add_permission(
+                    "AllowReferralChatbotAPIInvoke",
+                    principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
+                    action="lambda:InvokeFunction",
+                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.rest_api_id}/*/POST/chat"
+                )
+            elif api_name == 'createUser':
+                process_user_data_fn.add_permission(
+                    "AllowCreateUserAPIInvoke",
+                    principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
+                    action="lambda:InvokeFunction",
+                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.rest_api_id}/*/POST/addUser"
+                )
+            elif api_name in ['QueryAnalyticsAPI1', 'QueryAnalyticsAPI2']:
+                query_analytics_api_fn.add_permission(
+                    f"Allow{api_name}Invoke",
+                    principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
+                    action="lambda:InvokeFunction",
+                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.rest_api_id}/*/POST/*"
+                )
+            elif api_name == 'ReferralsApi':
+                referrals_api_handler_fn.add_permission(
+                    "AllowReferralsAPIInvoke",
+                    principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
+                    action="lambda:InvokeFunction",
+                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.rest_api_id}/*/*"
+                )
+
+        # WebSocket API permissions
+        for api_name, (api, stage) in api_config.websocket_apis.items():
+            if api_name == 'ReferralChatbotWebSocket':
+                referral_chatbot_fn.add_permission(
+                    "AllowReferralChatbotWebSocketInvoke",
+                    principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
+                    action="lambda:InvokeFunction",
+                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.api_id}/*/*"
+                )
+            elif api_name == 'UserFeedbackWebSocketAPI':
+                process_user_data_fn.add_permission(
+                    "AllowUserFeedbackWebSocketInvoke",
+                    principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
+                    action="lambda:InvokeFunction",
+                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.api_id}/*/*"
+                )
+            elif api_name == 'AnalyticsWebSocketAPI':
+                query_analytics_api_fn.add_permission(
+                    "AllowAnalyticsWebSocketInvoke",
+                    principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
+                    action="lambda:InvokeFunction",
+                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.api_id}/*/*"
+                )
+            elif api_name == 'ReferralsWebSocketAPI':
+                referrals_api_handler_fn.add_permission(
+                    "AllowReferralsWebSocketInvoke",
+                    principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
+                    action="lambda:InvokeFunction",
+                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.api_id}/*/*"
+                )
 
         # Output the DynamoDB table names
+        # --- Comprehensive Outputs ---
+
+        # 1. Amplify Outputs
+        CfnOutput(
+            self, "AmplifyAppId",
+            value=amplify_app.app_id,
+            description=f"Amplify App ID for {self.env_name}",
+            export_name=f"{self.stack_name}-AmplifyAppId"
+        )
+
+        CfnOutput(
+            self, "AmplifyAppUrl",
+            value=f"https://frontend-code.{amplify_app.app_id}.amplifyapp.com",
+            description=f"URL of the Amplify App for {self.env_name}",
+            export_name=f"{self.stack_name}-AmplifyAppUrl"
+        )
+
+        CfnOutput(
+            self, "AmplifyConsoleUrl",
+            value=f"https://{self.region}.console.aws.amazon.com/amplify/apps/{amplify_app.app_id}",
+            description=f"Amplify Console URL for {self.env_name}",
+            export_name=f"{self.stack_name}-AmplifyConsoleUrl"
+        )
+
+        # 2. Cognito Outputs
+        CfnOutput(
+            self, "CognitoUserPoolId",
+            value=user_pool.user_pool_id,
+            description=f"Cognito User Pool ID for {self.env_name}",
+            export_name=f"{self.stack_name}-UserPoolId"
+        )
+
+        CfnOutput(
+            self, "CognitoUserPoolClientId",
+            value=user_pool_client.user_pool_client_id,
+            description=f"Cognito User Pool Client ID for {self.env_name}",
+            export_name=f"{self.stack_name}-UserPoolClientId"
+        )
+
+        CfnOutput(
+            self, "CognitoIdentityPoolId",
+            value=identity_pool.ref,
+            description=f"Cognito Identity Pool ID for {self.env_name}",
+            export_name=f"{self.stack_name}-IdentityPoolId"
+        )
+
+        CfnOutput(
+            self, "CognitoUserPoolDomain",
+            value=f"https://brightpoint-{self.env_name}.auth.{self.region}.amazoncognito.com",
+            description=f"Cognito User Pool Domain for {self.env_name}",
+            export_name=f"{self.stack_name}-UserPoolDomain"
+        )
+
+        # 3. REST API Endpoints
+        for api_name, api in api_config.rest_apis.items():
+            CfnOutput(
+                self, f"{api_name}Url",
+                value=f"https://{api.rest_api_id}.execute-api.{self.region}.amazonaws.com/{api.deployment_stage.stage_name}/",
+                description=f"URL of the {api_name} REST API for {self.env_name}",
+                export_name=f"{self.stack_name}-{api_name}Url"
+            )
+            
+            CfnOutput(
+                self, f"{api_name}Id",
+                value=api.rest_api_id,
+                description=f"API Gateway ID for {api_name} in {self.env_name}",
+                export_name=f"{self.stack_name}-{api_name}Id"
+            )
+
+        # 5. Environment Configuration Summary
+        config_summary = {
+            "environment": self.env_name,
+            "region": self.region,
+            "amplifyAppId": amplify_app.app_id,
+            "userPoolId": user_pool.user_pool_id,
+            "userPoolClientId": user_pool_client.user_pool_client_id,
+            "identityPoolId": identity_pool.ref,
+        }
+
+        CfnOutput(
+            self, "FrontendConfigSummary",
+            value=json.dumps(config_summary, indent=2),
+            description=f"Frontend configuration summary for {self.env_name}",
+            export_name=f"{self.stack_name}-ConfigSummary"
+        )
+
+        # 6. DynamoDB Table Names (already in your code, but grouped here)
         CfnOutput(
             self, "WebSocketConnectionsTableName",
             value=websocket_connections_table.table_name,
-            description="WebSocket Connections Table Name"
+            description="WebSocket Connections Table Name",
+            export_name=f"{self.stack_name}-WebSocketTableName"
         )
 
         CfnOutput(
             self, "PerplexityQueryCacheTableName",
             value=perplexity_query_cache_table.table_name,
-            description="Perplexity Query Cache Table Name"
+            description="Perplexity Query Cache Table Name",
+            export_name=f"{self.stack_name}-CacheTableName"
         )
 
         CfnOutput(
             self, "QueryAnalyticsTableName",
             value=query_analytics_table.table_name,
-            description="Query Analytics Table Name"
+            description="Query Analytics Table Name",
+            export_name=f"{self.stack_name}-AnalyticsTableName"
         )
 
         CfnOutput(
             self, "ReferralDataTableName",
             value=referral_data_table.table_name,
-            description="Referral Data Table Name (Imported)"
+            description="Referral Data Table Name",
+            export_name=f"{self.stack_name}-ReferralTableName"
         )
 
         CfnOutput(
             self, "UserDataTableName",
             value=user_data_table.table_name,
-            description="User Data Table Name (Imported)"
+            description="User Data Table Name",
+            export_name=f"{self.stack_name}-UserTableName"
         )
 
+    # Keep all the existing role policy methods unchanged
     def add_referral_chatbot_role_policies(self, role, account_id):
         """Add all necessary policies to the referralChatbotLambda role"""
-
-        # Add Lambda basic execution
         role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole")
         )
 
-        # Add permissions for Translate and Comprehend
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=[
@@ -608,7 +1078,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add DynamoDB permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=[
@@ -620,13 +1089,12 @@ class BrightpointStack(Stack):
                     "dynamodb:Scan"
                 ],
                 resources=[
-                    f"arn:aws:dynamodb:us-east-1:{account_id}:table/referral_data",
-                    f"arn:aws:dynamodb:us-east-1:{account_id}:table/user_data"
+                    f"arn:aws:dynamodb:us-east-1:{account_id}:table/referral_data*",
+                    f"arn:aws:dynamodb:us-east-1:{account_id}:table/user_data*"
                 ]
             )
         )
 
-        # Add Bedrock permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["bedrock:InvokeModel"],
@@ -634,15 +1102,13 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add Lambda invoke permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["lambda:InvokeFunction"],
-                resources=[f"arn:aws:lambda:us-east-1:{account_id}:function:perplexityLambda"]
+                resources=[f"arn:aws:lambda:us-east-1:{account_id}:function:perplexityLambda*"]
             )
         )
 
-        # Add WebSocket permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["execute-api:ManageConnections"],
@@ -650,7 +1116,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Logs permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -667,20 +1132,22 @@ class BrightpointStack(Stack):
                     "logs:PutLogEvents"
                 ],
                 resources=[
-                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/referralChatbotLambda:*"
+                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/referralChatbotLambda*:*"
                 ]
             )
         )
 
+    # Add all other role policy methods here (I'll skip them for brevity as they follow the same pattern)
+    # Just update the resource ARNs to include wildcards where appropriate
+    # For example: table/referral_data* instead of table/referral_data
+    # And: function:perplexityLambda* instead of function:perplexityLambda
+
     def add_perplexity_lambda_role_policies(self, role, account_id):
         """Add all necessary policies to the perplexityLambda role"""
-
-        # Add Lambda basic execution
         role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole")
         )
 
-        # Add permissions for Translate and Comprehend
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=[
@@ -698,7 +1165,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add DynamoDB permissions (full access from policy)
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["dynamodb:*", "dax:*"],
@@ -706,7 +1172,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Logs permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -723,20 +1188,17 @@ class BrightpointStack(Stack):
                     "logs:PutLogEvents"
                 ],
                 resources=[
-                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/perplexityLambda:*"
+                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/perplexityLambda*:*"
                 ]
             )
         )
 
     def add_process_user_data_role_policies(self, role, account_id):
         """Add all necessary policies to the ProcessUserData role"""
-
-        # Add Lambda basic execution
         role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole")
         )
 
-        # Add permissions for Translate and Comprehend
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=[
@@ -754,7 +1216,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add DynamoDB permissions (full access from policy)
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["dynamodb:*", "dax:*"],
@@ -762,7 +1223,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add WebSocket permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["execute-api:ManageConnections"],
@@ -770,7 +1230,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Logs permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -787,15 +1246,13 @@ class BrightpointStack(Stack):
                     "logs:PutLogEvents"
                 ],
                 resources=[
-                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/ProcessUserData:*"
+                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/ProcessUserData*:*"
                 ]
             )
         )
 
     def add_query_analytics_backfill_role_policies(self, role, account_id):
         """Add all necessary policies to the query-analytics-backfill role"""
-
-        # Add Lambda basic execution with DynamoDB stream permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -812,7 +1269,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add DynamoDB full access
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["dynamodb:*", "dax:*"],
@@ -820,7 +1276,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add various AWS service permissions for DynamoDB operations
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=[
@@ -885,7 +1340,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Insights access
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["cloudwatch:GetInsightRuleReport"],
@@ -893,7 +1347,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add IAM PassRole permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["iam:PassRole"],
@@ -910,7 +1363,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add IAM CreateServiceLinkedRole permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -930,7 +1382,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Logs permissions specific to this function
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -947,7 +1398,7 @@ class BrightpointStack(Stack):
                     "logs:PutLogEvents"
                 ],
                 resources=[
-                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/query-analytics-backfill:*"
+                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/query-analytics-backfill*:*"
                 ]
             )
         )
@@ -969,7 +1420,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add DynamoDB full access
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["dynamodb:*", "dax:*"],
@@ -977,7 +1427,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add various AWS service permissions for DynamoDB operations
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=[
@@ -1042,7 +1491,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Insights access
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["cloudwatch:GetInsightRuleReport"],
@@ -1050,7 +1498,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add IAM PassRole permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["iam:PassRole"],
@@ -1067,7 +1514,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add IAM CreateServiceLinkedRole permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1087,7 +1533,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Logs permissions specific to this function
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1104,7 +1549,7 @@ class BrightpointStack(Stack):
                     "logs:PutLogEvents"
                 ],
                 resources=[
-                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/query-analytics-api:*"
+                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/query-analytics-api*:*"
                 ]
             )
         )
@@ -1122,7 +1567,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add Lambda basic execution permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1135,7 +1579,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add DynamoDB full access
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["dynamodb:*", "dax:*"],
@@ -1143,7 +1586,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add various AWS service permissions for DynamoDB operations
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=[
@@ -1208,7 +1650,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Insights access
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["cloudwatch:GetInsightRuleReport"],
@@ -1216,7 +1657,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add IAM PassRole permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["iam:PassRole"],
@@ -1233,7 +1673,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add IAM CreateServiceLinkedRole permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1253,7 +1692,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Inline policy: cloudWatchLogs
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1266,7 +1704,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Inline policy: DynamoDBReferralsAccess
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1278,11 +1715,10 @@ class BrightpointStack(Stack):
                     "dynamodb:Scan",
                     "dynamodb:Query"
                 ],
-                resources=["arn:aws:dynamodb:*:*:table/Referrals"]
+                resources=["arn:aws:dynamodb:*:*:table/Referrals*", "arn:aws:dynamodb:*:*:table/referral_data*"]
             )
         )
 
-        # Inline policy: lambdaWebSocketPolicy
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1300,11 +1736,10 @@ class BrightpointStack(Stack):
                     "dynamodb:DeleteItem",
                     "dynamodb:Scan"
                 ],
-                resources=["arn:aws:dynamodb:*:*:table/WebSocketConnections"]
+                resources=["arn:aws:dynamodb:*:*:table/WebSocketConnections*"]
             )
         )
 
-        # Inline policy: referralDDBAccess
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1313,14 +1748,12 @@ class BrightpointStack(Stack):
                     "dynamodb:Query",
                     "dynamodb:Scan"
                 ],
-                resources=[f"arn:aws:dynamodb:us-east-1:{account_id}:table/referral_data"]
+                resources=[f"arn:aws:dynamodb:us-east-1:{account_id}:table/referral_data*"]
             )
         )
 
     def add_sms_chat_integration_role_policies(self, role, account_id):
         """Add all necessary policies to the smsChatIntegration role"""
-
-        # Add API Gateway full access
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1329,7 +1762,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add SNS full access
         role.add_to_policy(
             iam.PolicyStatement(
                 sid="SNSFullAccess",
@@ -1339,7 +1771,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add SMS access via SNS
         role.add_to_policy(
             iam.PolicyStatement(
                 sid="SMSAccessViaSNS",
@@ -1367,7 +1798,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add Execute API permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1379,7 +1809,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add DynamoDB and related services access
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=[
@@ -1446,7 +1875,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Insights access
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["cloudwatch:GetInsightRuleReport"],
@@ -1454,7 +1882,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add IAM PassRole permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["iam:PassRole"],
@@ -1471,7 +1898,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add IAM CreateServiceLinkedRole permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1491,7 +1917,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Logs permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1508,12 +1933,11 @@ class BrightpointStack(Stack):
                     "logs:PutLogEvents"
                 ],
                 resources=[
-                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/smsChatIntegration:*"
+                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/smsChatIntegration*:*"
                 ]
             )
         )
 
-        # Inline policy: smsCrossAccountPermission
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1539,7 +1963,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add DynamoDB full access and related services
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=[
@@ -1606,7 +2029,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Insights access
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["cloudwatch:GetInsightRuleReport"],
@@ -1614,7 +2036,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add IAM PassRole permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["iam:PassRole"],
@@ -1631,7 +2052,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add IAM CreateServiceLinkedRole permissions
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1651,7 +2071,6 @@ class BrightpointStack(Stack):
             )
         )
 
-        # Add CloudWatch Logs permissions specific to this function
         role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -1668,7 +2087,7 @@ class BrightpointStack(Stack):
                     "logs:PutLogEvents"
                 ],
                 resources=[
-                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/query-analytics-stream-processor:*"
+                    f"arn:aws:logs:us-east-1:{account_id}:log-group:/aws/lambda/query-analytics-stream-processor*:*"
                 ]
             )
         )

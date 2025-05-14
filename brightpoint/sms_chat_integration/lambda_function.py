@@ -17,7 +17,8 @@ logger.setLevel(logging.INFO)
 # Configuration - retrieve from environment variables
 APPLICATION_ID = os.environ.get('PINPOINT_APPLICATION_ID')
 API_GATEWAY_URL = os.environ.get('API_GATEWAY_URL')
-USER_TABLE_NAME = os.environ.get('USER_TABLE_NAME', 'user_data')
+ENV = os.environ.get('ENVIRONMENT', 'dev')
+USER_TABLE_NAME = f'user_data-{ENV}'
 SOURCE_ACCOUNT_ROLE_ARN = os.environ.get('SOURCE_ACCOUNT_ROLE_ARN', 'arn:aws:iam::514811724234:role/crossAccountPinpointAccess')
 DEFAULT_ZIPCODE = os.environ.get('DEFAULT_ZIPCODE', '60067')
 DEFAULT_LANGUAGE = os.environ.get('DEFAULT_LANGUAGE', 'english')

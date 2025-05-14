@@ -1,279 +1,333 @@
-# Brightpoint Referral Chatbot CDK
+# Brightpoint Referral Chatbot - Full Stack Application
 
-This project contains an AWS CDK application that defines the infrastructure for the Brightpoint Referral Chatbot. It's designed to safely manage the existing Lambda functions, API Gateway, and related resources using Infrastructure as Code without disrupting the current flow.
+This project contains a full-stack application for the Brightpoint Referral Chatbot, consisting of:
+- A React frontend application
+- AWS CDK backend infrastructure with Lambda functions, API Gateway, and DynamoDB
 
 ## Project Structure
 
 ```
-brightpoint/
-├── app.py                      # Main CDK app entry point
-├── requirements.txt            # Python dependencies
-├── setup.py                    # Package setup for CDK
-├── cdk.json                    # CDK configuration
-├── deploy.sh                   # Helper script for deployment
-└── brightpoint/
-    ├── __init__.py
-    ├── brightpoint_stack.py    # Main stack definition
-    ├── referral_chatbot/       # Lambda code directory for referralChatbotLambda
-    │   ├── referralChatbotLambda.py
-    │   ├── bedrockAgent.py     # Helper module
-    │   └── getServiceCategories.py # Helper module
-    └── process_user_data/      # Lambda code directory for ProcessUserData
-        └── lambda_function.py  # ProcessUserData handler file
+brightpoint-project/
+├── frontend/                   # React application
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   └── README.md
+│
+└── backend/                    # AWS CDK infrastructure
+    ├── app.py                 # Main CDK app entry point
+    ├── requirements.txt       # Python dependencies
+    ├── setup.py              # Package setup for CDK
+    ├── cdk.json              # CDK configuration
+    ├── deploy.sh             # Helper script for deployment
+    └── brightpoint/
+        ├── __init__.py
+        ├── brightpoint_stack.py    # Main stack definition
+        ├── referral_chatbot/       # Lambda code for referralChatbotLambda
+        │   ├── referralChatbotLambda.py
+        │   ├── bedrockAgent.py
+        │   └── getServiceCategories.py
+        └── process_user_data/      # Lambda code for ProcessUserData
+            └── lambda_function.py
 ```
 
 ## Prerequisites
 
+### Backend Requirements
 - AWS CLI configured with appropriate credentials
 - Python 3.9 or newer (compatible with Python 3.12 used in Lambda)
 - Node.js 14 or newer (required for CDK)
 - AWS CDK Toolkit (`npm install -g aws-cdk`)
 
+### Frontend Requirements
+- Node.js 14 or newer
+- npm or yarn package manager
+
 ## Setup
 
-1. Clone this repository
-2. Create and activate a virtual environment:
+### Backend Setup
 
+1. Navigate to the backend directory:
+```bash
+cd backend
+```
+
+2. Create and activate a virtual environment:
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install dependencies:
-
+3. Install Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. If this is your first time using CDK in your AWS account/region, bootstrap the environment:
-
+4. If this is your first time using CDK in your AWS account/region, bootstrap:
 ```bash
 cdk bootstrap
 ```
 
-## Deployment Options
+### Frontend Setup
 
-This CDK project offers two main deployment approaches:
-
-### Option 1: Import Existing Resources (Recommended)
-
-The default implementation imports your existing Lambda functions, API Gateway endpoints, and DynamoDB tables, allowing you to manage infrastructure with CDK without recreating everything. This is the safest option and won't disrupt your current setup.
-
-To deploy with this option:
-
+1. Navigate to the frontend directory:
 ```bash
-./deploy.sh
-# Then select option 2
+cd frontend
 ```
 
-### Option 2: Create New Resources
-
-If you want to create new resources instead of importing existing ones:
-
-1. Edit `brightpoint_stack.py` to:
-   - Uncomment the Lambda function creation code
-   - Uncomment the IAM role creation code
-   - Uncomment the API Gateway resource creation code
-   - Comment out the resource import code
-2. Deploy using the script:
-
+2. Install dependencies:
 ```bash
-./deploy.sh
-# Then select option 3
+npm install
+# or
+yarn install
 ```
 
-**Warning**: This option will attempt to create new Lambda functions with the same names as your existing ones, which will cause conflicts. You may need to rename resources or delete existing ones first.
+## Development
 
-## Current Infrastructure Reference
+### Frontend Development
 
-The CDK code imports these existing resources:
+In the frontend directory, you can run:
 
-- Lambda Functions:
-  - `referralChatbotLambda` (with helper modules: bedrockAgent.py and getServiceCategories.py)
-  - `perplexityLambda`
-  - `ProcessUserData`
-  - `query-analytics-api`
-  - `ReferralsApiHandler`
+#### `npm start`
+Runs the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in your browser. The page will reload on changes.
 
-- REST APIs:
-  - `ReferralChatbotAPI` (ID: pncxzrq0r9)
-  - `createUser` (ID: kahgke45yd)
-  - `UserDashboardAPI` (ID: 329yd7xxm0)
-  - `QueryAnalyticsAPI1` (ID: adt0bzrd3e)
-  - `QueryAnalyticsAPI2` (ID: ite99ljw0b)
-  - `ReferralsApi` (ID: twi9ghqfhl)
+#### `npm test`
+Launches the test runner in interactive watch mode.
 
-- WebSocket APIs: 
-  - `ReferralChatbotWebSocket` (ID: lajngh4a22)
-  - `UserFeedbackWebSocketAPI` (ID: p8ea1v23i0)
-  - `AnalyticsWebSocketAPI` (ID: duqhouj11e)
-  - `ReferralsWebSocketAPI` (ID: z0ebrmmyd0)
+#### `npm run build`
+Builds the app for production to the `build` folder. The build is minified and optimized for best performance.
 
-- DynamoDB Tables:
-  - `WebSocketConnections`
-  - `perplexity_query_cache`
-  - `query_analytics`
-  - `referral_data`
-  - `user_data` (with Phone-index GSI)
+#### `npm run eject`
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-## REST API Details
+Removes the single build dependency and copies all configuration files and dependencies directly into your project for full control.
 
-### ReferralChatbotAPI (ID: pncxzrq0r9)
-- **Resources**:
-  - `/chat` - POST method (Lambda: referralChatbotLambda)
-- **Endpoint**: https://pncxzrq0r9.execute-api.us-east-1.amazonaws.com/dev/
+### Backend Development
 
-### createUser (ID: kahgke45yd)
-- **Resources**:
-  - `/addUser` - POST method (Lambda: ProcessUserData)
-- **Endpoint**: https://kahgke45yd.execute-api.us-east-1.amazonaws.com/dev/
+The backend uses AWS CDK to manage infrastructure. The project imports existing AWS resources to avoid disruption to current services.
 
-### UserDashboardAPI (ID: 329yd7xxm0)
-- **Resources**:
-  - `/dashboard` - GET method
-- **Endpoint**: https://329yd7xxm0.execute-api.us-east-1.amazonaws.com/dev/
-
-### QueryAnalyticsAPI (ID: adt0bzrd3e)
-- **Resources**:
-  - `/analytics/all` - POST method
-- **Endpoint**: https://adt0bzrd3e.execute-api.us-east-1.amazonaws.com/dev/
-
-### QueryAnalyticsAPI (ID: ite99ljw0b)
-- **Resources**:
-  - `/analytics/queries` - POST method
-- **Endpoint**: https://ite99ljw0b.execute-api.us-east-1.amazonaws.com/dev/
-
-### ReferralsApi (ID: twi9ghqfhl)
-- **Resources**:
-  - `/referrals/{referral_id}` - GET, POST, PUT, DELETE methods
-  - `/referrals/search` - POST method
-  - `/referrals` - GET, POST, PUT, DELETE methods
-- **Endpoint**: https://twi9ghqfhl.execute-api.us-east-1.amazonaws.com/dev/
-
-## WebSocket API Details
-
-### ReferralChatbotWebSocket (ID: lajngh4a22)
-- **Lambda Integration**: referralChatbotLambda
-- **Routes**: $connect, query, $disconnect
-- **Endpoint**: wss://lajngh4a22.execute-api.us-east-1.amazonaws.com/dev
-
-### UserFeedbackWebSocketAPI (ID: p8ea1v23i0)
-- **Lambda Integration**: ProcessUserData
-- **Routes**: $disconnect, sendFeedback, updateUser, getUser, $connect
-- **Endpoint**: wss://p8ea1v23i0.execute-api.us-east-1.amazonaws.com/dev
-
-### AnalyticsWebSocketAPI (ID: duqhouj11e)
-- **Lambda Integration**: query-analytics-api
-- **Routes**: $default, $connect, getAnalytics, $disconnect
-- **Endpoint**: wss://duqhouj11e.execute-api.us-east-1.amazonaws.com/dev
-
-### ReferralsWebSocketAPI (ID: z0ebrmmyd0)
-- **Lambda Integration**: ReferralsApiHandler
-- **Routes**: getReferrals, $connect, createReferral, searchReferrals, $default, updateReferral, $disconnect, deleteReferral, getReferral
-- **Endpoint**: wss://z0ebrmmyd0.execute-api.us-east-1.amazonaws.com/dev
-
-## DynamoDB Table Details
-
-### WebSocketConnections
-- **Partition Key**: connectionId (String)
-- **Billing Mode**: PAY_PER_REQUEST
-
-### perplexity_query_cache
-- **Partition Key**: query_id (String)
-- **Billing Mode**: PAY_PER_REQUEST
-
-### query_analytics
-- **Partition Key**: query_text (String)
-- **Sort Key**: Zipcode (String)
-- **Billing Mode**: PAY_PER_REQUEST
-
-### referral_data
-- **Partition Key**: referral_id (String)
-- **Billing Mode**: PAY_PER_REQUEST
-
-### user_data
-- **Partition Key**: user_id (String)
-- **Billing Mode**: PAY_PER_REQUEST
-- **Stream**: NEW_AND_OLD_IMAGES
-- **GSI**: Phone-index (Partition Key: Phone)
-
-## Lambda Function Details
-
-### referralChatbotLambda
-- **Runtime**: Python 3.12
-- **Memory**: 1024 MB
-- **Timeout**: 900 seconds (15 minutes)
-- **Handler**: referralChatbotLambda.lambda_handler
-- **Helper Modules**:
-  - bedrockAgent.py
-  - getServiceCategories.py
-
-### perplexityLambda
-- **Runtime**: Python 3.12
-- **Memory**: 2048 MB
-- **Timeout**: 900 seconds (15 minutes)
-- **Handler**: lambda_function.lambda_handler
-- **Environment Variables**:
-  - PERPLEXITY_API_KEY
-
-### ProcessUserData
-- **Runtime**: Python 3.12
-- **Memory**: 1024 MB
-- **Timeout**: 900 seconds (15 minutes)
-- **Handler**: lambda_function.lambda_handler
-- **API Gateway Integrations**:
-  - REST API routes: addUser
-  - WebSocket routes: $connect, $disconnect, sendFeedback, getUser, updateUser
-
-### query-analytics-api
-- **WebSocket Integration**: AnalyticsWebSocketAPI
-- **Routes**: $default, $connect, getAnalytics, $disconnect
-
-### ReferralsApiHandler
-- **REST API Integration**: ReferralsApi
-- **WebSocket Integration**: ReferralsWebSocketAPI
-- **Routes**: getReferrals, $connect, createReferral, searchReferrals, $default, updateReferral, $disconnect, deleteReferral, getReferral
-
-## Checking Infrastructure Differences
-
-To see what changes will be applied before deploying:
-
+#### Checking Infrastructure Changes
 ```bash
+cd backend
 ./deploy.sh
 # Then select option 1
 ```
 
 Or directly:
-
 ```bash
 cdk diff
 ```
 
-## Updating Lambda Code
+## Deployment
 
-When you need to update Lambda function code:
+### Backend Deployment
 
-1. Update the code in the respective directories:
-   - `brightpoint/referral_chatbot/` for referralChatbotLambda
-   - `brightpoint/process_user_data/` for ProcessUserData
-2. Uncomment the Lambda function creation sections in `brightpoint_stack.py`
-3. Run `cdk deploy` to update the functions
+The CDK project offers two deployment approaches:
+
+#### Option 1: Import Existing Resources (Recommended)
+This is the safest option that won't disrupt your current setup.
+```bash
+cd backend
+./deploy.sh
+# Then select option 2
+```
+
+#### Option 2: Create New Resources
+**Warning**: This option will attempt to create new Lambda functions with the same names as existing ones, which may cause conflicts.
+
+1. Edit `brightpoint_stack.py` to:
+   - Uncomment Lambda function creation code
+   - Uncomment IAM role creation code
+   - Uncomment API Gateway resource creation code
+   - Comment out resource import code
+2. Deploy:
+```bash
+./deploy.sh
+# Then select option 3
+```
+
+### Frontend Deployment
+
+Build the React application:
+```bash
+cd frontend
+npm run build
+```
+
+The `build` folder can then be deployed to your preferred hosting service (AWS S3 with CloudFront, Vercel, Netlify, etc.).
+
+## Backend Infrastructure Details
+
+### Lambda Functions
+- **referralChatbotLambda**
+  - Runtime: Python 3.12
+  - Memory: 1024 MB
+  - Timeout: 900 seconds (15 minutes)
+  - Handler: referralChatbotLambda.lambda_handler
+  - Helper Modules: bedrockAgent.py, getServiceCategories.py
+
+- **perplexityLambda**
+  - Runtime: Python 3.12
+  - Memory: 2048 MB
+  - Timeout: 900 seconds
+  - Environment Variables: PERPLEXITY_API_KEY
+
+- **ProcessUserData**
+  - Runtime: Python 3.12
+  - Memory: 1024 MB
+  - Timeout: 900 seconds
+  - Handler: lambda_function.lambda_handler
+
+- **query-analytics-api**
+- **ReferralsApiHandler**
+
+### API Endpoints
+
+#### REST APIs
+- **ReferralChatbotAPI**: `https://pncxzrq0r9.execute-api.us-east-1.amazonaws.com/dev/`
+  - `/chat` - POST (Main chatbot endpoint)
+
+- **createUser**: `https://kahgke45yd.execute-api.us-east-1.amazonaws.com/dev/`
+  - `/addUser` - POST (User creation)
+
+- **UserDashboardAPI**: `https://329yd7xxm0.execute-api.us-east-1.amazonaws.com/dev/`
+  - `/dashboard` - GET
+
+- **QueryAnalyticsAPI**:
+  - `https://adt0bzrd3e.execute-api.us-east-1.amazonaws.com/dev/`
+    - `/analytics/all` - POST
+  - `https://ite99ljw0b.execute-api.us-east-1.amazonaws.com/dev/`
+    - `/analytics/queries` - POST
+
+- **ReferralsApi**: `https://twi9ghqfhl.execute-api.us-east-1.amazonaws.com/dev/`
+  - `/referrals` - GET, POST, PUT, DELETE
+  - `/referrals/{referral_id}` - GET, POST, PUT, DELETE
+  - `/referrals/search` - POST
+
+#### WebSocket APIs
+- **ReferralChatbotWebSocket**: `wss://lajngh4a22.execute-api.us-east-1.amazonaws.com/dev`
+  - Routes: $connect, query, $disconnect
+
+- **UserFeedbackWebSocketAPI**: `wss://p8ea1v23i0.execute-api.us-east-1.amazonaws.com/dev`
+  - Routes: $disconnect, sendFeedback, updateUser, getUser, $connect
+
+- **AnalyticsWebSocketAPI**: `wss://duqhouj11e.execute-api.us-east-1.amazonaws.com/dev`
+  - Routes: $default, $connect, getAnalytics, $disconnect
+
+- **ReferralsWebSocketAPI**: `wss://z0ebrmmyd0.execute-api.us-east-1.amazonaws.com/dev`
+  - Routes: getReferrals, $connect, createReferral, searchReferrals, updateReferral, deleteReferral, getReferral
+
+### DynamoDB Tables
+- **WebSocketConnections**
+  - Partition Key: connectionId (String)
+  - Billing Mode: PAY_PER_REQUEST
+
+- **perplexity_query_cache**
+  - Partition Key: query_id (String)
+  - Billing Mode: PAY_PER_REQUEST
+
+- **query_analytics**
+  - Partition Key: query_text (String)
+  - Sort Key: Zipcode (String)
+  - Billing Mode: PAY_PER_REQUEST
+
+- **referral_data**
+  - Partition Key: referral_id (String)
+  - Billing Mode: PAY_PER_REQUEST
+
+- **user_data**
+  - Partition Key: user_id (String)
+  - Billing Mode: PAY_PER_REQUEST
+  - Stream: NEW_AND_OLD_IMAGES
+
+## Configuration
+
+### Frontend Environment Variables
+Create a `.env` file in the frontend directory:
+```
+REACT_APP_API_ENDPOINT=https://pncxzrq0r9.execute-api.us-east-1.amazonaws.com/dev
+REACT_APP_WEBSOCKET_ENDPOINT=wss://lajngh4a22.execute-api.us-east-1.amazonaws.com/dev
+REACT_APP_USER_API_ENDPOINT=https://kahgke45yd.execute-api.us-east-1.amazonaws.com/dev
+REACT_APP_DASHBOARD_API_ENDPOINT=https://329yd7xxm0.execute-api.us-east-1.amazonaws.com/dev
+```
+
+### Updating Lambda Code
+
+1. Update code in the respective directories:
+   - `backend/brightpoint/referral_chatbot/` for referralChatbotLambda
+   - `backend/brightpoint/process_user_data/` for ProcessUserData
+
+2. Deploy changes:
+```bash
+cd backend
+cdk deploy
+```
+
+## Advanced Frontend Configuration
+
+### Code Splitting
+The React app supports code splitting. See: [Create React App - Code Splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing Bundle Size
+See: [Create React App - Analyzing Bundle Size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Progressive Web App
+For PWA configuration: [Create React App - Making a Progressive Web App](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+See: [Create React App - Advanced Configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
 ## Cleanup
 
-If you need to remove CDK-managed resources:
-
+### Backend Cleanup
+Remove CDK-managed resources:
 ```bash
+cd backend
 cdk destroy
 ```
-
 **Note**: Resources that were imported (not created by CDK) will not be affected by `cdk destroy`.
 
-## Help and Troubleshooting
+### Frontend Cleanup
+Remove node_modules and build artifacts:
+```bash
+cd frontend
+rm -rf node_modules build
+```
 
-- If you're unsure about deployment, use the helper script:
-  ```bash
-  ./deploy.sh
-  ```
+## Troubleshooting
 
-- If you encounter permission issues, check the IAM role in `brightpoint_stack.py` against your AWS console permissions
+### Backend Issues
+- **Permission errors**: Check IAM roles in `brightpoint_stack.py` against your AWS console permissions
+- **Deployment failures**: Run `cdk diff` to check what changes will be applied
+- **General help**: Use the helper script for guided deployment: `./deploy.sh`
+
+### Frontend Issues
+- **Build failures**: See [npm run build fails to minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Runtime errors**: Check browser console and verify API endpoints in `.env`
+- **Test issues**: See [running tests](https://facebook.github.io/create-react-app/docs/running-tests)
+
+## Learn More
+
+### Frontend Resources
+- [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started)
+- [React documentation](https://reactjs.org/)
+
+### Backend Resources
+- [AWS CDK documentation](https://docs.aws.amazon.com/cdk/latest/guide/home.html)
+- [AWS Lambda documentation](https://docs.aws.amazon.com/lambda/)
+- [AWS API Gateway documentation](https://docs.aws.amazon.com/apigateway/)
+- [AWS DynamoDB documentation](https://docs.aws.amazon.com/dynamodb/)
+
+## License
+
+This project is proprietary to Brightpoint.
+
+## Support
+
+For infrastructure questions or issues, check the helper script:
+```bash
+cd backend
+./deploy.sh
+```
+
+For application-specific issues, consult the respective frontend or backend documentation.

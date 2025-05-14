@@ -1,0 +1,21 @@
+{
+  "version": "41.0.0",
+  "files": {
+    "fa87e7696c23741719dd2c52a05b7bfd0cf783ed48739b329b4d1a63420358ac": {
+      "displayName": "BrightpointDynamoDBTablesStack Template",
+      "source": {
+        "path": "BrightpointDynamoDBTablesStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "108782065617-us-east-1": {
+          "bucketName": "cdk-hnb659fds-assets-108782065617-us-east-1",
+          "objectKey": "fa87e7696c23741719dd2c52a05b7bfd0cf783ed48739b329b4d1a63420358ac.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::108782065617:role/cdk-hnb659fds-file-publishing-role-108782065617-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
