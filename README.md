@@ -465,8 +465,11 @@ A `build/` directory will be created. Zip the contents of the build directory by
 
 ### 7. Import Data to DynamoDB to referral_data table
 
+- Replace the appropriate table name referral_data-{env} in the script below
+- Ensure that the profile mentioned in the script is appropriate for accessing the table. Replace appropriate AWS Profile in the script. Example: Sandbox2025
+
 ```bash
-python3 importFromCSVtoDDBtables.py --env dev
+python3 importFromCSVtoDDBtables.py
 ```
 
 ## Development
