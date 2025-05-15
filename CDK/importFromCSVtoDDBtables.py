@@ -96,7 +96,7 @@ def import_csv_to_dynamodb(csv_file_path, table_name, region='us-east-1', profil
 if __name__ == "__main__":
     # Define your variables here
     csv_file_path = "../ProviderReferralData.csv"
-    table_name = "referral_data"
+    table_name = "referral_data-dev"
     region = "us-east-1"
     profile_name = "default"
 
