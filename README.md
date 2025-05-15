@@ -375,6 +375,45 @@ BrightpointStack-dev.UserDashboardAPIUrl = https://mheqo8o3d3.execute-api.us-eas
 
 Save these output values as you'll need them for the frontend configuration.
 
+**How to retrieve stack outputs after deployment:**
+
+If you need to get the outputs again later, you can use any of these methods:
+
+**Option 1: AWS CLI**
+```bash
+# Get all outputs for a specific stack
+aws cloudformation describe-stacks \
+    --stack-name BrightpointStack-dev \
+    --profile Sandbox2025 \
+    --query 'Stacks[0].Outputs' \
+    --output table
+
+# Get outputs in JSON format
+aws cloudformation describe-stacks \
+    --stack-name BrightpointStack-dev \
+    --profile Sandbox2025 \
+    --query 'Stacks[0].Outputs' \
+    --output json
+```
+
+**Option 2: CDK CLI**
+```bash
+# In the Brightpoint/ directory
+cdk outputs --profile Sandbox2025 -c env=dev
+```
+
+**Option 3: AWS Console**
+1. Go to the AWS CloudFormation console
+2. Select your stack (BrightpointStack-dev)
+3. Click on the "Outputs" tab
+
+**Option 4: Save outputs to a file during deployment**
+```bash
+# Deploy and save outputs to a JSON file
+cdk deploy --profile Sandbox2025 -c env=dev --all \
+    --outputs-file outputs.json
+```
+
 ### 3. Configure Frontend Environment Variables
 
 **macOS (Terminal)**
@@ -426,10 +465,8 @@ A `build/` directory will be created. Zip the contents of the build directory by
 
 ### 7. Import Data to DynamoDB to referral_data table
 
-- Ensure that the correct name of the referral_data={env} table is mentioned as per the environment
-
 ```bash
-python3 importFromCSVtoDDBtables.py
+python3 importFromCSVtoDDBtables.py --env dev
 ```
 
 ## Development
