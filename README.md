@@ -7,28 +7,34 @@ This project contains a full-stack application for the Brightpoint Referral Chat
 ## Project Structure
 
 ```
-brightpoint-project/
-├── frontend/                   # React application
-│   ├── public/
-│   ├── src/
-│   ├── package.json
-│   └── README.md
+Brightpoint/
+├── backend_code/                    # AWS CDK infrastructure
+│   ├── __pycache__/
+│   └── brightpoint/                # Main application package
+│       ├── __pycache__/
+│       ├── perplexity_lambda/       # Lambda for Perplexity API integration
+│       ├── process_user_data/       # Lambda for user data processing
+│       ├── query_analytics_api/     # Lambda for analytics API
+│       ├── query_analytics_backfill/# Lambda for analytics backfill
+│       ├── query_analytics_stream_proc/ # Lambda for analytics stream processing
+│       ├── referral_chatbot/        # Lambda for chatbot functionality
+│       ├── referrals_api_handler/   # Lambda for referrals API
+│       ├── sms_chat_integration/    # Lambda for SMS integration
+│       ├── __init__.py
+│       ├── brightpoint_stack.py     # Main CDK stack definition
+│       └── config.py               # Configuration file
 │
-└── backend/                    # AWS CDK infrastructure
-    ├── app.py                 # Main CDK app entry point
-    ├── requirements.txt       # Python dependencies
-    ├── setup.py              # Package setup for CDK
-    ├── cdk.json              # CDK configuration
-    ├── deploy.sh             # Helper script for deployment
-    └── brightpoint/
-        ├── __init__.py
-        ├── brightpoint_stack.py    # Main stack definition
-        ├── referral_chatbot/       # Lambda code for referralChatbotLambda
-        │   ├── referralChatbotLambda.py
-        │   ├── bedrockAgent.py
-        │   └── getServiceCategories.py
-        └── process_user_data/      # Lambda code for ProcessUserData
-            └── lambda_function.py
+└── frontend/                        # React application
+    ├── amplify/                    # AWS Amplify configuration
+    ├── build/                      # Production build output
+    ├── node_modules/               # Node dependencies
+    ├── public/                     # Static assets
+    ├── src/                        # React source code
+    ├── .DS_Store
+    ├── .gitignore
+    ├── README.md
+    ├── package-lock.json
+    └── package.json
 ```
 
 ## Prerequisites
@@ -256,14 +262,156 @@ cd Brightpoint
 git lfs pull
 ```
 
-### 2. Deploy the AWS CDK Stack
+### 2. Configure AWS Profile
 
-Configure the AWS user by creating a profile to access that account in us-east-1.
+Create an AWS profile to access your account. You'll need your AWS Access Key ID, Secret Access Key, and optionally a Session Token.
+
+**Option 1: Using AWS CLI Configure**
+```bash
+# Create a new profile named Sandbox2025
+aws configure --profile Sandbox2025
+
+# You'll be prompted to enter:
+# AWS Access Key ID [None]: YOUR_ACCESS_KEY_ID
+# AWS Secret Access Key [None]: YOUR_SECRET_ACCESS_KEY
+# Default region name [None]: us-east-1
+# Default output format [None]: json
+```
+
+**Option 2: Manual Configuration**
+
+**macOS/Linux:**
+```bash
+# Create/edit the credentials file
+mkdir -p ~/.aws
+nano ~/.aws/credentials
+
+# Add the following content:
+[Sandbox2025]
+aws_access_key_id = YOUR_ACCESS_KEY_ID
+aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+
+# Create/edit the config file
+nano ~/.aws/config
+
+# Add the following content:
+[profile Sandbox2025]
+region = us-east-1
+output = json
+```
+
+**Windows:**
+```powershell
+# Create/edit the credentials file
+notepad %USERPROFILE%\.aws\credentials
+
+# Add the following content:
+[Sandbox2025]
+aws_access_key_id = YOUR_ACCESS_KEY_ID
+aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+
+# Create/edit the config file
+notepad %USERPROFILE%\.aws\config
+
+# Add the following content:
+[profile Sandbox2025]
+region = us-east-1
+output = json
+```
+
+**If using temporary credentials (with session token):**
+```ini
+[Sandbox2025]
+aws_access_key_id = YOUR_ACCESS_KEY_ID
+aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+aws_session_token = YOUR_SESSION_TOKEN
+```
+
+**Verify Profile Configuration:**
+```bash
+# List all configured profiles
+aws configure list-profiles
+
+# Test the profile
+aws sts get-caller-identity --profile Sandbox2025
+```
+
+### 3. Deploy the AWS CDK Stack
+
+With the AWS profile configured, deploy the CDK stack.
 
 In the `Brightpoint/` directory run the following command:
 
 ```bash
 cdk deploy --profile Sandbox2025 -c env=dev --all
+```
+
+The deployment will output various resources. Here's an example of what the outputs look like:
+
+```
+Outputs:
+BrightpointStack-dev.AmplifyAppId = d1r0ryjeyn2vc4
+BrightpointStack-dev.AmplifyAppUrl = https://frontend-code.d1r0ryjeyn2vc4.amplifyapp.com
+BrightpointStack-dev.AmplifyConsoleUrl = https://us-east-1.console.aws.amazon.com/amplify/apps/d1r0ryjeyn2vc4
+BrightpointStack-dev.CognitoIdentityPoolId = us-east-1:db165b14-7422-4590-8250-0b2a86d8a897
+BrightpointStack-dev.CognitoUserPoolClientId = rg7j932b1v6f1mabupqcvvanq
+BrightpointStack-dev.CognitoUserPoolDomain = https://brightpoint-dev.auth.us-east-1.amazoncognito.com
+BrightpointStack-dev.CognitoUserPoolId = us-east-1_dQWsOJccF
+BrightpointStack-dev.FrontendConfigSummary = {
+  "environment": "dev",
+  "region": "us-east-1",
+  "amplifyAppId": "d1r0ryjeyn2vc4",
+  "userPoolId": "us-east-1_dQWsOJccF",
+  "userPoolClientId": "rg7j932b1v6f1mabupqcvvanq",
+  "identityPoolId": "us-east-1:db165b14-7422-4590-8250-0b2a86d8a897"
+}
+BrightpointStack-dev.ReferralChatbotAPIUrl = https://hjboae8luf.execute-api.us-east-1.amazonaws.com/dev/
+BrightpointStack-dev.createUserUrl = https://tcmn9ufece.execute-api.us-east-1.amazonaws.com/dev/
+BrightpointStack-dev.UserDashboardAPIUrl = https://mheqo8o3d3.execute-api.us-east-1.amazonaws.com/dev/
+... (additional outputs)
+
+✨  Total time: ~2-3 minutes
+```
+
+Save these output values as you'll need them for the frontend configuration.
+
+**How to retrieve stack outputs after deployment:**
+
+If you need to get the outputs again later, you can use any of these methods:
+
+**Option 1: AWS CLI**
+```bash
+# Get all outputs for a specific stack
+aws cloudformation describe-stacks \
+    --stack-name BrightpointStack-dev \
+    --profile Sandbox2025 \
+    --query 'Stacks[0].Outputs' \
+    --output table
+
+# Get outputs in JSON format
+aws cloudformation describe-stacks \
+    --stack-name BrightpointStack-dev \
+    --profile Sandbox2025 \
+    --query 'Stacks[0].Outputs' \
+    --output json
+```
+
+**Option 2: CDK CLI**
+```bash
+# In the Brightpoint/ directory
+cdk outputs --profile Sandbox2025 -c env=dev
+```
+
+**Option 3: AWS Console**
+1. Go to the AWS CloudFormation console
+2. Select your stack (BrightpointStack-dev)
+3. Click on the "Outputs" tab
+
+**Option 4: Save outputs to a file during deployment**
+```bash
+# Deploy and save outputs to a JSON file
+cdk deploy --profile Sandbox2025 -c env=dev --all \
+    --outputs-file outputs.json
 ```
 
 ### 3. Configure Frontend Environment Variables
@@ -309,17 +457,20 @@ A `build/` directory will be created. Zip the contents of the build directory by
 4. Select the `build.zip` file.
 5. Click **Deploy**.
 
-### 6. Import Data to DynamoDB to referral_data table
-
-```bash
-python3 importFromCSVtoDDBtables.py --env dev
-```
-
-### 7. Final Testing
+### 6. Final Testing
 
 - Visit the deployed Amplify frontend URL from CDK outputs
 - Sign up and log in using the app interface
 - Test referral submissions and responses
+
+### 7. Import Data to DynamoDB to referral_data table
+
+- Replace the appropriate table name referral_data-{env} in the script below
+- Ensure that the profile mentioned in the script is appropriate for accessing the table. Replace appropriate AWS Profile in the script. Example: Sandbox2025
+
+```bash
+python3 importFromCSVtoDDBtables.py
+```
 
 ## Development
 
