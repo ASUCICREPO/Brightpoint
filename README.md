@@ -38,49 +38,288 @@ brightpoint-project/
 - Python 3.9 or newer (compatible with Python 3.12 used in Lambda)
 - Node.js 14 or newer (required for CDK)
 - AWS CDK Toolkit (`npm install -g aws-cdk`)
+- Git LFS (Large File Storage)
 
 ### Frontend Requirements
 - Node.js 14 or newer
 - npm or yarn package manager
 
-## Setup
+## Detailed Installation Instructions
 
-### Backend Setup
+### macOS Installation
 
-1. Navigate to the backend directory:
+#### 1. Install Homebrew (Package Manager)
 ```bash
-cd backend
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-2. Create and activate a virtual environment:
+#### 2. Install Git and Git LFS
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Install Git (usually comes pre-installed)
+brew install git
+
+# Install Git LFS
+brew install git-lfs
+git lfs install
 ```
 
-3. Install Python dependencies:
+#### 3. Install AWS CLI
 ```bash
-pip install -r requirements.txt
+# Install AWS CLI
+brew install awscli
+
+# Verify installation
+aws --version
+
+# Configure AWS credentials
+aws configure
 ```
 
-4. If this is your first time using CDK in your AWS account/region, bootstrap:
+#### 4. Install Python 3.9+
 ```bash
-cdk bootstrap
+# Install Python
+brew install python@3.12
+
+# Verify installation
+python3 --version
+
+# Install pip (usually comes with Python)
+pip3 --version
+
+# Install virtualenv
+pip3 install virtualenv
 ```
 
-### Frontend Setup
+#### 5. Install Node.js and npm
+```bash
+# Install Node.js (includes npm)
+brew install node@20
 
-1. Navigate to the frontend directory:
+# Or using Node Version Manager (nvm)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+source ~/.zshrc  # or ~/.bash_profile
+nvm install 20
+nvm use 20
+
+# Verify installation
+node --version
+npm --version
+```
+
+#### 6. Install AWS CDK Toolkit
+```bash
+npm install -g aws-cdk
+
+# Verify installation
+cdk --version
+```
+
+### Windows Installation
+
+#### 1. Install Chocolatey (Package Manager)
+Open PowerShell as Administrator and run:
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
+
+#### 2. Install Git and Git LFS
+```powershell
+# Install Git
+choco install git -y
+
+# Install Git LFS
+choco install git-lfs -y
+
+# Initialize Git LFS (run in regular Command Prompt or PowerShell)
+git lfs install
+```
+
+#### 3. Install AWS CLI
+```powershell
+# Install AWS CLI using MSI installer
+# Download from: https://awscli.amazonaws.com/AWSCLIV2.msi
+# Or use Chocolatey:
+choco install awscli -y
+
+# Verify installation (run in new terminal)
+aws --version
+
+# Configure AWS credentials
+aws configure
+```
+
+#### 4. Install Python 3.9+
+```powershell
+# Install Python
+choco install python312 -y
+
+# Or download from https://www.python.org/downloads/
+
+# Verify installation (run in new terminal)
+python --version
+
+# Install pip (usually comes with Python)
+pip --version
+
+# Install virtualenv
+pip install virtualenv
+```
+
+#### 5. Install Node.js and npm
+```powershell
+# Install Node.js (includes npm)
+choco install nodejs-lts -y
+
+# Or download from https://nodejs.org/
+
+# Verify installation (run in new terminal)
+node --version
+npm --version
+```
+
+#### 6. Install AWS CDK Toolkit
+```powershell
+npm install -g aws-cdk
+
+# Verify installation
+cdk --version
+```
+
+### Alternative Installation Methods
+
+#### Using Package Managers
+
+**macOS with MacPorts:**
+```bash
+# Install MacPorts from https://www.macports.org/
+sudo port install git git-lfs python312 nodejs20 awscli
+```
+
+**Windows with Scoop:**
+```powershell
+# Install Scoop
+iwr -useb get.scoop.sh | iex
+
+# Install packages
+scoop install git python nodejs aws
+```
+
+### Verifying All Prerequisites
+
+After installation, verify all components are properly installed:
+
+```bash
+# Check versions
+git --version
+git lfs version
+aws --version
+python3 --version  # or python --version on Windows
+node --version
+npm --version
+cdk --version
+```
+
+### Common Installation Issues
+
+#### macOS
+- **Command not found**: Add Homebrew to your PATH: `echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc`
+- **Permission errors**: Use `sudo` when needed or fix npm permissions
+- **Python conflicts**: Use `pyenv` or `virtualenv` to manage Python versions
+
+#### Windows
+- **Execution policy errors**: Run PowerShell as Administrator
+- **Path issues**: Restart terminal after installations or manually add to PATH
+- **Python not found**: Use `py` instead of `python` command
+- **npm permissions**: Run Command Prompt as Administrator for global installs
+
+## Deployment Instructions
+
+**For DEV environment** (For other environments, replace `dev` with other environment names)
+
+### 1. Clone the Project Repository
+
+```bash
+# Install Git LFS (choose your platform)
+brew install git-lfs          # macOS
+choco install git-lfs         # Windows
+
+# Initialize Git LFS
+git lfs install
+
+# Clone the backend_code branch of the repository
+git clone --branch backend_code https://github.com/ASUCICREPO/Brightpoint.git
+
+# Change into the project directory
+cd Brightpoint
+
+# Pull large files tracked by Git LFS
+git lfs pull
+```
+
+### 2. Deploy the AWS CDK Stack
+
+Configure the AWS user by creating a profile to access that account in us-east-1.
+
+In the `Brightpoint/` directory run the following command:
+
+```bash
+cdk deploy --profile Sandbox2025 -c env=dev --all
+```
+
+### 3. Configure Frontend Environment Variables
+
+**macOS (Terminal)**
 ```bash
 cd frontend
+cat > .env << EOF
+REACT_APP_ENVIRONMENT=dev
+REACT_APP_USER_POOL_ID=<from-cdk-output>
+REACT_APP_USER_POOL_CLIENT_ID=<from-cdk-output>
+REACT_APP_IDENTITY_POOL_ID=<from-cdk-output>
+REACT_APP_API_URL=<from-cdk-output>
+EOF
 ```
 
-2. Install dependencies:
+**Windows (PowerShell)**
+```powershell
+cd frontend
+@"
+REACT_APP_ENVIRONMENT=dev
+REACT_APP_USER_POOL_ID=<from-cdk-output>
+REACT_APP_USER_POOL_CLIENT_ID=<from-cdk-output>
+REACT_APP_IDENTITY_POOL_ID=<from-cdk-output>
+REACT_APP_API_URL=<from-cdk-output>
+"@ > .env
+```
+
+### 4. Build the Frontend
+
 ```bash
 npm install
-# or
-yarn install
+npm run build
 ```
+
+A `build/` directory will be created. Zip the contents of the build directory by going inside the directory, selecting all files and zipping it to `build.zip`.
+
+### 5. Upload Frontend to AWS Amplify
+
+1. Open the Amplify Console using the link from the `AmplifyManualAppConsoleUrl` output from the CDK deployment.
+2. Select the **dev** branch in the Amplify App.
+3. Click **"Upload" → "Deploy without Git provider"**.
+4. Select the `build.zip` file.
+5. Click **Deploy**.
+
+### 6. Import Data to DynamoDB to referral_data table
+
+```bash
+python3 importFromCSVtoDDBtables.py --env dev
+```
+
+### 7. Final Testing
+
+- Visit the deployed Amplify frontend URL from CDK outputs
+- Sign up and log in using the app interface
+- Test referral submissions and responses
 
 ## Development
 
@@ -96,65 +335,6 @@ Launches the test runner in interactive watch mode.
 
 #### `npm run build`
 Builds the app for production to the `build` folder. The build is minified and optimized for best performance.
-
-#### `npm run eject`
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-Removes the single build dependency and copies all configuration files and dependencies directly into your project for full control.
-
-### Backend Development
-
-The backend uses AWS CDK to manage infrastructure. The project imports existing AWS resources to avoid disruption to current services.
-
-#### Checking Infrastructure Changes
-```bash
-cd backend
-./deploy.sh
-# Then select option 1
-```
-
-Or directly:
-```bash
-cdk diff
-```
-
-## Deployment
-
-### Backend Deployment
-
-The CDK project offers two deployment approaches:
-
-#### Option 1: Import Existing Resources (Recommended)
-This is the safest option that won't disrupt your current setup.
-```bash
-cd backend
-./deploy.sh
-# Then select option 2
-```
-
-#### Option 2: Create New Resources
-**Warning**: This option will attempt to create new Lambda functions with the same names as existing ones, which may cause conflicts.
-
-1. Edit `brightpoint_stack.py` to:
-   - Uncomment Lambda function creation code
-   - Uncomment IAM role creation code
-   - Uncomment API Gateway resource creation code
-   - Comment out resource import code
-2. Deploy:
-```bash
-./deploy.sh
-# Then select option 3
-```
-
-### Frontend Deployment
-
-Build the React application:
-```bash
-cd frontend
-npm run build
-```
-
-The `build` folder can then be deployed to your preferred hosting service (AWS S3 with CloudFront, Vercel, Netlify, etc.).
 
 ## Backend Infrastructure Details
 
@@ -240,18 +420,7 @@ The `build` folder can then be deployed to your preferred hosting service (AWS S
   - Billing Mode: PAY_PER_REQUEST
   - Stream: NEW_AND_OLD_IMAGES
 
-## Configuration
-
-### Frontend Environment Variables
-Create a `.env` file in the frontend directory:
-```
-REACT_APP_API_ENDPOINT=https://pncxzrq0r9.execute-api.us-east-1.amazonaws.com/dev
-REACT_APP_WEBSOCKET_ENDPOINT=wss://lajngh4a22.execute-api.us-east-1.amazonaws.com/dev
-REACT_APP_USER_API_ENDPOINT=https://kahgke45yd.execute-api.us-east-1.amazonaws.com/dev
-REACT_APP_DASHBOARD_API_ENDPOINT=https://329yd7xxm0.execute-api.us-east-1.amazonaws.com/dev
-```
-
-### Updating Lambda Code
+## Updating Lambda Code
 
 1. Update code in the respective directories:
    - `backend/brightpoint/referral_chatbot/` for referralChatbotLambda
@@ -261,37 +430,6 @@ REACT_APP_DASHBOARD_API_ENDPOINT=https://329yd7xxm0.execute-api.us-east-1.amazon
 ```bash
 cd backend
 cdk deploy
-```
-
-## Advanced Frontend Configuration
-
-### Code Splitting
-The React app supports code splitting. See: [Create React App - Code Splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing Bundle Size
-See: [Create React App - Analyzing Bundle Size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Progressive Web App
-For PWA configuration: [Create React App - Making a Progressive Web App](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-See: [Create React App - Advanced Configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-## Cleanup
-
-### Backend Cleanup
-Remove CDK-managed resources:
-```bash
-cd backend
-cdk destroy
-```
-**Note**: Resources that were imported (not created by CDK) will not be affected by `cdk destroy`.
-
-### Frontend Cleanup
-Remove node_modules and build artifacts:
-```bash
-cd frontend
-rm -rf node_modules build
 ```
 
 ## Troubleshooting
