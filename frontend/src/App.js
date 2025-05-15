@@ -21,6 +21,7 @@ import DashboardTab from "./Components/DashboardTab";
 import ReferralDatabase from "./Components/ReferralDatabaseTab";
 import SpanishApp from "./Pages/SpanishApp";
 import PolishApp from "./Pages/PolishApp";
+import NewAdmin from "./Pages/NewAdmin";
 Amplify.configure(awsExports);
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
                 <Route path="/admindashboard" element={<AdminDashboard />} />
                 <Route path="/analytics" element={<DashboardTab />} />
                 <Route path="/referral" element={<ReferralDatabase />} />
+                <Route path="/newadmin" element={<NewAdmin />} />
 
               </Routes>
             </Router>

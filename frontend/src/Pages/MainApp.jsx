@@ -66,7 +66,7 @@ const MainApp = () => {
       {/* App Header */}
       <Grid item sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 10 }}>
         <AppHeader
-          username={userData?.username || "johndoe"}
+          username={userData?.username || userData?.user_id || "johndoe"}
           showSwitch={true}
           leftNavToggle={
             isMobile && (
@@ -157,7 +157,8 @@ const MainApp = () => {
       <ModalComponent
         openModal={openModal}
         setOpenModal={setOpenModal}
-        referralQuestions={referralQuestions}
+        referralQuestions={user?.feedbackQuestions || []}
+        userData={user}
       />
     </Grid>
   );
