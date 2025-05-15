@@ -7,28 +7,34 @@ This project contains a full-stack application for the Brightpoint Referral Chat
 ## Project Structure
 
 ```
-brightpoint-project/
-├── frontend/                   # React application
-│   ├── public/
-│   ├── src/
-│   ├── package.json
-│   └── README.md
+Brightpoint/
+├── backend_code/                    # AWS CDK infrastructure
+│   ├── __pycache__/
+│   └── brightpoint/                # Main application package
+│       ├── __pycache__/
+│       ├── perplexity_lambda/       # Lambda for Perplexity API integration
+│       ├── process_user_data/       # Lambda for user data processing
+│       ├── query_analytics_api/     # Lambda for analytics API
+│       ├── query_analytics_backfill/# Lambda for analytics backfill
+│       ├── query_analytics_stream_proc/ # Lambda for analytics stream processing
+│       ├── referral_chatbot/        # Lambda for chatbot functionality
+│       ├── referrals_api_handler/   # Lambda for referrals API
+│       ├── sms_chat_integration/    # Lambda for SMS integration
+│       ├── __init__.py
+│       ├── brightpoint_stack.py     # Main CDK stack definition
+│       └── config.py               # Configuration file
 │
-└── backend/                    # AWS CDK infrastructure
-    ├── app.py                 # Main CDK app entry point
-    ├── requirements.txt       # Python dependencies
-    ├── setup.py              # Package setup for CDK
-    ├── cdk.json              # CDK configuration
-    ├── deploy.sh             # Helper script for deployment
-    └── brightpoint/
-        ├── __init__.py
-        ├── brightpoint_stack.py    # Main stack definition
-        ├── referral_chatbot/       # Lambda code for referralChatbotLambda
-        │   ├── referralChatbotLambda.py
-        │   ├── bedrockAgent.py
-        │   └── getServiceCategories.py
-        └── process_user_data/      # Lambda code for ProcessUserData
-            └── lambda_function.py
+└── frontend/                        # React application
+    ├── amplify/                    # AWS Amplify configuration
+    ├── build/                      # Production build output
+    ├── node_modules/               # Node dependencies
+    ├── public/                     # Static assets
+    ├── src/                        # React source code
+    ├── .DS_Store
+    ├── .gitignore
+    ├── README.md
+    ├── package-lock.json
+    └── package.json
 ```
 
 ## Prerequisites
