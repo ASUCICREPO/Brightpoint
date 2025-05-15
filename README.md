@@ -262,15 +262,118 @@ cd Brightpoint
 git lfs pull
 ```
 
-### 2. Deploy the AWS CDK Stack
+### 2. Configure AWS Profile
 
-Configure the AWS user by creating a profile to access that account in us-east-1.
+Create an AWS profile to access your account. You'll need your AWS Access Key ID, Secret Access Key, and optionally a Session Token.
+
+**Option 1: Using AWS CLI Configure**
+```bash
+# Create a new profile named Sandbox2025
+aws configure --profile Sandbox2025
+
+# You'll be prompted to enter:
+# AWS Access Key ID [None]: YOUR_ACCESS_KEY_ID
+# AWS Secret Access Key [None]: YOUR_SECRET_ACCESS_KEY
+# Default region name [None]: us-east-1
+# Default output format [None]: json
+```
+
+**Option 2: Manual Configuration**
+
+**macOS/Linux:**
+```bash
+# Create/edit the credentials file
+mkdir -p ~/.aws
+nano ~/.aws/credentials
+
+# Add the following content:
+[Sandbox2025]
+aws_access_key_id = YOUR_ACCESS_KEY_ID
+aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+
+# Create/edit the config file
+nano ~/.aws/config
+
+# Add the following content:
+[profile Sandbox2025]
+region = us-east-1
+output = json
+```
+
+**Windows:**
+```powershell
+# Create/edit the credentials file
+notepad %USERPROFILE%\.aws\credentials
+
+# Add the following content:
+[Sandbox2025]
+aws_access_key_id = YOUR_ACCESS_KEY_ID
+aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+
+# Create/edit the config file
+notepad %USERPROFILE%\.aws\config
+
+# Add the following content:
+[profile Sandbox2025]
+region = us-east-1
+output = json
+```
+
+**If using temporary credentials (with session token):**
+```ini
+[Sandbox2025]
+aws_access_key_id = YOUR_ACCESS_KEY_ID
+aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+aws_session_token = YOUR_SESSION_TOKEN
+```
+
+**Verify Profile Configuration:**
+```bash
+# List all configured profiles
+aws configure list-profiles
+
+# Test the profile
+aws sts get-caller-identity --profile Sandbox2025
+```
+
+### 3. Deploy the AWS CDK Stack
+
+With the AWS profile configured, deploy the CDK stack.
 
 In the `Brightpoint/` directory run the following command:
 
 ```bash
 cdk deploy --profile Sandbox2025 -c env=dev --all
 ```
+
+The deployment will output various resources. Here's an example of what the outputs look like:
+
+```
+Outputs:
+BrightpointStack-dev.AmplifyAppId = d1r0ryjeyn2vc4
+BrightpointStack-dev.AmplifyAppUrl = https://frontend-code.d1r0ryjeyn2vc4.amplifyapp.com
+BrightpointStack-dev.AmplifyConsoleUrl = https://us-east-1.console.aws.amazon.com/amplify/apps/d1r0ryjeyn2vc4
+BrightpointStack-dev.CognitoIdentityPoolId = us-east-1:db165b14-7422-4590-8250-0b2a86d8a897
+BrightpointStack-dev.CognitoUserPoolClientId = rg7j932b1v6f1mabupqcvvanq
+BrightpointStack-dev.CognitoUserPoolDomain = https://brightpoint-dev.auth.us-east-1.amazoncognito.com
+BrightpointStack-dev.CognitoUserPoolId = us-east-1_dQWsOJccF
+BrightpointStack-dev.FrontendConfigSummary = {
+  "environment": "dev",
+  "region": "us-east-1",
+  "amplifyAppId": "d1r0ryjeyn2vc4",
+  "userPoolId": "us-east-1_dQWsOJccF",
+  "userPoolClientId": "rg7j932b1v6f1mabupqcvvanq",
+  "identityPoolId": "us-east-1:db165b14-7422-4590-8250-0b2a86d8a897"
+}
+BrightpointStack-dev.ReferralChatbotAPIUrl = https://hjboae8luf.execute-api.us-east-1.amazonaws.com/dev/
+BrightpointStack-dev.createUserUrl = https://tcmn9ufece.execute-api.us-east-1.amazonaws.com/dev/
+BrightpointStack-dev.UserDashboardAPIUrl = https://mheqo8o3d3.execute-api.us-east-1.amazonaws.com/dev/
+... (additional outputs)
+
+✨  Total time: ~2-3 minutes
+```
+
+Save these output values as you'll need them for the frontend configuration.
 
 ### 3. Configure Frontend Environment Variables
 
@@ -315,17 +418,19 @@ A `build/` directory will be created. Zip the contents of the build directory by
 4. Select the `build.zip` file.
 5. Click **Deploy**.
 
-### 6. Import Data to DynamoDB to referral_data table
-
-```bash
-python3 importFromCSVtoDDBtables.py --env dev
-```
-
-### 7. Final Testing
+### 6. Final Testing
 
 - Visit the deployed Amplify frontend URL from CDK outputs
 - Sign up and log in using the app interface
 - Test referral submissions and responses
+
+### 7. Import Data to DynamoDB to referral_data table
+
+- Ensure that the correct name of the referral_data={env} table is mentioned as per the environment
+
+```bash
+python3 importFromCSVtoDDBtables.py
+```
 
 ## Development
 
