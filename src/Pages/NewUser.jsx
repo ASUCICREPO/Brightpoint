@@ -7,7 +7,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../utilities/UserContext'; // Import useUser
 import {signUp} from 'aws-amplify/auth';
-import { USER_API } from '../utilities/constants';
+import { USER_API , USER_ADD_API} from '../utilities/constants';
+import { Auth } from 'aws-amplify';
 
 
 
@@ -36,52 +37,87 @@ const NewUser = () => {
     const { username, password } = userData;
     const { givenName, lastName, email, zipcode, phone } = formData;
   
+    console.log("Starting Cognito signup...");
+    console.log("Signup credentials:", { username, password });
+    console.log("Attributes:", { email });
+  
     try {
-      const { success, response, error } = await signUp({
+      const response = await signUp({
         username,
         password,
         options: {
           userAttributes: {
             email,
-            given_name: givenName,
           },
         },
       });
   
-      if (success) {
-        console.log('Cognito user created!', response);
+      console.log("✅ Cognito signUp response:", response);
   
-        // === WebSocket integration ===
-        const ws = new WebSocket(USER_API); // replace with your actual URL
+      // // REST API payload
+      // const restPayload = {
+      //   user_id: username,
+      //   Zipcode: zipcode,
+      //   Phone: phone,
+      //   emails: email,
+      //   operation: "POST",
+      // };
   
-        ws.onopen = () => {
-          console.log("WebSocket connected, sending createUser payload...");
+      // console.log("📤 Sending payload to REST API:", restPayload);
   
-          const payload = {
-            action: "updateUser",
-            user_id: username,
-            Zipcode: zipcode,
-            Phone: phone,
-            Email: email,
-          };
+      // const restRes = await fetch(USER_ADD_API, {
+      //   method: 'PUT',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(restPayload),
+      // });
   
-          ws.send(JSON.stringify(payload));
-          console.log("WebSocket message sent:", payload);
+      // const restData = await restRes.json();
   
-          // Optional: Close socket after sending
-          ws.close();
-        };
+      // if (!restRes.ok) {
+      //   console.error("❌ REST API error:", restData);
+      //   throw new Error("REST API call failed.");
+      // }
   
-        ws.onerror = (err) => {
-          console.error("WebSocket error:", err);
-        };
-      } else {
-        console.error(error);
-      }
-    } catch (err) {
-      console.error('SignUp Error:', err);
+      // console.log("✅ REST API response:", restData);
+  
+      // WebSocket message
+      const wsPayload = {
+        action: "updateUser",
+        user_id: username,
+        Zipcode: zipcode,
+        Phone: phone,
+        Email: email,
+      };
+  
+      console.log("🌐 Connecting to WebSocket:", USER_API);
+  
+      const socket = new WebSocket(USER_API);
+  
+      socket.onopen = () => {
+        console.log("✅ WebSocket connection opened.");
+        socket.send(JSON.stringify(wsPayload));
+        console.log("📤 Sent to WebSocket:", wsPayload);
+      };
+  
+      socket.onmessage = (message) => {
+        console.log("📨 WebSocket message received:", message.data);
+      };
+  
+      socket.onerror = (error) => {
+        console.error("❌ WebSocket error:", error);
+      };
+  
+      socket.onclose = () => {
+        console.log("🔌 WebSocket connection closed.");
+      };
+  
+    } catch (error) {
+      console.error("❌ Error during signup or API calls:", error);
     }
   };
+  
   
 
   

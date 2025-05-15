@@ -33,10 +33,12 @@ function getStyles(name, selectedValues, theme) {
 
 export default function ReferralDatabase() {
   const theme = useTheme();
+  
   const [agencies, setAgencies] = useState([]);
   const [categories, setCategories] = useState([]);
   const [cities, setCities] = useState([]);
   const [zipcodes, setZipcodes] = useState([]);
+  
   const [allRows, setAllRows] = useState([]);
   const [filteredRows, setFilteredRows] = useState([]);
 
@@ -54,13 +56,23 @@ export default function ReferralDatabase() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  useEffect(() => {
-    const socket = new WebSocket(REFERRAL_MANAGEMENT_API);
-    socket.onopen = () => socket.send(JSON.stringify({ action: "getReferrals" }));
+  // Store the websocket instance in a ref so it can be used outside useEffect
+  const [socket, setSocket] = useState(null);
 
-    socket.onmessage = (event) => {
+  useEffect(() => {
+    const ws = new WebSocket(REFERRAL_MANAGEMENT_API);
+    setSocket(ws);
+
+    ws.onopen = () => {
+      console.log("WebSocket opened - requesting referrals");
+      ws.send(JSON.stringify({ action: "getReferrals" }));
+    };
+
+    ws.onmessage = (event) => {
       const response = JSON.parse(event.data);
-      const referrals = response.referrals;
+      console.log("Received referral data:", response);
+
+      const referrals = response.referrals || [];
 
       const agenciesSet = new Set();
       const categoriesSet = new Set();
@@ -87,7 +99,7 @@ export default function ReferralDatabase() {
         structuredReferrals.push({
           agency: name,
           category,
-          process: phone,
+          process: phone, 
           hours,
           address,
           city,
@@ -103,48 +115,103 @@ export default function ReferralDatabase() {
       setCities(Array.from(citiesSet));
       setZipcodes(Array.from(zipCodesSet));
       setAllRows(structuredReferrals);
+
+      console.log("Structured referrals set:", structuredReferrals);
     };
 
-    socket.onerror = (error) => console.error('WebSocket Error: ', error);
-    socket.onclose = () => console.log('WebSocket connection closed');
-    return () => socket.close();
+    ws.onerror = (error) => console.error('WebSocket Error: ', error);
+    ws.onclose = () => console.log('WebSocket connection closed');
+    
+    return () => {
+      console.log("Closing WebSocket");
+      ws.close();
+    };
   }, []);
 
   useEffect(() => {
     let filtered = allRows;
 
-    if (searchQuery)
+    if (searchQuery) {
       filtered = filtered.filter(row =>
         Object.values(row).some(value =>
           typeof value === 'string' &&
           value.toLowerCase().includes(searchQuery.toLowerCase())
         )
       );
+    }
 
-    if (selectedAgencies.length)
+    if (selectedAgencies.length) {
       filtered = filtered.filter(row => selectedAgencies.includes(row.agency));
+    }
 
-    if (selectedCategories.length)
+    if (selectedCategories.length) {
       filtered = filtered.filter(row => selectedCategories.includes(row.category));
+    }
 
-    if (selectedCities.length)
+    if (selectedCities.length) {
       filtered = filtered.filter(row => selectedCities.includes(row.city));
+    }
 
-    if (selectedZipcodes.length)
+    if (selectedZipcodes.length) {
       filtered = filtered.filter(row => selectedZipcodes.includes(row.zipcode));
+    }
 
     setFilteredRows(filtered);
     setPage(0);
+
+    console.log("Filtered rows updated:", filtered);
   }, [searchQuery, selectedAgencies, selectedCategories, selectedCities, selectedZipcodes, allRows]);
 
   const handleClick = (referral) => {
+    console.log("Referral row clicked:", referral);
     setSelectedReferral(referral);
     setDetailsModalOpen(true);
+  };
+
+  // Log selected referral whenever it changes
+  useEffect(() => {
+    console.log("Selected referral changed:", selectedReferral);
+  }, [selectedReferral]);
+
+  // Handle adding a referral by sending createReferral action over WebSocket
+  const handleAddReferral = (newReferralData) => {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      console.error("WebSocket not connected");
+      return;
+    }
+
+    const createMessage = {
+      action: "createReferral",
+      data: newReferralData,
+    };
+
+    socket.send(JSON.stringify(createMessage));
+    console.log("Sent createReferral message:", createMessage);
+
+    // Optionally, listen for a confirmation or new referral update from the server
+    // For now, we optimistically add the new referral locally
+
+    const newStructuredReferral = {
+      agency: newReferralData["Client Name"] || "N/A",
+      category: newReferralData["Service Category Type"] || "N/A",
+      process: newReferralData.Phone || "N/A",
+      hours: newReferralData.Hours || "N/A",
+      address: newReferralData.Address || "N/A",
+      city: newReferralData.City || "N/A",
+      state: newReferralData.State || "N/A",
+      zipcode: newReferralData["Service Area Zip Code"] || "N/A",
+      // fullData: newReferralData,
+      referral_id: `temp-${Date.now()}`, // temporary id until server confirms
+    };
+
+    setAllRows(prev => [newStructuredReferral, ...prev]);
+    setCreateModalOpen(false);
   };
 
   return (
     <Box>
       <Typography variant="h4" fontWeight="bold" mb={2} color="primary">Providers</Typography>
+      
       <Paper elevation={1} sx={{ p: 2 }}>
         <Grid container spacing={2} alignItems="center" mb={2}>
           <Grid item xs={12} md={3}>
@@ -232,15 +299,22 @@ export default function ReferralDatabase() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
-                <TableRow key={index} hover onClick={() => handleClick(row)} sx={{ cursor: 'pointer' }}>
-                  <TableCell>{row.agency}</TableCell>
-                  <TableCell>{row.category}</TableCell>
-                  <TableCell>{row.city}</TableCell>
-                  <TableCell>{row.zipcode}</TableCell>
-                  <TableCell>{row.process}</TableCell>
-                </TableRow>
-              ))}
+              {filteredRows
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index) => (
+                  <TableRow 
+                    key={index} 
+                    hover 
+                    onClick={() => handleClick(row)} 
+                    sx={{ cursor: 'pointer' }}
+                  >
+                    <TableCell>{row.agency}</TableCell>
+                    <TableCell>{row.category}</TableCell>
+                    <TableCell>{row.city}</TableCell>
+                    <TableCell>{row.zipcode}</TableCell>
+                    <TableCell>{row.process}</TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -255,9 +329,29 @@ export default function ReferralDatabase() {
         />
       </Paper>
 
-      <CreateReferralModal open={createModalOpen} onClose={() => setCreateModalOpen(false)} />
-      <ReferralDetailsModal open={detailsModalOpen} onClose={() => setDetailsModalOpen(false)} referral={selectedReferral} />
-      <EditReferralModal open={editModalOpen} onClose={() => setEditModalOpen(false)} referral={selectedReferral} />
+      <CreateReferralModal 
+        open={createModalOpen} 
+        onClose={() => setCreateModalOpen(false)} 
+        onAdd={handleAddReferral} 
+      />
+      <ReferralDetailsModal 
+        open={detailsModalOpen} 
+        onClose={() => setDetailsModalOpen(false)} 
+        referralData={selectedReferral}    
+        onEdit={() => {
+          setEditModalOpen(true);
+          setDetailsModalOpen(false);
+        }}
+        onDelete={() => {
+          setDetailsModalOpen(false);
+          // Handle delete logic here
+        }}  
+      />
+      <EditReferralModal 
+        open={editModalOpen} 
+        onClose={() => setEditModalOpen(false)} 
+        referralData={selectedReferral} 
+      />
     </Box>
   );
 }

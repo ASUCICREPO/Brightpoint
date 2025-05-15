@@ -6,9 +6,10 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
 
     const fallbackUser = {
       user_id: userId,
-      language: 'English',
+      username: '',
+      language: 'english',
       zipcode: '62701',
-      phoneNumber: '(123) 456-7890',
+      phoneNumber: '+19252048244',
       email: 'user@example.com',
       referrals: [],
       feedbackQuestions: [],
@@ -17,44 +18,53 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
     const timeout = setTimeout(() => {
       console.warn("WebSocket timeout. Using fallback user data.");
       updateUser(fallbackUser);
-      resolve(); // ✅ don't reject
+      resolve();
       socket.close();
     }, 3000);
 
     socket.onopen = () => {
-      socket.send(JSON.stringify({
-        action: 'getUser',
-        user_id: userId,
-      }));
+      console.log("WebSocket connected. Sending user fetch request for:", userId);
+      socket.send(JSON.stringify({ action: 'getUser', user_id: userId }));
     };
 
     socket.onmessage = (event) => {
+      console.log("WebSocket message received:", event.data);
       clearTimeout(timeout);
-
+    
       try {
         const data = JSON.parse(event.data);
-
+    
         if (data && data.user) {
           const {
             user_id,
-            language,
-            Zipcode,
-            Phone,
-            Email,
-            referrals,
+            username = '',
+            language = 'english',
+            Zipcode: zipcode = '',          // Notice 'Zipcode' from server
+            Phone: phoneNumber = '',         // 'Phone' from server
+            Email: email = '',               // 'Email' from server
+            referrals = [],
           } = data.user;
-
-          const feedbackQuestions = data.feedback_questions || [];
-
+    
+          // Use feedback_questions from server (underscored)
+          const formattedFeedback = (data.feedback_questions || []).map((q) => ({
+            referral_id: q.referral_id,
+            question: q.question,                  // Use the exact question string from server
+            agency: q.agency || '',
+            service_category: q.service_category || '',
+          }));
+    
           updateUser({
             user_id,
+            username,
             language,
-            zipcode: Zipcode,
-            phoneNumber: Phone,
-            email: Email,
+            zipcode,
+            phoneNumber,
+            email,
             referrals,
-            feedbackQuestions,
+            feedbackQuestions: formattedFeedback,
           });
+    
+          console.log("User context updated:", formattedFeedback, referrals);
         } else {
           console.warn('WebSocket response missing user. Using fallback.');
           updateUser(fallbackUser);
@@ -63,16 +73,17 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
         console.error('Error parsing user data:', err);
         updateUser(fallbackUser);
       }
-
+    
       socket.close();
-      resolve(); // ✅ always resolve
+      resolve();
     };
+    
 
     socket.onerror = (error) => {
       console.error('WebSocket error:', error);
       clearTimeout(timeout);
       updateUser(fallbackUser);
-      resolve(); // ✅ no rejection
+      resolve();
       socket.close();
     };
   });

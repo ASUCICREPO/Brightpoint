@@ -1,18 +1,56 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Grid, Typography, Box } from "@mui/material";
-import Attachment from "./Attachment";
 import ChatInput from "./ChatInput";
 import StreamingResponse from "./StreamingResponse";
 import createMessageBlock from "../utilities/createMessageBlock";
 import { useUser } from "../utilities/UserContext";
 import { ALLOW_FILE_UPLOAD, ALLOW_VOICE_RECOGNITION } from "../utilities/constants";
-import BotFileCheckReply from "./BotFileCheckReply";
-import SpeechRecognitionComponent from "./SpeechRecognition";
 import FirstBotMessage from './FirstBotMessage';
 import { CHAT_API } from "../utilities/constants";
 import { useLocation } from "react-router-dom"; // <-- Import location hook
+import BotFileCheckReply from "./BotFileCheckReply";
+
+const translations = {
+  EN: {
+    networkError: "Network Error. Please try again later.",
+    thinking: "Thinking...",
+    errorProcessing: "There was an error processing your request. Please try again.",
+    noUnderstanding: "Sorry, I couldn't understand that.",
+    prefixText: "I could not find relevant information in our database, but here is what I could find on the internet.\n\n",
+    referralProcess: "Referral Process:",
+    hours: "Hours:",
+    phone: "Phone:",
+    address: "Address:",
+    additionalInfo: "Additional Info:"
+  },
+  ES: {
+    networkError: "Error de red. Por favor, inténtalo de nuevo más tarde.",
+    thinking: "Pensando...",
+    errorProcessing: "Hubo un error al procesar tu solicitud. Por favor, inténtalo de nuevo.",
+    noUnderstanding: "Lo siento, no pude entender eso.",
+    prefixText: "No pude encontrar información relevante en nuestra base de datos, pero esto es lo que encontré en internet.\n\n",
+    referralProcess: "Proceso de Referencia:",
+    hours: "Horario:",
+    phone: "Teléfono:",
+    address: "Dirección:",
+    additionalInfo: "Información Adicional:"
+  },
+  PL: {
+    networkError: "Błąd sieci. Spróbuj ponownie później.",
+    thinking: "Myślę...",
+    errorProcessing: "Wystąpił błąd podczas przetwarzania twojego żądania. Spróbuj ponownie.",
+    noUnderstanding: "Przepraszam, nie mogłem tego zrozumieć.",
+    prefixText: "Nie znalazłem odpowiednich informacji w naszej bazie danych, ale oto co znalazłem w internecie.\n\n",
+    referralProcess: "Proces skierowania:",
+    hours: "Godziny:",
+    phone: "Telefon:",
+    address: "Adres:",
+    additionalInfo: "Dodatkowe informacje:"
+  }
+};
 
 function ChatBody( language ) {
+
   const { userData } = useUser();
   const [messageList, setMessageList] = useState([]);
   const [processing, setProcessing] = useState(false);
@@ -29,6 +67,7 @@ function ChatBody( language ) {
   } else if (path.startsWith("/plapp")) {
     lang = "PL";
   }
+
 
   useEffect(() => {
     const firstBotMessage = createMessageBlock(
@@ -50,7 +89,7 @@ function ChatBody( language ) {
     setProcessing(true);
     const newMessageBlock = createMessageBlock(msg, "USER", "TEXT", "SENT");
     setMessageList((prevList) => [...prevList, newMessageBlock]);
-    getBotResponse(setMessageList, setProcessing, msg, userData.username, userData.zipcode, language);
+    getBotResponse(setMessageList, setProcessing, msg, userData.username, userData.zipcode, language, lang);
     setQuestionAsked(true);
   };
 
@@ -82,83 +121,58 @@ function ChatBody( language ) {
     <Box
   display="flex"
   flexDirection="column"
-  justifyContent="space-between"
   sx={{
-    height: "100vh",
-    overflow: "hidden",
-    px: { xs: 1, sm: 2, md: 3 },
+    height: '100vh',
+    overflow: 'hidden', // ensure children don’t overflow
   }}
 >
+
+
 
 <Box
   flex={1}
   overflow="auto"
   className="chatScrollContainer"
   sx={{
-    pb: { xs: "120px", sm: "80px" }, // More padding for mobile keyboards
+    pb: '100px', // enough space to avoid input overlay
   }}
 >
-
         {messageList.map((msg, index) => (
           <Box key={index} mb={2}>
-            {msg.sentBy === "USER" ? (
-              <UserReply message={msg.message} />
-            ) : msg.sentBy === "BOT" && msg.state === "PROCESSING" ? (
-              <StreamingResponse initialMessage={msg.message} setProcessing={setProcessing} />
-            ) : (
-              <BotFileCheckReply message={msg.message} fileName={msg.fileName} fileStatus={msg.fileStatus} messageType={msg.sentBy === "USER" ? "user_doc_upload" : "bot_response"} />
-            )}
-          </Box>
+          {msg.sentBy === "USER" ? (
+            <UserReply message={msg.message} />
+          ) : msg.sentBy === "BOT" && msg.state === "PROCESSING" ? (
+            <StreamingResponse initialMessage={msg.message} setProcessing={setProcessing} />
+          ) : (
+            <BotFileCheckReply message={msg.message} fileName={msg.fileName} fileStatus={msg.fileStatus} messageType={msg.sentBy === "USER" ? "user_doc_upload" : "bot_response"} />
+          )}
+        </Box>
+        
         ))}
         <div ref={messagesEndRef} />
       </Box>
 
       <Box
-        display="flex"
-        flexWrap="wrap"
-        justifyContent="space-between"
-        alignItems="flex-end"
-        sx={{
-          flexShrink: 0,
-          position: "fixed",
-          bottom: 0,
-          width: '100%',
-          px: 2,
-          py: 1,
-          backgroundColor: "white",
-          zIndex: 10
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            width: { xs: '100%', sm: 'auto' },
-            flexWrap: "wrap",
-            gap: 1,
-            mb: { xs: 1, sm: 0 }
-          }}
-        >
-          {ALLOW_VOICE_RECOGNITION && (
-            <SpeechRecognitionComponent setMessage={setMessage} getMessage={getMessage} />
-          )}
-          {ALLOW_FILE_UPLOAD && (
-            <Attachment onFileUploadComplete={handleFileUploadComplete} />
-          )}
-        </Box>
-        <Box sx={{ flexGrow: 1, width: { xs: '100%', sm: 'auto' }, p: 1 }}>
+  sx={{
+    position: 'fixed',
+    width:"60%",
+    bottom: 0,
+    backgroundColor: 'white',
+    borderTop: '1px solid #ccc',
+    px: 2,
+    py: 1,
+    zIndex: 1000,
+  }}
+>
   <ChatInput
     onSendMessage={handleSendMessage}
     processing={processing}
     message={message}
     setMessage={setMessage}
-    language
+    language={lang} // make sure this passes correctly
   />
 </Box>
-
-      </Box>
-
-    </Box>
+</Box>
   );
 }
 
@@ -201,9 +215,11 @@ function UserReply({ message }) {
   );
 }
 
-const getBotResponse = (setMessageList, setProcessing, message, username, zipcode, language) => {
-  const processingMessageBlock = createMessageBlock("Thinking...", "BOT", "TEXT", "PROCESSING");
+const getBotResponse = (setMessageList, setProcessing, message, username, zipcode, language, lang ) => {
+  const t = translations[lang];
+  const processingMessageBlock = createMessageBlock(t.thinking, "BOT", "TEXT", "PROCESSING");
   setMessageList((prevList) => [...prevList, processingMessageBlock]);
+
 
   const socket = new WebSocket(CHAT_API);
 
@@ -232,7 +248,7 @@ const getBotResponse = (setMessageList, setProcessing, message, username, zipcod
       setMessageList((prevList) =>
         prevList.map((msg) =>
           msg.state === "PROCESSING"
-            ? createMessageBlock("There was an error processing your request. Please try again.", "BOT", "TEXT", "RECEIVED")
+            ? createMessageBlock(t.errorProcessing, "BOT", "TEXT", "RECEIVED")
             : msg
         )
       );
@@ -251,8 +267,13 @@ const getBotResponse = (setMessageList, setProcessing, message, username, zipcod
     }
 
     if (status === "complete" || status == "success") {
-      const { message: mainMessage, services } = data.response_data || {};
-
+      const { message: mainMessage, services, source } = data.response_data || {};
+    
+      let prefixText = "";
+      if (source && source.toLowerCase().includes("perplexity")) {
+        prefixText = t.prefixText;
+      }
+    
       if (services && Array.isArray(services)) {
         const servicesUI = services.map((service) => {
           const { agency, details = {}, address, city, state, zipcode } = service;
@@ -262,16 +283,16 @@ const getBotResponse = (setMessageList, setProcessing, message, username, zipcod
             phone,
             additional_information
           } = details;
-
+    
           return (
             <Box key={service.id || Math.random()} sx={{ mb: 3 }}>
               {agency && <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{agency}</Typography>}
-              {referral_process && <Typography><strong>Referral Process:</strong> {referral_process}</Typography>}
-              {hours && <Typography><strong>Hours:</strong> {hours}</Typography>}
-              {phone && <Typography><strong>Phone:</strong> {phone}</Typography>}
+              {referral_process && <Typography><strong>{t.referralProcess}</strong> {referral_process}</Typography>}
+              {hours && <Typography><strong>{t.hours}</strong> {hours}</Typography>}
+              {phone && <Typography><strong>{t.phone}</strong> {phone}</Typography>}
               {(address || city || state || zipcode) && (
                 <Typography>
-                  <strong>Address:</strong> {`${address || ""}, ${city || ""}, ${state || ""} ${zipcode || ""}`}
+                  <strong>{t.address}</strong> {`${address || ""}, ${city || ""}, ${state || ""} ${zipcode || ""}`}
                 </Typography>
               )}
               {additional_information && (
@@ -280,15 +301,17 @@ const getBotResponse = (setMessageList, setProcessing, message, username, zipcod
             </Box>
           );
         });
-
+    
         const botMessageBlock = createMessageBlock(
           <div>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{mainMessage}</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              {prefixText}{mainMessage}
+            </Typography>
             {servicesUI}
           </div>,
           "BOT", "TEXT", "RECEIVED"
         );
-
+    
         // Replace "Thinking..." message
         setMessageList((prevList) =>
           prevList.map((msg) =>
@@ -305,21 +328,11 @@ const getBotResponse = (setMessageList, setProcessing, message, username, zipcod
           )
         );
       }
-
-      setProcessing(false);
-      socket.close();
-    } else if (status == "error") {
-      // Invalid status or error case
-      setMessageList((prevList) =>
-        prevList.map((msg) =>
-          msg.state === "PROCESSING"
-            ? createMessageBlock("There was some issue processing your request. Please try again.", "BOT", "TEXT", "RECEIVED")
-            : msg
-        )
-      );
+    
       setProcessing(false);
       socket.close();
     }
+    
   };
 
   socket.onerror = () => {

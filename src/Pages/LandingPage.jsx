@@ -39,9 +39,9 @@ const LandingPage = () => {
 
 
       // Trigger API call to fetch and store user info
-      await fetchAndStoreUserData(username, updateUser); // Call after login
-
-      navigate('/app'); // move navigation after successful data fetch
+      await fetchAndStoreUserData(username, updateUser);
+      console.log("User data updated via context. Navigating to /app now...", username);
+      navigate('/app');
 
     } catch (error) {
       // console.log()
@@ -59,7 +59,7 @@ const LandingPage = () => {
       <img src={BrightpointLogo} alt="Brightpoint Logo" height="6%" style={{ marginBottom: 10 }} />
 
       <Box
-        width="40%"
+        width="30%"
         maxWidth="40%"
         bgcolor="white"
         p={4}
