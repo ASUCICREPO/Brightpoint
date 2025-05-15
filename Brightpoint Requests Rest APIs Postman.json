@@ -1,0 +1,340 @@
+{
+	"info": {
+		"_postman_id": "b653e609-6bd4-4574-8bb6-dc15653edba6",
+		"name": "Brightpoint Requests Rest APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "12140948"
+	},
+	"item": [
+		{
+			"name": "createUser Get",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"user_abcd\",\n  \"Zipcode\": \"12445\",\n  \"Phone\": \"555-1234\",\n  \"Email\": \"user@example.com\",\n  \"operation\" : \"GET\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://kahgke45yd.execute-api.us-east-1.amazonaws.com/dev/addUser"
+			},
+			"response": []
+		},
+		{
+			"name": "createUser Put/Update",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"user_abcd\",\n  \"Zipcode\": \"12445\",\n  \"Phone\": \"555-1234\",\n  \"Email\": \"user@example.com\",\n  \"operation\" : \"PUT\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://vnc1dq35yk.execute-api.us-east-1.amazonaws.com/prod/addUser"
+			},
+			"response": []
+		},
+		{
+			"name": "captureUserFeedback",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"user_abc\",\n  \"Zipcode\": \"12345\",\n  \"Phone\": \"555-1234\",\n  \"Email\": \"user@example.com\",\n  \"operation\": \"FEEDBACK\",\n  \"feedback_list\": [\n    {\"referral_id\": \"59168b95-07f6-4627-a8e4-d20d10b314ab\", \"feedback\": \"yes\"},\n    {\"referral_id\": \"ref2\", \"feedback\": \"no\"},\n    {\"referral_id\": \"ref3\", \"feedback\": \"yes\"},\n    {\"referral_id\": \"ref4\", \"feedback\": \"no\"},\n    {\"referral_id\": \"ref5\", \"feedback\": \"yes\"}\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://kahgke45yd.execute-api.us-east-1.amazonaws.com/dev/addUser"
+			},
+			"response": []
+		},
+		{
+			"name": "userFeedbackQuestions",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"user_abc\",\n  \"operation\" : \"GET\",\n  \"language\" : \"spanish\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://kahgke45yd.execute-api.us-east-1.amazonaws.com/dev/addUser"
+			},
+			"response": []
+		},
+		{
+			"name": "chatbotQuery",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"user123\",\n  \"zipcode\": \"85281\",\n  \"user_query\": \"Punto de entrega de UPS cerca de mí?\",\n  \"language\" : \"spanish\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://pncxzrq0r9.execute-api.us-east-1.amazonaws.com/dev/chat"
+			},
+			"response": []
+		},
+		{
+			"name": "getAllReferrals",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"user_abcdefghxy\",\n  \"zipcode\": \"62701\",\n  \"user_query\": \"dispensarios de perros cerca de mí\",\n  \"language\" : \"spanish\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://twi9ghqfhl.execute-api.us-east-1.amazonaws.com/dev/referrals"
+			},
+			"response": []
+		},
+		{
+			"name": "getAllReferralsByID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"user_abcdefghxy\",\n  \"zipcode\": \"62701\",\n  \"user_query\": \"dispensarios de perros cerca de mí\",\n  \"language\" : \"spanish\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://twi9ghqfhl.execute-api.us-east-1.amazonaws.com/dev/referrals/5dbd110a-51b4-47fa-9741-0a0fb919bf38"
+			},
+			"response": []
+		},
+		{
+			"name": "updateReferralByID",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Additional Information\": \"Blehhhhhhified\",\n  \"Address\": \"Blehhhhhh\",\n  \"City\": \"MBlehhhhhh\",\n  \"Eligibility Requirements\": \"PBlehhhhhhgibility based on need and residency.\",\n  \"Zipcode\": \"60056\",\n  \"referral_id\": \"aa0438d2-3f75-4be6-acf6-36e2d73b5943\",\n  \"Organization\": \"Updated Dummy Referral\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://twi9ghqfhl.execute-api.us-east-1.amazonaws.com/dev/referrals/aa0438d2-3f75-4be6-acf6-36e2d73b5943"
+			},
+			"response": []
+		},
+		{
+			"name": "deleteReferralByID",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://twi9ghqfhl.execute-api.us-east-1.amazonaws.com/dev/referrals/65de643c-0078-4d01-853a-f01b59822aab"
+			},
+			"response": []
+		},
+		{
+			"name": "addReferral",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Additional Information\": \"None specified\",\n  \"Address\": \"1300 W. Northwest Highway\",\n  \"City\": \"Mount Prospect\",\n  \"Eligibility Requirements\": \"Provides support services; eligibility based on need and residency.\",\n  \"Hours\": \"Hours vary by location; please contact for details.\",\n  \"Phone\": \"847-392-2344\",\n  \"Program Name\": \"Housing and support services for individuals experiencing homelessness\",\n  \"Referral Process\": \"None\",\n  \"Service Area Zip Code\": 60056,\n  \"Service Availability\": \"Employment services\",\n  \"Service Category Type\": \"Employment\",\n  \"Source\": \"Community Directory PY25\",\n  \"State\": \"IL\",\n  \"Website\": \"https://northwestcompass.org/\",\n  \"Zipcode\": \"60056\",\n  \"Organization\": \"Dummy Referral\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://twi9ghqfhl.execute-api.us-east-1.amazonaws.com/dev/referrals"
+			},
+			"response": []
+		},
+		{
+			"name": "searchByLabel",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"searchParams\": {\n    \"Agency Names\": [\"Rosecrance\"],\n    \"Service Area Zip Codes\": [61822],\n    \"Service Category Types\": [],\n    \"Cities\": [\"Champaign\"]\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://twi9ghqfhl.execute-api.us-east-1.amazonaws.com/dev/referrals/search"
+			},
+			"response": []
+		},
+		{
+			"name": "queryAnalyticsAll",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": " application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"start_date\": \"2025-04-01T00:00:00\",\n  \"end_date\": \"2025-05-12T23:59:59\",\n  \"zipcodes\": [\"62701\"],\n  \"limit\": 10,\n  \"include_query_frequency\": true,\n  \"include_user_referrals\": true,\n  \"include_feedback_stats\": true,\n  \"include_perplexity_queries\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://adt0bzrd3e.execute-api.us-east-1.amazonaws.com/dev/analytics/all"
+			},
+			"response": []
+		}
+	]
+}
