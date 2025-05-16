@@ -174,11 +174,11 @@ const AdminLanding = () => {
           Log In
         </Button>
       </Box>
-      <Typography variant="body2" mt={2}>
+      {/* <Typography variant="body2" mt={2}>
   <a href="/newadmin" style={{ color: '#1F1463', textDecoration: 'underline' }}>
     Create new Admin
   </a>
-</Typography>
+</Typography> */}
 
     </Box>
   );
