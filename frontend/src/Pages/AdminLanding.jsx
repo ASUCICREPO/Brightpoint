@@ -1,25 +1,31 @@
-import React, { useState , useEffect} from 'react';
-import { Box, Button, Typography, TextField, Link, InputAdornment, IconButton } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Button,
+  Typography,
+  TextField,
+  InputAdornment,
+  IconButton
+} from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import BrightpointLogo from '../Assets/Brightpoint_logo.svg';
-import { useUser } from '../utilities/UserContext'; // Import UserContext
-import { handleReferralOnLogin } from "../utilities/userReferralHandler"; // Import the referral handler
-import { signIn, signOut } from 'aws-amplify/auth'; // Correct import for Auth
+import { useUser } from '../utilities/UserContext';
+import { handleReferralOnLogin } from "../utilities/userReferralHandler";
+import * as AmplifyAuth from 'aws-amplify/auth';
 
 const AdminLanding = () => {
-  const { updateUser } = useUser(); // Get updateUser function from context
+  const { updateUser } = useUser();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const zipcode = "62701"; // Hardcoded zipcode for this example
+  const zipcode = "62701";
 
-  // Log out the previous user when the page loads
   useEffect(() => {
     const logoutPreviousUser = async () => {
       try {
-        await signOut(); // Sign out the previous user (if any)
+        await AmplifyAuth.signOut();
         console.log("Previous user logged out successfully.");
       } catch (error) {
         console.error("Error signing out the previous user:", error.message || error);
@@ -27,44 +33,68 @@ const AdminLanding = () => {
     };
 
     logoutPreviousUser();
-  }, []); // Empty dependency array ensures this runs only once when the page loads
+  }, []);
 
   const handleLogin = async () => {
     try {
-      // Authenticate using Cognito
-      const user = await signIn({ username, password });
-      console.log('Cognito login success:', user);
-
-      updateUser({ username, zipcode });
-
-      // Handle referrals
+      const response = await AmplifyAuth.signIn({ username, password });
+      console.log('Cognito login success:', response);
+  
+      if (!response.isSignedIn) {
+        const step = response.nextStep?.signInStep;
+        
+        if (step === 'CONFIRM_SIGN_UP') {
+          alert("Please confirm your account before logging in.");
+          // Optionally navigate to confirmation page or handle confirmation here
+          return;
+        }
+  
+        alert("Login incomplete: " + step);
+        return;
+      }
+  
+      const session = await AmplifyAuth.fetchAuthSession();
+  
+      // ✅ getAccessToken now works because user is fully signed in
+      const payload = session.tokens?.accessToken?.payload;
+      const groups = payload?.["cognito:groups"];
+      const userGroups = Array.isArray(groups) ? groups : groups ? [groups] : [];
+  
+      console.log('User groups:', userGroups);
+  
+      if (!userGroups.includes("Admin")) {
+        alert("Access denied: You are not authorized to access this admin portal.");
+        await AmplifyAuth.signOut();
+        return;
+      }
+  
+      updateUser({ username: username, zipcode });
+  
       handleReferralOnLogin(username, (referrals) => {
-        if (referrals && referrals.length > 0) {
+        if (referrals?.length) {
           updateUser({ referrals });
           console.log('Referrals updated in user context:', referrals);
         } else {
           console.error('Error: No referral data returned');
         }
       });
-
-      navigate('/admindashboard'); // Navigate to the next page
-
+  
+      navigate('/admindashboard');
+  
     } catch (error) {
       console.error('Cognito login error:', error.message || error);
       alert('Login failed: ' + (error.message || 'Unknown error'));
     }
   };
-
+  
   const isButtonDisabled = !username || !password;
 
   return (
     <Box height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" bgcolor="white">
-      
-      {/* Logo above the container */}
       <img src={BrightpointLogo} alt="Brightpoint Logo" height="50" style={{ marginBottom: 10 }} />
 
       <Box
-        width="100%"
+        width="40%"
         maxWidth="400px"
         bgcolor="white"
         p={4}
@@ -79,7 +109,6 @@ const AdminLanding = () => {
           Log In
         </Typography>
 
-        {/* Username Label */}
         <Typography variant="body1" alignSelf="flex-start" mb={0.5}>
           Username:
         </Typography>
@@ -99,7 +128,6 @@ const AdminLanding = () => {
           }}
         />
 
-        {/* Password Label */}
         <Typography variant="body1" alignSelf="flex-start" mt={2} mb={0.5}>
           Password:
         </Typography>
@@ -129,10 +157,8 @@ const AdminLanding = () => {
           }}
         />
 
-        {/* Log In Button */}
         <Button
           variant="contained"
-          color="error"
           fullWidth
           sx={{
             borderRadius: '20px',
@@ -148,17 +174,11 @@ const AdminLanding = () => {
           Log In
         </Button>
       </Box>
-
-      {/* Sign Up Text outside the box
-      <Box mt={2}>
-        <Typography variant="body2">
-          Don’t have an account?{' '}
-          <Link href="/newsignup" color="#0000FF">
-            Sign Up
-          </Link>
-          {' '}to create an account
-        </Typography>
-      </Box> */}
+      <Typography variant="body2" mt={2}>
+  <a href="/newadmin" style={{ color: '#1F1463', textDecoration: 'underline' }}>
+    Create new Admin
+  </a>
+</Typography>
 
     </Box>
   );

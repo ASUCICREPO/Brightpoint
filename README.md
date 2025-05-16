@@ -191,53 +191,6 @@ npm install -g aws-cdk
 cdk --version
 ```
 
-### Alternative Installation Methods
-
-#### Using Package Managers
-
-**macOS with MacPorts:**
-```bash
-# Install MacPorts from https://www.macports.org/
-sudo port install git git-lfs python312 nodejs20 awscli
-```
-
-**Windows with Scoop:**
-```powershell
-# Install Scoop
-iwr -useb get.scoop.sh | iex
-
-# Install packages
-scoop install git python nodejs aws
-```
-
-### Verifying All Prerequisites
-
-After installation, verify all components are properly installed:
-
-```bash
-# Check versions
-git --version
-git lfs version
-aws --version
-python3 --version  # or python --version on Windows
-node --version
-npm --version
-cdk --version
-```
-
-### Common Installation Issues
-
-#### macOS
-- **Command not found**: Add Homebrew to your PATH: `echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc`
-- **Permission errors**: Use `sudo` when needed or fix npm permissions
-- **Python conflicts**: Use `pyenv` or `virtualenv` to manage Python versions
-
-#### Windows
-- **Execution policy errors**: Run PowerShell as Administrator
-- **Path issues**: Restart terminal after installations or manually add to PATH
-- **Python not found**: Use `py` instead of `python` command
-- **npm permissions**: Run Command Prompt as Administrator for global installs
-
 ## Deployment Instructions
 
 **For DEV environment** (For other environments, replace `dev` with other environment names)
@@ -276,64 +229,6 @@ aws configure --profile Sandbox2025
 # AWS Secret Access Key [None]: YOUR_SECRET_ACCESS_KEY
 # Default region name [None]: us-east-1
 # Default output format [None]: json
-```
-
-**Option 2: Manual Configuration**
-
-**macOS/Linux:**
-```bash
-# Create/edit the credentials file
-mkdir -p ~/.aws
-nano ~/.aws/credentials
-
-# Add the following content:
-[Sandbox2025]
-aws_access_key_id = YOUR_ACCESS_KEY_ID
-aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
-
-# Create/edit the config file
-nano ~/.aws/config
-
-# Add the following content:
-[profile Sandbox2025]
-region = us-east-1
-output = json
-```
-
-**Windows:**
-```powershell
-# Create/edit the credentials file
-notepad %USERPROFILE%\.aws\credentials
-
-# Add the following content:
-[Sandbox2025]
-aws_access_key_id = YOUR_ACCESS_KEY_ID
-aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
-
-# Create/edit the config file
-notepad %USERPROFILE%\.aws\config
-
-# Add the following content:
-[profile Sandbox2025]
-region = us-east-1
-output = json
-```
-
-**If using temporary credentials (with session token):**
-```ini
-[Sandbox2025]
-aws_access_key_id = YOUR_ACCESS_KEY_ID
-aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
-aws_session_token = YOUR_SESSION_TOKEN
-```
-
-**Verify Profile Configuration:**
-```bash
-# List all configured profiles
-aws configure list-profiles
-
-# Test the profile
-aws sts get-caller-identity --profile Sandbox2025
 ```
 
 ### 3. Deploy the AWS CDK Stack
@@ -396,24 +291,6 @@ aws cloudformation describe-stacks \
     --output json
 ```
 
-**Option 2: CDK CLI**
-```bash
-# In the Brightpoint/ directory
-cdk outputs --profile Sandbox2025 -c env=dev
-```
-
-**Option 3: AWS Console**
-1. Go to the AWS CloudFormation console
-2. Select your stack (BrightpointStack-dev)
-3. Click on the "Outputs" tab
-
-**Option 4: Save outputs to a file during deployment**
-```bash
-# Deploy and save outputs to a JSON file
-cdk deploy --profile Sandbox2025 -c env=dev --all \
-    --outputs-file outputs.json
-```
-
 ### 3. Configure Frontend Environment Variables
 
 **macOS (Terminal)**
@@ -471,21 +348,6 @@ A `build/` directory will be created. Zip the contents of the build directory by
 ```bash
 python3 importFromCSVtoDDBtables.py
 ```
-
-## Development
-
-### Frontend Development
-
-In the frontend directory, you can run:
-
-#### `npm start`
-Runs the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in your browser. The page will reload on changes.
-
-#### `npm test`
-Launches the test runner in interactive watch mode.
-
-#### `npm run build`
-Builds the app for production to the `build` folder. The build is minified and optimized for best performance.
 
 ## Backend Infrastructure Details
 
@@ -582,20 +444,6 @@ Builds the app for production to the `build` folder. The build is minified and o
 cd backend
 cdk deploy
 ```
-
-## Troubleshooting
-
-### Backend Issues
-- **Permission errors**: Check IAM roles in `brightpoint_stack.py` against your AWS console permissions
-- **Deployment failures**: Run `cdk diff` to check what changes will be applied
-- **General help**: Use the helper script for guided deployment: `./deploy.sh`
-
-### Frontend Issues
-- **Build failures**: See [npm run build fails to minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-- **Runtime errors**: Check browser console and verify API endpoints in `.env`
-- **Test issues**: See [running tests](https://facebook.github.io/create-react-app/docs/running-tests)
-
-## Learn More
 
 ### Frontend Resources
 - [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started)

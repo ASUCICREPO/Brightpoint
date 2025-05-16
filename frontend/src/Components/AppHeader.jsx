@@ -12,13 +12,14 @@ import {
 import Logo from "../Assets/Brightpoint_logo.svg";
 import accountIcon from "../Assets/account_icon.svg";
 import dropdownIcon from "../Assets/dropdown.svg";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";  // <-- import useLocation
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 function AppHeader({ username, isCollapsed, onNavToggle }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();  // <-- get current location
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -37,6 +38,9 @@ function AppHeader({ username, isCollapsed, onNavToggle }) {
   const handleLogout = () => {
     navigate("/");
   };
+
+  // Check if current path starts with /admin
+  const isAdminRoute = location.pathname.startsWith("/admin");
 
   return (
     <AppBar
@@ -59,17 +63,6 @@ function AppHeader({ username, isCollapsed, onNavToggle }) {
           flexWrap: "nowrap",
         }}
       >
-        {/* Collapse Toggle Icon */}
-        {/* <Grid item>
-          <IconButton onClick={onNavToggle} sx={{ padding: 0 }}>
-            {isCollapsed ? (
-              <ChevronRightIcon sx={{ fontSize: 30, color: "#1F1463" }} />
-            ) : (
-              <ChevronLeftIcon sx={{ fontSize: 30, color: "#1F1463" }} />
-            )}
-          </IconButton>
-        </Grid> */}
-
         {/* Logo */}
         <Grid item>
           <img
@@ -120,7 +113,8 @@ function AppHeader({ username, isCollapsed, onNavToggle }) {
               },
             }}
           >
-            <MenuItem onClick={handleProfile}>View Profile</MenuItem>
+            {/* Conditionally render View Profile only if NOT on /admin path */}
+            {!isAdminRoute && <MenuItem onClick={handleProfile}>View Profile</MenuItem>}
             <MenuItem onClick={handleLogout} sx={{ color: "red" }}>
               Logout
             </MenuItem>
