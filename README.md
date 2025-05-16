@@ -45,44 +45,29 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. If this is your first time using CDK in your AWS account/region, bootstrap the environment:
+4. Configure AWS Profile to deploy the CDK using Access Key ID and Secret Access Key
+
+```bash
+aws configure --profile Brightpoint_User
+```
+
+5. If this is your first time using CDK in your AWS account/region, bootstrap the environment:
 
 ```bash
 cdk bootstrap
 ```
 
-## Deployment Options
-
-This CDK project offers two main deployment approaches:
-
-### Option 1: Import Existing Resources (Recommended)
-
-The default implementation imports your existing Lambda functions, API Gateway endpoints, and DynamoDB tables, allowing you to manage infrastructure with CDK without recreating everything. This is the safest option and won't disrupt your current setup.
-
-To deploy with this option:
+6. If this is your first time using CDK in your AWS account/region, bootstrap the environment:
 
 ```bash
-./deploy.sh
-# Then select option 2
+cdk bootstrap
 ```
 
-### Option 2: Create New Resources
-
-If you want to create new resources instead of importing existing ones:
-
-1. Edit `brightpoint_stack.py` to:
-   - Uncomment the Lambda function creation code
-   - Uncomment the IAM role creation code
-   - Uncomment the API Gateway resource creation code
-   - Comment out the resource import code
-2. Deploy using the script:
+6. Deploy the CDK
 
 ```bash
-./deploy.sh
-# Then select option 3
+cdk deploy --profile Brightpoint_User -c env=prod --all
 ```
-
-**Warning**: This option will attempt to create new Lambda functions with the same names as your existing ones, which will cause conflicts. You may need to rename resources or delete existing ones first.
 
 ## Current Infrastructure Reference
 
