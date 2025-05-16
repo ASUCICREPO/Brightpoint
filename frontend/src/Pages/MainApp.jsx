@@ -157,8 +157,8 @@ const MainApp = () => {
       <ModalComponent
         openModal={openModal}
         setOpenModal={setOpenModal}
-        referralQuestions={user?.feedbackQuestions || []}
-        userData={user}
+        referralQuestions={userData?.feedbackQuestions || []}
+        userData={userData}
       />
     </Grid>
   );
