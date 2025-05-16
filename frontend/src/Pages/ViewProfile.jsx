@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Divider } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import AppHeader from '../components/AppHeader';
+import AppHeader from '../Components/AppHeader';
 import { useUser } from '../utilities/UserContext'; // ✅ Use context
 
 const UserProfile = () => {
