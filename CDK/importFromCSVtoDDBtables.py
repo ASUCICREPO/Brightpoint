@@ -4,7 +4,7 @@ import uuid
 from decimal import Decimal
 import os
 
-def import_csv_to_dynamodb(csv_file_path, table_name, region='us-east-1', profile_name='default'):
+def import_csv_to_dynamodb(csv_file_path, table_name, region='us-east-1', profile_name='Brightpoit_User'):
     """
     Import data from a CSV file to a DynamoDB table.
 
@@ -15,7 +15,7 @@ def import_csv_to_dynamodb(csv_file_path, table_name, region='us-east-1', profil
         profile_name (str): AWS profile name (default: 'default')
     """
     # Create a boto3 session with the specified profile
-    session = boto3.Session(profile_name="Brightpoint")
+    session = boto3.Session(profile_name="Brightpoit_User")
 
     # Initialize DynamoDB resource using the session
     dynamodb = session.resource('dynamodb', region_name=region)
@@ -96,9 +96,9 @@ def import_csv_to_dynamodb(csv_file_path, table_name, region='us-east-1', profil
 if __name__ == "__main__":
     # Define your variables here
     csv_file_path = "../ProviderReferralData.csv"
-    table_name = "referral_data-dev"
+    table_name = "referral_data-test"
     region = "us-east-1"
-    profile_name = "default"
+    profile_name = "Brightpoit_User"
 
     # Run the import
     import_csv_to_dynamodb(csv_file_path, table_name, region, profile_name)

@@ -33,7 +33,7 @@ ENV = os.environ.get('ENVIRONMENT', 'dev')
 USER_TABLE = f'user_data-{ENV}'
 # Initialize AWS Lambda client for calling Perplexity Lambda
 lambda_client = boto3.client('lambda', region_name="us-east-1")
-PERPLEXITY_LAMBDA_ARN = "arn:aws:lambda:us-east-1:224328319083:function:perplexityLambda"
+PERPLEXITY_LAMBDA_ARN = "arn:aws:lambda:us-east-1:216989103356:function:perplexityLambda"
 
 def lambda_handler(event, context):
     """

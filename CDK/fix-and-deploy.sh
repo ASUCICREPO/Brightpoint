@@ -2,7 +2,7 @@
 
 PROFILE="Sandbox2025"
 REGION="us-east-1"
-ACCOUNT_ID="216989103356"
+ACCOUNT_ID="224328319083"
 
 echo "Step 1: Cleaning up failed stack..."
 aws cloudformation delete-stack --stack-name BrightpointStack --profile $PROFILE

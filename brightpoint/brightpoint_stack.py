@@ -513,7 +513,7 @@ class BrightpointStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         self.env_name = env_name
-        self.account_id = "216989103356"
+        self.account_id = "224328319083"
 
         perplexity_secret = secretsmanager.Secret.from_secret_name_v2(
             self, "PerplexityApiKeySecret",

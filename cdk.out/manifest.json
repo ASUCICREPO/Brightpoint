@@ -1,0 +1,1325 @@
+{
+  "version": "41.0.0",
+  "artifacts": {
+    "BrightpointStack-test.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "BrightpointStack-test.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "BrightpointStack-test": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://216989103356/us-east-1",
+      "properties": {
+        "templateFile": "BrightpointStack-test.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "Application": "Brightpoint",
+          "Environment": "test"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-deploy-role-216989103356-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-cfn-exec-role-216989103356-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-216989103356-us-east-1/2367689ef4590640991df35ff8bea6ec401bd0b597d8924a59605aa002053c0a.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "BrightpointStack-test.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-lookup-role-216989103356-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "BrightpointStack-test.assets"
+      ],
+      "metadata": {
+        "/BrightpointStack-test": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Application",
+                "Value": "Brightpoint"
+              },
+              {
+                "Key": "Environment",
+                "Value": "test"
+              }
+            ]
+          }
+        ],
+        "/BrightpointStack-test/WebSocketConnectionsTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "WebSocketConnectionsTable7F0028CC"
+            }
+          }
+        ],
+        "/BrightpointStack-test/WebSocketConnectionsTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebSocketConnectionsTable7F0028CC"
+          }
+        ],
+        "/BrightpointStack-test/perplexity_query_cacheTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "perplexityquerycacheTable9E120D0C"
+            }
+          }
+        ],
+        "/BrightpointStack-test/perplexity_query_cacheTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "perplexityquerycacheTable9E120D0C"
+          }
+        ],
+        "/BrightpointStack-test/query_analyticsTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "queryanalyticsTableC6CEA252"
+            }
+          }
+        ],
+        "/BrightpointStack-test/query_analyticsTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "queryanalyticsTableC6CEA252"
+          }
+        ],
+        "/BrightpointStack-test/referral_dataTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "referraldataTable5ABDFEB4"
+            }
+          }
+        ],
+        "/BrightpointStack-test/referral_dataTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referraldataTable5ABDFEB4"
+          }
+        ],
+        "/BrightpointStack-test/user_dataTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "userdataTableB31622A0"
+            }
+          }
+        ],
+        "/BrightpointStack-test/user_dataTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "userdataTableB31622A0"
+          }
+        ],
+        "/BrightpointStack-test/BrightpointUserPool/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BrightpointUserPoolF24B41F9"
+          }
+        ],
+        "/BrightpointStack-test/BrightpointUserPoolClient/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BrightpointUserPoolClient3A182275"
+          }
+        ],
+        "/BrightpointStack-test/BrightpointIdentityPool": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BrightpointIdentityPool"
+          }
+        ],
+        "/BrightpointStack-test/BrightpointManualAmplifyApp/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BrightpointManualAmplifyAppRole72173ABA"
+          }
+        ],
+        "/BrightpointStack-test/BrightpointManualAmplifyApp/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BrightpointManualAmplifyApp4DC32DC0"
+          }
+        ],
+        "/BrightpointStack-test/BrightpointManualAmplifyApp/frontend-code/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BrightpointManualAmplifyAppfrontendcode98B96F52"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotRoleDD6FC688"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotRoleDefaultPolicyA7AF46B4"
+          }
+        ],
+        "/BrightpointStack-test/PerplexityLambdaRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PerplexityLambdaRoleF29E6D66"
+          }
+        ],
+        "/BrightpointStack-test/PerplexityLambdaRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PerplexityLambdaRoleDefaultPolicyAE238026"
+          }
+        ],
+        "/BrightpointStack-test/ProcessUserDataRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProcessUserDataRole3CAFEF38"
+          }
+        ],
+        "/BrightpointStack-test/ProcessUserDataRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProcessUserDataRoleDefaultPolicy552F74C9"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsBackfillRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsBackfillRole4F8F73C6"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsBackfillRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsBackfillRoleDefaultPolicy3EAE125F"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsApiRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsApiRole4843455A"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsApiRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsApiRoleDefaultPolicy554AC0DA"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApiHandlerRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiHandlerRoleEF1D513A"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApiHandlerRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiHandlerRoleDefaultPolicy33785ED8"
+          }
+        ],
+        "/BrightpointStack-test/SmsChatIntegrationRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SmsChatIntegrationRoleDDE00F4D"
+          }
+        ],
+        "/BrightpointStack-test/SmsChatIntegrationRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SmsChatIntegrationRoleDefaultPolicy28D66DB5"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsStreamProcessorRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsStreamProcessorRole29A40FE9"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsStreamProcessorRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsStreamProcessorRoleDefaultPolicyC96B9CD2"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotLambdaFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotLambdaFnC2AC6930"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotLambdaFn/AllowReferralChatbotAPIInvoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotLambdaFnAllowReferralChatbotAPIInvoke70FB3B94"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotLambdaFn/AllowReferralChatbotWebSocketInvoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotLambdaFnAllowReferralChatbotWebSocketInvoke7F09DE1A"
+          }
+        ],
+        "/BrightpointStack-test/PerplexityLambdaFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PerplexityLambdaFn263EE720"
+          }
+        ],
+        "/BrightpointStack-test/ProcessUserDataFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProcessUserDataFn7B28A59E"
+          }
+        ],
+        "/BrightpointStack-test/ProcessUserDataFn/AllowCreateUserAPIInvoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProcessUserDataFnAllowCreateUserAPIInvoke7D4B1E51"
+          }
+        ],
+        "/BrightpointStack-test/ProcessUserDataFn/AllowUserFeedbackWebSocketInvoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProcessUserDataFnAllowUserFeedbackWebSocketInvoke5A8F919B"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsApiFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsApiFn482A67B8"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsApiFn/AllowQueryAnalyticsAPI1Invoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsApiFnAllowQueryAnalyticsAPI1Invoke3DE1AA3B"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsApiFn/AllowQueryAnalyticsAPI2Invoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsApiFnAllowQueryAnalyticsAPI2InvokeD5541736"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsApiFn/AllowAnalyticsWebSocketInvoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsApiFnAllowAnalyticsWebSocketInvoke209CEE7C"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApiHandlerFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiHandlerFn3A709788"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApiHandlerFn/AllowReferralsAPIInvoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiHandlerFnAllowReferralsAPIInvokeC339AA31"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApiHandlerFn/AllowReferralsWebSocketInvoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiHandlerFnAllowReferralsWebSocketInvokeC5473DE4"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsBackfillFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsBackfillFn3DEFB3EC"
+          }
+        ],
+        "/BrightpointStack-test/SmsChatIntegrationFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SmsChatIntegrationFnE64E832B"
+          }
+        ],
+        "/BrightpointStack-test/SmsChatIntegrationFn/AllowSNSInvoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SmsChatIntegrationFnAllowSNSInvokeE20E0893"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsStreamProcessorFn/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsStreamProcessorFnD029B018"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsStreamProcessorFn/UserDataStreamMapping/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsStreamProcessorFnUserDataStreamMapping1704D309"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIAB9DEF4E"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPI/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIDeployment08723AE8412d11b1b876d32a4d2670bb600fc45d"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPI/DeploymentStage.test/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIDeploymentStagetest96341D9C"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPI/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIEndpoint7C069EF1"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPI/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIOPTIONS71B2EA2B"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPI/Default/dashboard/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIdashboard666C7B40"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPI/Default/dashboard/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIdashboardOPTIONSF14C5D41"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPI/Default/dashboard/GET/ApiPermission.BrightpointStacktestUserDashboardAPI54C05D65.GET..dashboard": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIdashboardGETApiPermissionBrightpointStacktestUserDashboardAPI54C05D65GETdashboard908E95EC"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPI/Default/dashboard/GET/ApiPermission.Test.BrightpointStacktestUserDashboardAPI54C05D65.GET..dashboard": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIdashboardGETApiPermissionTestBrightpointStacktestUserDashboardAPI54C05D65GETdashboard7FD1AD41"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPI/Default/dashboard/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIdashboardGETF7865FD6"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI12288DAE3"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1Deployment9BBE6C31f2355a9a82fedbcb8346a01933a7deb9"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/DeploymentStage.test/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1DeploymentStagetest4E7EB64E"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1Endpoint64CAB9AF"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1OPTIONSE69B27B3"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Default/analytics/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1analytics225CDDD9"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Default/analytics/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1analyticsOPTIONSFC6165D4"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Default/analytics/all/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1analyticsall1EAB5259"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Default/analytics/all/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1analyticsallOPTIONS366A897D"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Default/analytics/all/POST/ApiPermission.BrightpointStacktestQueryAnalyticsAPI17382A801.POST..analytics.all": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1analyticsallPOSTApiPermissionBrightpointStacktestQueryAnalyticsAPI17382A801POSTanalyticsall78E23F7A"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Default/analytics/all/POST/ApiPermission.Test.BrightpointStacktestQueryAnalyticsAPI17382A801.POST..analytics.all": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1analyticsallPOSTApiPermissionTestBrightpointStacktestQueryAnalyticsAPI17382A801POSTanalyticsall3500D3CA"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1/Default/analytics/all/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1analyticsallPOST19C61C9E"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2645EC6E1"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2Deployment458DEAB4831f87412b2e9c92e50c4d7f7ca7a37b"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/DeploymentStage.test/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2DeploymentStagetest92FFD4ED"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2Endpoint2E21B3D5"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2OPTIONSED42EE57"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Default/analytics/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2analytics0FAD754F"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Default/analytics/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2analyticsOPTIONS3EAA0234"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Default/analytics/queries/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2analyticsqueries99C84E2D"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Default/analytics/queries/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2analyticsqueriesOPTIONS383E974A"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Default/analytics/queries/POST/ApiPermission.BrightpointStacktestQueryAnalyticsAPI22F2E532B.POST..analytics.queries": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2analyticsqueriesPOSTApiPermissionBrightpointStacktestQueryAnalyticsAPI22F2E532BPOSTanalyticsqueries83DB2950"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Default/analytics/queries/POST/ApiPermission.Test.BrightpointStacktestQueryAnalyticsAPI22F2E532B.POST..analytics.queries": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2analyticsqueriesPOSTApiPermissionTestBrightpointStacktestQueryAnalyticsAPI22F2E532BPOSTanalyticsqueries56598FD2"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2/Default/analytics/queries/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2analyticsqueriesPOSTEFD9A8C7"
+          }
+        ],
+        "/BrightpointStack-test/createUser/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUserC6ED88E6"
+          }
+        ],
+        "/BrightpointStack-test/createUser/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUserDeployment294A82B4fdf6010c306b12e0de1db5ea366d07c7"
+          }
+        ],
+        "/BrightpointStack-test/createUser/DeploymentStage.test/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUserDeploymentStagetest487A7E2C"
+          }
+        ],
+        "/BrightpointStack-test/createUser/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUserEndpoint779A5A75"
+          }
+        ],
+        "/BrightpointStack-test/createUser/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUserOPTIONS2ACEF464"
+          }
+        ],
+        "/BrightpointStack-test/createUser/Default/addUser/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUseraddUser409049C7"
+          }
+        ],
+        "/BrightpointStack-test/createUser/Default/addUser/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUseraddUserOPTIONSC13FE992"
+          }
+        ],
+        "/BrightpointStack-test/createUser/Default/addUser/POST/ApiPermission.BrightpointStacktestcreateUserEA96E84C.POST..addUser": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUseraddUserPOSTApiPermissionBrightpointStacktestcreateUserEA96E84CPOSTaddUser422A2CCB"
+          }
+        ],
+        "/BrightpointStack-test/createUser/Default/addUser/POST/ApiPermission.Test.BrightpointStacktestcreateUserEA96E84C.POST..addUser": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUseraddUserPOSTApiPermissionTestBrightpointStacktestcreateUserEA96E84CPOSTaddUser03188254"
+          }
+        ],
+        "/BrightpointStack-test/createUser/Default/addUser/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUseraddUserPOSTB281B83C"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPI978B0CF6"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPI/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIDeployment8513055E2062d9b8fbef8a7c9a0c668bd5356797"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPI/DeploymentStage.test/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIDeploymentStagetestC3E14D9C"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPI/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIEndpoint19B05A23"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPI/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIOPTIONSE67E5B0D"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPI/Default/chat/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIchat9ADE8AE5"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPI/Default/chat/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIchatOPTIONS4EC29376"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPI/Default/chat/POST/ApiPermission.BrightpointStacktestReferralChatbotAPIB9F40490.POST..chat": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIchatPOSTApiPermissionBrightpointStacktestReferralChatbotAPIB9F40490POSTchat0B6FD9EF"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPI/Default/chat/POST/ApiPermission.Test.BrightpointStacktestReferralChatbotAPIB9F40490.POST..chat": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIchatPOSTApiPermissionTestBrightpointStacktestReferralChatbotAPIB9F40490POSTchatB92155E5"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPI/Default/chat/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIchatPOST91996584"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApi2C829B6C"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiDeploymentA431722Edae536d7ce02c9deb00a6970de960cd6"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/DeploymentStage.test/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiDeploymentStagetestE5FA95AC"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiEndpoint954CB844"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiOPTIONS8AC6CF1A"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferrals474AEC2E"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsOPTIONS0134053C"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/DELETE/ApiPermission.BrightpointStacktestReferralsApiD8CD151D.DELETE..referrals": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsDELETEApiPermissionBrightpointStacktestReferralsApiD8CD151DDELETEreferrals1DC60FE5"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/DELETE/ApiPermission.Test.BrightpointStacktestReferralsApiD8CD151D.DELETE..referrals": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsDELETEApiPermissionTestBrightpointStacktestReferralsApiD8CD151DDELETEreferralsEECF4D04"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/DELETE/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsDELETE5952DBE9"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/GET/ApiPermission.BrightpointStacktestReferralsApiD8CD151D.GET..referrals": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsGETApiPermissionBrightpointStacktestReferralsApiD8CD151DGETreferrals8DE9A541"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/GET/ApiPermission.Test.BrightpointStacktestReferralsApiD8CD151D.GET..referrals": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsGETApiPermissionTestBrightpointStacktestReferralsApiD8CD151DGETreferrals524D2AD7"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsGET7252075C"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/POST/ApiPermission.BrightpointStacktestReferralsApiD8CD151D.POST..referrals": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsPOSTApiPermissionBrightpointStacktestReferralsApiD8CD151DPOSTreferrals3C0D9E76"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/POST/ApiPermission.Test.BrightpointStacktestReferralsApiD8CD151D.POST..referrals": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsPOSTApiPermissionTestBrightpointStacktestReferralsApiD8CD151DPOSTreferrals5692CCDC"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsPOST8D1840E1"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/PUT/ApiPermission.BrightpointStacktestReferralsApiD8CD151D.PUT..referrals": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsPUTApiPermissionBrightpointStacktestReferralsApiD8CD151DPUTreferralsFA5EC5EB"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/PUT/ApiPermission.Test.BrightpointStacktestReferralsApiD8CD151D.PUT..referrals": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsPUTApiPermissionTestBrightpointStacktestReferralsApiD8CD151DPUTreferrals660F1894"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/PUT/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsPUTEF7CAA7B"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralid9613265A"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidOPTIONSBA49BC3A"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/DELETE/ApiPermission.BrightpointStacktestReferralsApiD8CD151D.DELETE..referrals.{referral_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidDELETEApiPermissionBrightpointStacktestReferralsApiD8CD151DDELETEreferralsreferralidA9508782"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/DELETE/ApiPermission.Test.BrightpointStacktestReferralsApiD8CD151D.DELETE..referrals.{referral_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidDELETEApiPermissionTestBrightpointStacktestReferralsApiD8CD151DDELETEreferralsreferralidCB74147A"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/DELETE/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidDELETE835878DD"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/GET/ApiPermission.BrightpointStacktestReferralsApiD8CD151D.GET..referrals.{referral_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidGETApiPermissionBrightpointStacktestReferralsApiD8CD151DGETreferralsreferralid5155F7D0"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/GET/ApiPermission.Test.BrightpointStacktestReferralsApiD8CD151D.GET..referrals.{referral_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidGETApiPermissionTestBrightpointStacktestReferralsApiD8CD151DGETreferralsreferralid7E63BCF5"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidGET56872033"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/POST/ApiPermission.BrightpointStacktestReferralsApiD8CD151D.POST..referrals.{referral_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidPOSTApiPermissionBrightpointStacktestReferralsApiD8CD151DPOSTreferralsreferralid2667EC6C"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/POST/ApiPermission.Test.BrightpointStacktestReferralsApiD8CD151D.POST..referrals.{referral_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidPOSTApiPermissionTestBrightpointStacktestReferralsApiD8CD151DPOSTreferralsreferralidFECCC5E7"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidPOSTD840CDC0"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/PUT/ApiPermission.BrightpointStacktestReferralsApiD8CD151D.PUT..referrals.{referral_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidPUTApiPermissionBrightpointStacktestReferralsApiD8CD151DPUTreferralsreferralid70788989"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/PUT/ApiPermission.Test.BrightpointStacktestReferralsApiD8CD151D.PUT..referrals.{referral_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidPUTApiPermissionTestBrightpointStacktestReferralsApiD8CD151DPUTreferralsreferralid1F3A4EA1"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/{referral_id}/PUT/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralsreferralidPUT484F166A"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/search/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralssearch49B1FEDC"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/search/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralssearchOPTIONS3AF616CC"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/search/POST/ApiPermission.BrightpointStacktestReferralsApiD8CD151D.POST..referrals.search": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralssearchPOSTApiPermissionBrightpointStacktestReferralsApiD8CD151DPOSTreferralssearchFD4124B2"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/search/POST/ApiPermission.Test.BrightpointStacktestReferralsApiD8CD151D.POST..referrals.search": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralssearchPOSTApiPermissionTestBrightpointStacktestReferralsApiD8CD151DPOSTreferralssearchD9854385"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApi/Default/referrals/search/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApireferralssearchPOSTFDD98591"
+          }
+        ],
+        "/BrightpointStack-test/AnalyticsWebSocketAPI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AnalyticsWebSocketAPI8F36832A"
+          }
+        ],
+        "/BrightpointStack-test/AnalyticsWebSocketAPI/$default-Route/AnalyticsWebSocketAPIIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AnalyticsWebSocketAPIdefaultRouteAnalyticsWebSocketAPIIntegrationPermission4ACE18C1"
+          }
+        ],
+        "/BrightpointStack-test/AnalyticsWebSocketAPI/$default-Route/AnalyticsWebSocketAPIIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AnalyticsWebSocketAPIdefaultRouteAnalyticsWebSocketAPIIntegration144B87CC"
+          }
+        ],
+        "/BrightpointStack-test/AnalyticsWebSocketAPI/$default-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AnalyticsWebSocketAPIdefaultRoute50828D5C"
+          }
+        ],
+        "/BrightpointStack-test/AnalyticsWebSocketAPI/$connect-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AnalyticsWebSocketAPIconnectRouteC2AEBBD1"
+          }
+        ],
+        "/BrightpointStack-test/AnalyticsWebSocketAPI/getAnalytics-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AnalyticsWebSocketAPIgetAnalyticsRouteCC3BBB2A"
+          }
+        ],
+        "/BrightpointStack-test/AnalyticsWebSocketAPI/$disconnect-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AnalyticsWebSocketAPIdisconnectRoute2F99D150"
+          }
+        ],
+        "/BrightpointStack-test/AnalyticsWebSocketAPIStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AnalyticsWebSocketAPIStage1986798F"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotWebSocket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotWebSocket4AF2CD48"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotWebSocket/$connect-Route/ReferralChatbotWebSocketIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotWebSocketconnectRouteReferralChatbotWebSocketIntegrationPermission6E6266AE"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotWebSocket/$connect-Route/ReferralChatbotWebSocketIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotWebSocketconnectRouteReferralChatbotWebSocketIntegration775808E2"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotWebSocket/$connect-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotWebSocketconnectRoute03BAA996"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotWebSocket/query-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotWebSocketqueryRoute794307B9"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotWebSocket/$disconnect-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotWebSocketdisconnectRoute85C7C19F"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotWebSocketStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotWebSocketStageDFA7809E"
+          }
+        ],
+        "/BrightpointStack-test/UserFeedbackWebSocketAPI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFeedbackWebSocketAPIAC8C1AA7"
+          }
+        ],
+        "/BrightpointStack-test/UserFeedbackWebSocketAPI/$disconnect-Route/UserFeedbackWebSocketAPIIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFeedbackWebSocketAPIdisconnectRouteUserFeedbackWebSocketAPIIntegrationPermissionCE35B8E0"
+          }
+        ],
+        "/BrightpointStack-test/UserFeedbackWebSocketAPI/$disconnect-Route/UserFeedbackWebSocketAPIIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFeedbackWebSocketAPIdisconnectRouteUserFeedbackWebSocketAPIIntegration60BE7FA5"
+          }
+        ],
+        "/BrightpointStack-test/UserFeedbackWebSocketAPI/$disconnect-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFeedbackWebSocketAPIdisconnectRoute804B2C8D"
+          }
+        ],
+        "/BrightpointStack-test/UserFeedbackWebSocketAPI/sendFeedback-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFeedbackWebSocketAPIsendFeedbackRoute20CA2685"
+          }
+        ],
+        "/BrightpointStack-test/UserFeedbackWebSocketAPI/updateUser-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFeedbackWebSocketAPIupdateUserRoute3D06DBCE"
+          }
+        ],
+        "/BrightpointStack-test/UserFeedbackWebSocketAPI/getUser-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFeedbackWebSocketAPIgetUserRoute8AD42F0A"
+          }
+        ],
+        "/BrightpointStack-test/UserFeedbackWebSocketAPI/$connect-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFeedbackWebSocketAPIconnectRoute86B2CC12"
+          }
+        ],
+        "/BrightpointStack-test/UserFeedbackWebSocketAPIStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFeedbackWebSocketAPIStageB2561EC0"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPI16F9DC58"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/getReferrals-Route/ReferralsWebSocketAPIIntegration-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationPermission18593FB8"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/getReferrals-Route/ReferralsWebSocketAPIIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIgetReferralsRouteReferralsWebSocketAPIIntegrationBEF4E322"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/getReferrals-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIgetReferralsRoute836E7A4F"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/$connect-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIconnectRoute11251B98"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/createReferral-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIcreateReferralRoute43444E49"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/searchReferrals-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIsearchReferralsRoute55186394"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/$default-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIdefaultRouteD510CF0A"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/updateReferral-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIupdateReferralRoute53E4FD77"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/$disconnect-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIdisconnectRoute21707849"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/deleteReferral-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIdeleteReferralRoute4D249A16"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPI/getReferral-Route/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIgetReferralRouteFE5843E1"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsWebSocketAPIStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsWebSocketAPIStage1053224E"
+          }
+        ],
+        "/BrightpointStack-test/AmplifyAppId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AmplifyAppId"
+          }
+        ],
+        "/BrightpointStack-test/AmplifyAppUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AmplifyAppUrl"
+          }
+        ],
+        "/BrightpointStack-test/AmplifyConsoleUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AmplifyConsoleUrl"
+          }
+        ],
+        "/BrightpointStack-test/CognitoUserPoolId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoUserPoolId"
+          }
+        ],
+        "/BrightpointStack-test/CognitoUserPoolClientId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoUserPoolClientId"
+          }
+        ],
+        "/BrightpointStack-test/CognitoIdentityPoolId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoIdentityPoolId"
+          }
+        ],
+        "/BrightpointStack-test/CognitoUserPoolDomain": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoUserPoolDomain"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPIUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIUrl"
+          }
+        ],
+        "/BrightpointStack-test/UserDashboardAPIId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDashboardAPIId"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1Url": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1Url"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI1Id": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI1Id"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2Url": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2Url"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsAPI2Id": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsAPI2Id"
+          }
+        ],
+        "/BrightpointStack-test/createUserUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUserUrl"
+          }
+        ],
+        "/BrightpointStack-test/createUserId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "createUserId"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPIUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIUrl"
+          }
+        ],
+        "/BrightpointStack-test/ReferralChatbotAPIId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotAPIId"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApiUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiUrl"
+          }
+        ],
+        "/BrightpointStack-test/ReferralsApiId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsApiId"
+          }
+        ],
+        "/BrightpointStack-test/FrontendConfigSummary": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendConfigSummary"
+          }
+        ],
+        "/BrightpointStack-test/WebSocketConnectionsTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebSocketConnectionsTableName"
+          }
+        ],
+        "/BrightpointStack-test/PerplexityQueryCacheTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PerplexityQueryCacheTableName"
+          }
+        ],
+        "/BrightpointStack-test/QueryAnalyticsTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryAnalyticsTableName"
+          }
+        ],
+        "/BrightpointStack-test/ReferralDataTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralDataTableName"
+          }
+        ],
+        "/BrightpointStack-test/UserDataTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserDataTableName"
+          }
+        ],
+        "/BrightpointStack-test/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/BrightpointStack-test/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/BrightpointStack-test/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "BrightpointStack-test"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  },
+  "minimumCliVersion": "2.1005.0"
+}
