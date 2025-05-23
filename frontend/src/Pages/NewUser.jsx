@@ -54,69 +54,69 @@ const NewUser = () => {
   
       console.log("✅ Cognito signUp response:", response);
   
-      // // REST API payload
-      // const restPayload = {
-      //   user_id: username,
-      //   Zipcode: zipcode,
-      //   Phone: phone,
-      //   emails: email,
-      //   operation: "POST",
-      // };
+      // REST API payload
+      const restPayload = {
+        user_id: username,
+        Zipcode: zipcode,
+        Phone: phone,
+        Email: email,
+        operation: "PUT",
+      };
   
-      // console.log("📤 Sending payload to REST API:", restPayload);
+      console.log("📤 Sending payload to REST API:", restPayload);
   
-      // const restRes = await fetch(USER_ADD_API, {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(restPayload),
-      // });
+      const restRes = await fetch(USER_ADD_API, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(restPayload),
+      });
   
-      // const restData = await restRes.json();
+      const restData = await restRes.json();
   
-      // if (!restRes.ok) {
-      //   console.error("❌ REST API error:", restData);
-      //   throw new Error("REST API call failed.");
-      // }
+      if (!restRes.ok) {
+        console.error("❌ REST API error:", restData);
+        throw new Error("REST API call failed.");
+      }
   
-      // console.log("✅ REST API response:", restData);
+      console.log("✅ REST API response:", restData);
   
       // WebSocket message
-      const wsPayload = {
-        action: "createUser",
-        user_id: username.toLowerCase(),
-        Zipcode: zipcode,
-        Phone: phonenumber,
-        Email: email,
-      };
-      console.log("Sent request:", wsPayload);
+    //   const wsPayload = {
+    //     action: "createUser",
+    //     user_id: username.toLowerCase(),
+    //     Zipcode: zipcode,
+    //     Phone: phonenumber,
+    //     Email: email,
+    //   };
+    //   console.log("Sent request:", wsPayload);
   
-      console.log("🌐 Connecting to WebSocket:", USER_API);
+    //   console.log("🌐 Connecting to WebSocket:", USER_API);
   
-      const socket = new WebSocket(USER_API);
+    //   const socket = new WebSocket(USER_API);
   
-      socket.onopen = () => {
-        console.log("✅ WebSocket connection opened.");
-        socket.send(JSON.stringify(wsPayload));
-        console.log("📤 Sent to WebSocket:", wsPayload);
-      };
+    //   socket.onopen = () => {
+    //     console.log("✅ WebSocket connection opened.");
+    //     socket.send(JSON.stringify(wsPayload));
+    //     console.log("📤 Sent to WebSocket:", wsPayload);
+    //   };
   
-      socket.onmessage = (message) => {
-        console.log("📨 WebSocket message received:", message.data);
-      };
+    //   socket.onmessage = (message) => {
+    //     console.log("📨 WebSocket message received:", message.data);
+    //   };
   
-      socket.onerror = (error) => {
-        console.error("❌ WebSocket error:", error);
-      };
+    //   socket.onerror = (error) => {
+    //     console.error("❌ WebSocket error:", error);
+    //   };
   
-      socket.onclose = () => {
-        console.log("🔌 WebSocket connection closed.");
-      };
+    //   socket.onclose = () => {
+    //     console.log("🔌 WebSocket connection closed.");
+    //   };
   
-    } catch (error) {
-      console.error("❌ Error during signup or API calls:", error);
-    }
+    // } catch (error) {
+    //   console.error("❌ Error during signup or API calls:", error);
+    // }
   };
   
   
