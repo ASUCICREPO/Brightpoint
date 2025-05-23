@@ -84,7 +84,7 @@ const NewUser = () => {
   
       // WebSocket message
       const wsPayload = {
-        action: "updateUser",
+        action: "createUser",
         user_id: username.toLowerCase(),
         Zipcode: zipcode,
         Phone: phonenumber,
