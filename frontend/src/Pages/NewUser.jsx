@@ -114,9 +114,9 @@ const NewUser = () => {
     //     console.log("🔌 WebSocket connection closed.");
     //   };
   
-    // } catch (error) {
-    //   console.error("❌ Error during signup or API calls:", error);
-    // }
+    } catch (error) {
+      console.error("❌ Error during signup or API calls:", error);
+    }
   };
   
   
