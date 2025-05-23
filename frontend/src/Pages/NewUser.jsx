@@ -90,6 +90,7 @@ const NewUser = () => {
         Phone: phonenumber,
         Email: email,
       };
+      console.log("Sent request:", wsPayload);
   
       console.log("🌐 Connecting to WebSocket:", USER_API);
   
