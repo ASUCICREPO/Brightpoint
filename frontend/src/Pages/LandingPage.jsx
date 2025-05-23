@@ -33,13 +33,14 @@ const LandingPage = () => {
   const handleLogin = async () => {
     try {
       // Authenticate using Cognito
-      const user = await signIn({ username, password });
+      usernameL = username.toLowerCase();
+      const user = await signIn({ usernameL, password });
       console.log('Cognito login success:', user);
-      console.log('Cognito login success:', username, password);
+      console.log('Cognito login success:', usernameL, password);
 
 
       // Trigger API call to fetch and store user info
-      await fetchAndStoreUserData(username, updateUser);
+      await fetchAndStoreUserData(usernameL, updateUser);
       console.log("User data updated via context. Navigating to /app now...", username);
       navigate('/app');
 
