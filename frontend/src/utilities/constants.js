@@ -156,7 +156,8 @@ export const CHAT_API = "wss://lajngh4a22.execute-api.us-east-1.amazonaws.com/de
 export const USER_API ="wss://p8ea1v23i0.execute-api.us-east-1.amazonaws.com/dev/"; // User and Referral
 export const REFERRAL_MANAGEMENT_API = "wss://z0ebrmmyd0.execute-api.us-east-1.amazonaws.com/dev/"; // Referral database management
 export const ANALYTICS_API = "https://adt0bzrd3e.execute-api.us-east-1.amazonaws.com/dev/analytics/all"; // Analytics dashboard information
-export const USER_ADD_API ="https://kahgke45yd.execute-api.us-east-1.amazonaws.com/dev/addUser";
+export const USER_ADD_API ="https://f6mk2ph20e.execute-api.us-east-1.amazonaws.com/dev/";
+
 // --------------------------------------------------------------------------------------------------------//
 // --------------------------------------------------------------------------------------------------------//
 
