@@ -512,8 +512,17 @@ class BrightpointStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, env_name: str = "dev", **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        self.env_name = env_name
-        self.account_id = "224328319083"
+        # Get account_id and region from stack environment
+        self.env_name = self.node.try_get_context("env")
+        self.account_id = self.node.try_get_context("account")
+        self.target_region = self.node.try_get_context("region")
+
+        if not self.env_name:
+            raise ValueError("Environment must be provided via -c env=<env_name>")
+        if not self.account_id:
+            raise ValueError("Account ID must be provided via -c account=<account_id>")
+        if not self.target_region:
+            raise ValueError("Region must be provided via -c region=<region>")
 
         perplexity_secret = secretsmanager.Secret.from_secret_name_v2(
             self, "PerplexityApiKeySecret",
@@ -633,7 +642,7 @@ class BrightpointStack(Stack):
         env_branch.add_environment("REACT_APP_USER_POOL_ID", user_pool.user_pool_id)
         env_branch.add_environment("REACT_APP_USER_POOL_CLIENT_ID", user_pool_client.user_pool_client_id)
         env_branch.add_environment("REACT_APP_IDENTITY_POOL_ID", identity_pool.ref)
-        env_branch.add_environment("REACT_APP_REGION", self.region)
+        env_branch.add_environment("REACT_APP_REGION", self.target_region)
 
         # Create Lambda execution roles with environment-specific names
         referral_chatbot_role = iam.Role(
@@ -876,28 +885,28 @@ class BrightpointStack(Stack):
                     "AllowReferralChatbotAPIInvoke",
                     principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
                     action="lambda:InvokeFunction",
-                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.rest_api_id}/*/POST/chat"
+                    source_arn=f"arn:aws:execute-api:{self.target_region}:{self.account_id}:{api.rest_api_id}/*/POST/chat"
                 )
             elif api_name == 'createUser':
                 process_user_data_fn.add_permission(
                     "AllowCreateUserAPIInvoke",
                     principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
                     action="lambda:InvokeFunction",
-                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.rest_api_id}/*/POST/addUser"
+                    source_arn=f"arn:aws:execute-api:{self.target_region}:{self.account_id}:{api.rest_api_id}/*/POST/addUser"
                 )
             elif api_name in ['QueryAnalyticsAPI1', 'QueryAnalyticsAPI2']:
                 query_analytics_api_fn.add_permission(
                     f"Allow{api_name}Invoke",
                     principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
                     action="lambda:InvokeFunction",
-                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.rest_api_id}/*/POST/*"
+                    source_arn=f"arn:aws:execute-api:{self.target_region}:{self.account_id}:{api.rest_api_id}/*/POST/*"
                 )
             elif api_name == 'ReferralsApi':
                 referrals_api_handler_fn.add_permission(
                     "AllowReferralsAPIInvoke",
                     principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
                     action="lambda:InvokeFunction",
-                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.rest_api_id}/*/*"
+                    source_arn=f"arn:aws:execute-api:{self.target_region}:{self.account_id}:{api.rest_api_id}/*/*"
                 )
 
         # WebSocket API permissions
@@ -907,28 +916,28 @@ class BrightpointStack(Stack):
                     "AllowReferralChatbotWebSocketInvoke",
                     principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
                     action="lambda:InvokeFunction",
-                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.api_id}/*/*"
+                    source_arn=f"arn:aws:execute-api:{self.target_region}:{self.account_id}:{api.api_id}/*/*"
                 )
             elif api_name == 'UserFeedbackWebSocketAPI':
                 process_user_data_fn.add_permission(
                     "AllowUserFeedbackWebSocketInvoke",
                     principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
                     action="lambda:InvokeFunction",
-                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.api_id}/*/*"
+                    source_arn=f"arn:aws:execute-api:{self.target_region}:{self.account_id}:{api.api_id}/*/*"
                 )
             elif api_name == 'AnalyticsWebSocketAPI':
                 query_analytics_api_fn.add_permission(
                     "AllowAnalyticsWebSocketInvoke",
                     principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
                     action="lambda:InvokeFunction",
-                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.api_id}/*/*"
+                    source_arn=f"arn:aws:execute-api:{self.target_region}:{self.account_id}:{api.api_id}/*/*"
                 )
             elif api_name == 'ReferralsWebSocketAPI':
                 referrals_api_handler_fn.add_permission(
                     "AllowReferralsWebSocketInvoke",
                     principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
                     action="lambda:InvokeFunction",
-                    source_arn=f"arn:aws:execute-api:{self.region}:{self.account_id}:{api.api_id}/*/*"
+                    source_arn=f"arn:aws:execute-api:{self.target_region}:{self.account_id}:{api.api_id}/*/*"
                 )
 
         # Output the DynamoDB table names
@@ -951,7 +960,7 @@ class BrightpointStack(Stack):
 
         CfnOutput(
             self, "AmplifyConsoleUrl",
-            value=f"https://{self.region}.console.aws.amazon.com/amplify/apps/{amplify_app.app_id}",
+            value=f"https://{self.target_region}.console.aws.amazon.com/amplify/apps/{amplify_app.app_id}",
             description=f"Amplify Console URL for {self.env_name}",
             export_name=f"{self.stack_name}-AmplifyConsoleUrl"
         )
@@ -980,7 +989,7 @@ class BrightpointStack(Stack):
 
         CfnOutput(
             self, "CognitoUserPoolDomain",
-            value=f"https://brightpoint-{self.env_name}.auth.{self.region}.amazoncognito.com",
+            value=f"https://brightpoint-{self.env_name}.auth.{self.target_region}.amazoncognito.com",
             description=f"Cognito User Pool Domain for {self.env_name}",
             export_name=f"{self.stack_name}-UserPoolDomain"
         )
@@ -989,7 +998,7 @@ class BrightpointStack(Stack):
         for api_name, api in api_config.rest_apis.items():
             CfnOutput(
                 self, f"{api_name}Url",
-                value=f"https://{api.rest_api_id}.execute-api.{self.region}.amazonaws.com/{api.deployment_stage.stage_name}/",
+                value=f"https://{api.rest_api_id}.execute-api.{self.target_region}.amazonaws.com/{api.deployment_stage.stage_name}/",
                 description=f"URL of the {api_name} REST API for {self.env_name}",
                 export_name=f"{self.stack_name}-{api_name}Url"
             )
@@ -1004,7 +1013,7 @@ class BrightpointStack(Stack):
         # 5. Environment Configuration Summary
         config_summary = {
             "environment": self.env_name,
-            "region": self.region,
+            "target_region": self.target_region,
             "amplifyAppId": amplify_app.app_id,
             "userPoolId": user_pool.user_pool_id,
             "userPoolClientId": user_pool_client.user_pool_client_id,
