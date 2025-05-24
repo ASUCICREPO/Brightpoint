@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ff7ef2e-35a7-4c4d-bd94-9b3ea7ae56b2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/brightpoint/brightpoint_stack.py" beforeDir="false" afterPath="$PROJECT_DIR$/brightpoint/brightpoint_stack.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.template.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.template.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cdk.out/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cdk.out/tree.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/tree.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/NewSignUp.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/NewSignUp.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/NewUser.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/NewUser.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/aws-exports.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/aws-exports.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/utilities/constants.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utilities/constants.js" afterDir="false" />
-    </list>
+    <list default="true" id="3ff7ef2e-35a7-4c4d-bd94-9b3ea7ae56b2" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -108,7 +97,7 @@
       <workItem from="1746127095880" duration="8013000" />
       <workItem from="1746911500180" duration="37975000" />
       <workItem from="1747685946800" duration="6836000" />
-      <workItem from="1747931254031" duration="21547000" />
+      <workItem from="1747931254031" duration="21896000" />
     </task>
     <servers />
   </component>
