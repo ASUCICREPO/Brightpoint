@@ -1,16 +1,17 @@
-import React, { useState , useEffect} from 'react';
-import { 
-  Box, Button, Typography, TextField, Link, InputAdornment, IconButton 
+import React, { useState, useEffect } from 'react';
+import {
+  Box, Button, Typography, TextField, Link, InputAdornment, IconButton
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import BrightpointLogo from '../Assets/Brightpoint_logo.svg';
-import { useUser } from '../utilities/UserContext'; // Import UserContext
-import {signUp, signOut} from 'aws-amplify/auth';
+import { useUser } from '../utilities/UserContext';
+import { signOut } from 'aws-amplify/auth';
 
 const NewSignUp = () => {
-  const { updateUser } = useUser(); // Get updateUser function
+  const { updateUser } = useUser();
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // ✅ Add email field
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -20,7 +21,7 @@ const NewSignUp = () => {
   useEffect(() => {
     const logoutPreviousUser = async () => {
       try {
-        await signOut(); // Sign out the previous user (if any)
+        await signOut();
         console.log("Previous user logged out successfully.");
       } catch (error) {
         console.error("Error signing out the previous user:", error.message || error);
@@ -28,26 +29,30 @@ const NewSignUp = () => {
     };
 
     logoutPreviousUser();
-  }, []); // Empty dependency array ensures this runs only once when the page loads
-
+  }, []);
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-  
-    updateUser({ username, password }); // ⬅️ Save for later use
-    navigate('/newusersignup');         // ⬅️ Go to next page
-  };
-  
 
-  const isButtonDisabled = !username || !password || !confirmPassword;
+    // ✅ Store all signup data in context for later use
+    updateUser({
+      username,
+      email,
+      password
+    });
+
+    console.log("Signup data stored in context:", { username, email });
+    navigate('/newusersignup'); // Navigate to profile completion page
+  };
+
+  const isButtonDisabled = !username || !email || !password || !confirmPassword; // ✅ Include email
 
   return (
     <Box height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" bgcolor="white">
-      
-      {/* Logo above the container */}
+
       <img src={BrightpointLogo} alt="Brightpoint Logo" height="50" style={{ marginBottom: 10 }} />
 
       <Box
@@ -66,7 +71,7 @@ const NewSignUp = () => {
           Sign Up
         </Typography>
 
-        {/* Username Label */}
+        {/* Username Field */}
         <Typography variant="body1" alignSelf="flex-start" mb={0.5}>
           Username <span style={{ color: 'red' }}>*</span>
         </Typography>
@@ -86,7 +91,28 @@ const NewSignUp = () => {
           }}
         />
 
-        {/* Password Label */}
+        {/* ✅ Email Field */}
+        <Typography variant="body1" alignSelf="flex-start" mt={2} mb={0.5}>
+          Email <span style={{ color: 'red' }}>*</span>
+        </Typography>
+        <TextField
+          placeholder="Enter your email"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          sx={{
+            backgroundColor: '#f0f0f0',
+            borderRadius: '12px',
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '12px',
+            },
+          }}
+        />
+
+        {/* Password Field */}
         <Typography variant="body1" alignSelf="flex-start" mt={2} mb={0.5}>
           Password <span style={{ color: 'red' }}>*</span>
         </Typography>
@@ -116,7 +142,7 @@ const NewSignUp = () => {
           }}
         />
 
-        {/* Confirm Password Label */}
+        {/* Confirm Password Field */}
         <Typography variant="body1" alignSelf="flex-start" mt={2} mb={0.5}>
           Confirm Password <span style={{ color: 'red' }}>*</span>
         </Typography>
@@ -146,7 +172,6 @@ const NewSignUp = () => {
           }}
         />
 
-        {/* Sign Up Button */}
         <Button
           variant="contained"
           color="error"
@@ -162,11 +187,10 @@ const NewSignUp = () => {
           disabled={isButtonDisabled}
           onClick={handleSignUp}
         >
-          Sign Up
+          Continue
         </Button>
       </Box>
 
-      {/* Log In Text outside the box */}
       <Box mt={2}>
         <Typography variant="body2">
           Already registered?{' '}

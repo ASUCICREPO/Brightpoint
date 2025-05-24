@@ -150,15 +150,43 @@ export const LANDING_PAGE_TEXT = {
 // --------------------------------------------------------------------------------------------------------//
 
 // API endpoints
+// WebSocket APIs
+export const CHAT_API = process.env.REACT_APP_CHAT_API;
+export const USER_API = process.env.REACT_APP_USER_API;
+export const REFERRAL_MANAGEMENT_API = process.env.REACT_APP_REFERRAL_MANAGEMENT_API;
 
+// REST APIs
+export const ANALYTICS_API = process.env.REACT_APP_ANALYTICS_API;
+export const USER_ADD_API = process.env.REACT_APP_USER_ADD_API;
 
-export const CHAT_API = "wss://lajngh4a22.execute-api.us-east-1.amazonaws.com/dev"; // Chat
-export const USER_API ="wss://p8ea1v23i0.execute-api.us-east-1.amazonaws.com/dev/"; // User and Referral
-export const REFERRAL_MANAGEMENT_API = "wss://z0ebrmmyd0.execute-api.us-east-1.amazonaws.com/dev/"; // Referral database management
-export const ANALYTICS_API = "https://adt0bzrd3e.execute-api.us-east-1.amazonaws.com/dev/analytics/all"; // Analytics dashboard information
-export const USER_ADD_API ="https://f6mk2ph20e.execute-api.us-east-1.amazonaws.com/dev/";
+export const REFERRAL_CHATBOT_REST_API = process.env.REACT_APP_REFERRAL_CHATBOT_REST_API;
+export const REFERRALS_REST_API = process.env.REACT_APP_REFERRALS_REST_API;
 
-// --------------------------------------------------------------------------------------------------------//
+console.log("API Configuration from CDK:");
+console.log("CHAT_API:", CHAT_API);
+console.log("USER_API:", USER_API);
+console.log("REFERRAL_MANAGEMENT_API:", REFERRAL_MANAGEMENT_API);
+console.log("ANALYTICS_API:", ANALYTICS_API);
+console.log("USER_ADD_API:", USER_ADD_API);
+
+// ✅ Environment info
+export const ENVIRONMENT = process.env.REACT_APP_ENVIRONMENT || 'dev';
+export const AWS_REGION = process.env.REACT_APP_REGION || 'us-east-1';
+
+// ✅ Validation check
+const requiredEnvVars = [
+    'REACT_APP_CHAT_API',
+    'REACT_APP_USER_API',
+    'REACT_APP_REFERRAL_MANAGEMENT_API',
+    'REACT_APP_ANALYTICS_API',
+    'REACT_APP_USER_ADD_API'
+];
+
+const missingVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+if (missingVars.length > 0) {
+    console.warn("Missing environment variables (using fallbacks):", missingVars);
+    console.warn("Make sure your CDK deployment set these in Amplify environment variables");
+}
 // --------------------------------------------------------------------------------------------------------//
 
 // Features

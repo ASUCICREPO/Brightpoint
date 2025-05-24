@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-deploy-role-216989103356-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-cfn-exec-role-216989103356-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-216989103356-us-east-1/5f648d5e1fdb1b491a32aa5cdcf87b6f994b32d848d3dca9a798c276960f7a18.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-216989103356-us-east-1/ee95b455096649b14e90a589d566fb0865bca6ccea2e96bc298d6490253f4371.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -135,10 +135,34 @@
             "data": "BrightpointUserPoolClient3A182275"
           }
         ],
+        "/BrightpointStack-dev/BrightpointUserPoolDomain/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BrightpointUserPoolDomain9D141311"
+          }
+        ],
         "/BrightpointStack-dev/BrightpointIdentityPool": [
           {
             "type": "aws:cdk:logicalId",
             "data": "BrightpointIdentityPool"
+          }
+        ],
+        "/BrightpointStack-dev/CognitoAuthenticatedRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoAuthenticatedRole5CA1BC89"
+          }
+        ],
+        "/BrightpointStack-dev/CognitoAuthenticatedRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoAuthenticatedRoleDefaultPolicyA138AC36"
+          }
+        ],
+        "/BrightpointStack-dev/IdentityPoolRoleAttachment": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IdentityPoolRoleAttachment"
           }
         ],
         "/BrightpointStack-dev/BrightpointManualAmplifyApp/Role/Resource": [
@@ -285,10 +309,10 @@
             "data": "ProcessUserDataFn7B28A59E"
           }
         ],
-        "/BrightpointStack-dev/ProcessUserDataFn/AllowCreateUserAPIInvoke": [
+        "/BrightpointStack-dev/ProcessUserDataFn/AllowCreateUserAPIPutInvoke": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "ProcessUserDataFnAllowCreateUserAPIInvoke7D4B1E51"
+            "data": "ProcessUserDataFnAllowCreateUserAPIPutInvokeD811BD74"
           }
         ],
         "/BrightpointStack-dev/ProcessUserDataFn/AllowUserFeedbackWebSocketInvoke": [
@@ -582,7 +606,7 @@
         "/BrightpointStack-dev/createUser/Deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "createUserDeployment294A82B4a31647d1c81a96e0a371105e57337208"
+            "data": "createUserDeployment294A82B41cd77b17e603bc74fd85a531a4baab07"
           }
         ],
         "/BrightpointStack-dev/createUser/DeploymentStage.dev/Resource": [
@@ -615,22 +639,22 @@
             "data": "createUseraddUserOPTIONSC13FE992"
           }
         ],
-        "/BrightpointStack-dev/createUser/Default/addUser/POST/ApiPermission.BrightpointStackdevcreateUserE1E7718B.POST..addUser": [
+        "/BrightpointStack-dev/createUser/Default/addUser/PUT/ApiPermission.BrightpointStackdevcreateUserE1E7718B.PUT..addUser": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "createUseraddUserPOSTApiPermissionBrightpointStackdevcreateUserE1E7718BPOSTaddUser12F1B2E8"
+            "data": "createUseraddUserPUTApiPermissionBrightpointStackdevcreateUserE1E7718BPUTaddUser3C61ED6B"
           }
         ],
-        "/BrightpointStack-dev/createUser/Default/addUser/POST/ApiPermission.Test.BrightpointStackdevcreateUserE1E7718B.POST..addUser": [
+        "/BrightpointStack-dev/createUser/Default/addUser/PUT/ApiPermission.Test.BrightpointStackdevcreateUserE1E7718B.PUT..addUser": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "createUseraddUserPOSTApiPermissionTestBrightpointStackdevcreateUserE1E7718BPOSTaddUserE028E8B2"
+            "data": "createUseraddUserPUTApiPermissionTestBrightpointStackdevcreateUserE1E7718BPUTaddUserB068086C"
           }
         ],
-        "/BrightpointStack-dev/createUser/Default/addUser/POST/Resource": [
+        "/BrightpointStack-dev/createUser/Default/addUser/PUT/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "createUseraddUserPOSTB281B83C"
+            "data": "createUseraddUserPUT3C43EC59"
           }
         ],
         "/BrightpointStack-dev/ReferralChatbotAPI/Resource": [

@@ -5,42 +5,97 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import AddIcon from '@mui/icons-material/Add';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../utilities/UserContext'; // Import useUser
-import {signUp} from 'aws-amplify/auth';
-import { USER_API , USER_ADD_API} from '../utilities/constants';
-import { Auth } from 'aws-amplify';
-
-
+import { useUser } from '../utilities/UserContext';
+import { signUp, confirmSignUp } from 'aws-amplify/auth';
+import { Amplify } from 'aws-amplify'; // ✅ Added missing import
+import { USER_API, USER_ADD_API } from '../utilities/constants';
 
 const NewUser = () => {
-  const { userData, updateUser } = useUser(); // Get user context
+  const { userData, updateUser } = useUser();
   const [page, setPage] = useState(0);
-  const totalPages = 3;
+  const totalPages = 4;
 
   // Form Data State
   const [formData, setFormData] = useState({
     givenName: '',
     lastName: '',
     zipcode: '',
-    email: '',
     phonenumber: '',
     language: '',
     children: [{ birthDate: null }],
     dueDate: null,
   });
-  // Snackbar State
-  const [snackbarOpen, setSnackbarOpen] = useState(true);
 
-  const navigate = useNavigate(); // hook for navigation
+  // Verification state
+  const [verificationCode, setVerificationCode] = useState('');
+  const [isSignUpComplete, setIsSignUpComplete] = useState(false);
+
+  // Snackbar State
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  const navigate = useNavigate();
+
+  // ✅ COMPLETE COGNITO POOL VERIFICATION
+  useEffect(() => {
+    console.log("🔍 COGNITO POOL VERIFICATION:");
+    console.log("=".repeat(50));
+
+    // Check environment variables
+    console.log("Environment Variables:");
+    console.log("- REACT_APP_USER_POOL_ID:", process.env.REACT_APP_USER_POOL_ID);
+    console.log("- REACT_APP_USER_POOL_CLIENT_ID:", process.env.REACT_APP_USER_POOL_CLIENT_ID);
+    console.log("- REACT_APP_REGION:", process.env.REACT_APP_REGION);
+    console.log("- REACT_APP_USER_ADD_API:", process.env.REACT_APP_USER_ADD_API);
+    console.log("- REACT_APP_USER_API:", process.env.REACT_APP_USER_API);
+
+    // Check Amplify configuration
+    const config = Amplify.getConfig();
+    console.log("Amplify Configuration:");
+    console.log("- User Pool ID:", config.Auth?.Cognito?.userPoolId);
+    console.log("- Client ID:", config.Auth?.Cognito?.userPoolClientId);
+    console.log("- Region:", config.Auth?.Cognito?.region);
+
+    // Verify it's YOUR pool (should be different from old wrong one)
+    const poolId = config.Auth?.Cognito?.userPoolId;
+    if (poolId) {
+      console.log("✅ Pool Verification:");
+      console.log(`- Pool ID: ${poolId}`);
+      console.log(`- Is correct region: ${poolId.startsWith('us-east-1_') ? '✅ YES' : '❌ NO'}`);
+      console.log(`- Is old wrong pool: ${poolId === 'us-east-1_umBuF7Dx8' ? '❌ YES (WRONG!)' : '✅ NO (GOOD!)'}`);
+
+      if (poolId === 'us-east-1_umBuF7Dx8') {
+        console.error("🚨 CRITICAL: Still using the WRONG Cognito pool!");
+        console.error("🚨 This means environment variables are not being picked up correctly.");
+      } else {
+        console.log("🎉 SUCCESS: Using a different pool - likely the correct one!");
+      }
+    } else {
+      console.error("❌ CRITICAL: No Cognito pool configured!");
+    }
+
+    // Check API URLs
+    console.log("API URLs Verification:");
+    console.log("- USER_ADD_API:", USER_ADD_API);
+    console.log("- USER_API:", USER_API);
+    console.log(`- Is using old hardcoded API: ${USER_ADD_API?.includes('f6mk2ph20e') ? '❌ YES (WRONG!)' : '✅ NO (GOOD!)'}`);
+
+    console.log("=".repeat(50));
+  }, []);
 
   const handleCompleteSignup = async () => {
-    const { username, password } = userData;
-    const { givenName, lastName, email, zipcode, phonenumber } = formData;
-  
-    console.log("Starting Cognito signup...");
-    console.log("Signup credentials:", { username, password });
-    console.log("Attributes:", { email });
-  
+    const { username, password, email } = userData;
+    const { givenName, lastName, zipcode, phonenumber } = formData;
+
+    console.log("🚀 STARTING COGNITO SIGNUP:");
+    console.log("=".repeat(40));
+    console.log("Signup credentials:", { username, password: "***", email });
+
+    // ✅ VERIFY TARGET POOL RIGHT BEFORE SIGNUP
+    const targetPool = Amplify.getConfig().Auth?.Cognito?.userPoolId;
+    console.log("🎯 TARGET POOL ID:", targetPool);
+    console.log("🔍 Is this your CDK pool?", targetPool !== 'us-east-1_umBuF7Dx8' ? '✅ YES' : '❌ NO - STILL WRONG!');
+
     try {
       const response = await signUp({
         username,
@@ -51,20 +106,62 @@ const NewUser = () => {
           },
         },
       });
-  
-      console.log("✅ Cognito signUp response:", response);
-  
-      // REST API payload
+
+      console.log("✅ COGNITO SIGNUP RESPONSE:");
+      console.log("- User ID:", response.userId);
+      console.log("- Is Sign Up Complete:", response.isSignUpComplete);
+      console.log("- Next Step:", response.nextStep);
+      console.log("- Full Response:", response);
+
+      setIsSignUpComplete(true);
+      setSnackbarMessage("Signup successful! Please check your email for verification code.");
+      setSnackbarOpen(true);
+
+      // Move to verification page
+      setPage(3);
+
+    } catch (error) {
+      console.error("❌ COGNITO SIGNUP ERROR:");
+      console.error("- Error message:", error.message);
+      console.error("- Error code:", error.name);
+      console.error("- Full error:", error);
+      setSnackbarMessage(`Signup failed: ${error.message}`);
+      setSnackbarOpen(true);
+    }
+    console.log("=".repeat(40));
+  };
+
+  const handleEmailVerification = async () => {
+    const { username } = userData;
+
+    console.log("🔐 STARTING EMAIL VERIFICATION:");
+    console.log("- Username:", username);
+    console.log("- Verification Code:", verificationCode);
+
+    try {
+      await confirmSignUp({
+        username: username,
+        confirmationCode: verificationCode
+      });
+
+      console.log("✅ Email verification successful");
+
+      // Now call REST API to store additional profile data
       const restPayload = {
         user_id: username,
-        Zipcode: zipcode,
-        Phone: phone,
-        Email: email,
+        Zipcode: formData.zipcode,
+        Phone: formData.phonenumber,
+        Email: userData.email,
+        FirstName: formData.givenName, // ✅ Added missing fields
+        LastName: formData.lastName,   // ✅ Added missing fields
+        Language: formData.language,   // ✅ Added missing fields
         operation: "PUT",
       };
-  
-      console.log("📤 Sending payload to REST API:", restPayload);
-  
+
+      console.log("📤 SENDING TO REST API:");
+      console.log("- URL:", USER_ADD_API);
+      console.log("- Payload:", restPayload);
+
       const restRes = await fetch(USER_ADD_API, {
         method: 'PUT',
         headers: {
@@ -72,93 +169,80 @@ const NewUser = () => {
         },
         body: JSON.stringify(restPayload),
       });
-  
+
       const restData = await restRes.json();
-  
+
       if (!restRes.ok) {
-        console.error("❌ REST API error:", restData);
+        console.error("❌ REST API ERROR:");
+        console.error("- Status:", restRes.status);
+        console.error("- Response:", restData);
         throw new Error("REST API call failed.");
       }
-  
-      console.log("✅ REST API response:", restData);
-  
-      // WebSocket message
-    //   const wsPayload = {
-    //     action: "createUser",
-    //     user_id: username.toLowerCase(),
-    //     Zipcode: zipcode,
-    //     Phone: phonenumber,
-    //     Email: email,
-    //   };
-    //   console.log("Sent request:", wsPayload);
-  
-    //   console.log("🌐 Connecting to WebSocket:", USER_API);
-  
-    //   const socket = new WebSocket(USER_API);
-  
-    //   socket.onopen = () => {
-    //     console.log("✅ WebSocket connection opened.");
-    //     socket.send(JSON.stringify(wsPayload));
-    //     console.log("📤 Sent to WebSocket:", wsPayload);
-    //   };
-  
-    //   socket.onmessage = (message) => {
-    //     console.log("📨 WebSocket message received:", message.data);
-    //   };
-  
-    //   socket.onerror = (error) => {
-    //     console.error("❌ WebSocket error:", error);
-    //   };
-  
-    //   socket.onclose = () => {
-    //     console.log("🔌 WebSocket connection closed.");
-    //   };
-  
+
+      console.log("✅ REST API SUCCESS:");
+      console.log("- Response:", restData);
+
+      setSnackbarMessage("Account verified and profile saved successfully!");
+      setSnackbarOpen(true);
+
+      // Navigate to app after successful verification and profile save
+      setTimeout(() => {
+        navigate('/app');
+      }, 2000);
+
     } catch (error) {
-      console.error("❌ Error during signup or API calls:", error);
+      console.error("❌ VERIFICATION ERROR:");
+      console.error("- Error message:", error.message);
+      console.error("- Full error:", error);
+      setSnackbarMessage(`Verification failed: ${error.message}`);
+      setSnackbarOpen(true);
     }
   };
-  
-  
 
-  
   const handleNext = () => {
-    if (page === totalPages - 1) {
-      try {
-        handleCompleteSignup(); // Trigger signup before navigating
-        navigate('/app');     // Redirect after successful signup
-      } catch (error) {
-        console.error("Signup failed:", error);
-        // Optional: Show error to user
-      }
+    if (page === 2) {
+      // Last form page - trigger signup
+      handleCompleteSignup();
+    } else if (page === 3) {
+      // Verification page - verify email
+      handleEmailVerification();
     } else {
-      // Otherwise, go to the next page
+      // Regular navigation
       setPage(page + 1);
     }
   };
+
   const handleBack = () => {
     if (page > 0) setPage(page - 1);
   };
 
   const handleChange = (field) => (event) => {
     const value = event.target.value;
-    
-    // Log what is being captured from the input field
+
     console.log(`Updating field: ${field}, New Value: ${value}`);
-  
+
     setFormData((prev) => {
       const updatedForm = { ...prev, [field]: value };
-      console.log("Updated formData:", updatedForm); // Log the updated formData
+      console.log("Updated formData:", updatedForm);
       return updatedForm;
     });
-  
-    if (field === 'zipcode') {
-      updateUser({ zipcode: value });
-      console.log("User Context after zipCode update:", userData);
 
+    if (field === 'zipcode') {
+      updateUser({ ...userData, zipcode: value });
+      console.log("User Context after zipCode update:", userData);
     }
   };
-  
+
+  // Fixed field mapping
+  const getFieldName = (label) => {
+    const fieldMap = {
+      'First Name': 'givenName',
+      'Last Name': 'lastName',
+      'Zip Code': 'zipcode',
+      'Phone Number': 'phonenumber'
+    };
+    return fieldMap[label] || label.toLowerCase().replace(' ', '');
+  };
 
   const handleChildChange = (index, date) => {
     const newChildren = [...formData.children];
@@ -175,23 +259,47 @@ const NewUser = () => {
 
   return (
     <Box height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" bgcolor="white">
-      
-      {/* Snackbar - Success Message */}
-      <Snackbar 
-        open={snackbarOpen} 
-        autoHideDuration={3000} 
-        onClose={() => setSnackbarOpen(false)} 
+
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert severity="success" sx={{ backgroundColor: 'white', color: 'black', fontWeight: 'bold', boxShadow: 1 }}>
-          Signed up Successfully
+        <Alert
+          severity={snackbarMessage.includes('failed') ? 'error' : 'success'}
+          sx={{ backgroundColor: 'white', color: 'black', fontWeight: 'bold', boxShadow: 1 }}
+        >
+          {snackbarMessage}
         </Alert>
       </Snackbar>
 
       {/* Logo */}
       <img src={BrightpointLogo} alt="Brightpoint Logo" height="60" style={{ marginBottom: 10 }} />
 
-      {/* Multipage Container */}
+      {/* ✅ Debug Info Panel (remove in production) */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 10,
+          left: 10,
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          color: 'white',
+          padding: 1,
+          borderRadius: 1,
+          fontSize: '10px',
+          zIndex: 9999,
+          maxWidth: '300px'
+        }}
+      >
+        <div><strong>🔍 Pool Debug:</strong></div>
+        <div>Pool: {Amplify.getConfig().Auth?.Cognito?.userPoolId || 'Not configured'}</div>
+        <div>API: {USER_ADD_API?.substring(8, 25) || 'Not configured'}...</div>
+        <div>Status: {Amplify.getConfig().Auth?.Cognito?.userPoolId === 'us-east-1_umBuF7Dx8' ? '❌ WRONG' : '✅ GOOD'}</div>
+      </Box>
+
+      {/* Container */}
       <Box
         width="100%"
         maxWidth="400px"
@@ -204,7 +312,7 @@ const NewUser = () => {
         alignItems="center"
         justifyContent="center"
       >
-        {/* Progress Indicator - Spanning full width of the container */}
+        {/* Progress Indicator */}
         <Box display="flex" justifyContent="center" gap={2} width="100%" mb={3}>
           {[...Array(totalPages)].map((_, index) => (
             <Box
@@ -218,10 +326,10 @@ const NewUser = () => {
         </Box>
 
         <Typography variant="h5" color="#1F1463" gutterBottom fontWeight="bold">
-          Welcome!
+          {page === 3 ? 'Verify Email' : 'Welcome!'}
         </Typography>
 
-        {/* Page 1: First Name, Last Name, Zip Code */}
+        {/* Page 0: First Name, Last Name, Zip Code */}
         {page === 0 && (
           <>
             {['First Name', 'Last Name', 'Zip Code'].map((label, index) => (
@@ -233,8 +341,8 @@ const NewUser = () => {
                   placeholder={`Enter your ${label.toLowerCase()}`}
                   variant="outlined"
                   fullWidth
-                  value={formData[label.toLowerCase().replace(' ', '')]}
-                  onChange={handleChange(label.toLowerCase().replace(' ', ''))}
+                  value={formData[getFieldName(label)]}
+                  onChange={handleChange(getFieldName(label))}
                   sx={{
                     backgroundColor: '#f0f0f0',
                     borderRadius: '8px',
@@ -248,30 +356,28 @@ const NewUser = () => {
           </>
         )}
 
-        {/* Page 2: Email, Phone, Preferred Language */}
+        {/* Page 1: Phone, Preferred Language */}
         {page === 1 && (
           <>
-            {['Email', 'Phone Number'].map((label, index) => (
-              <Box key={index} width="100%" mb={2}>
-                <Typography variant="body1" alignSelf="flex-start" mb={0.5}>
-                  {label}
-                </Typography>
-                <TextField
-                  placeholder={`Enter your ${label.toLowerCase()}`}
-                  variant="outlined"
-                  fullWidth
-                  value={formData[label.toLowerCase().replace(' ', '')]}
-                  onChange={handleChange(label.toLowerCase().replace(' ', ''))}
-                  sx={{
-                    backgroundColor: '#f0f0f0',
+            <Box width="100%" mb={2}>
+              <Typography variant="body1" alignSelf="flex-start" mb={0.5}>
+                Phone Number
+              </Typography>
+              <TextField
+                placeholder="Enter your phone number"
+                variant="outlined"
+                fullWidth
+                value={formData.phonenumber}
+                onChange={handleChange('phonenumber')}
+                sx={{
+                  backgroundColor: '#f0f0f0',
+                  borderRadius: '8px',
+                  '& .MuiOutlinedInput-root': {
                     borderRadius: '8px',
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '8px',
-                    },
-                  }}
-                />
-              </Box>
-            ))}
+                  },
+                }}
+              />
+            </Box>
 
             {/* Preferred Language Radio Group */}
             <Box width="100%" mt={2}>
@@ -283,7 +389,7 @@ const NewUser = () => {
                   <FormControlLabel
                     key={lang}
                     value={lang}
-                    control={<Radio />} // Hides default radio button
+                    control={<Radio />}
                     label={lang}
                     sx={{
                       flex: 1,
@@ -305,33 +411,30 @@ const NewUser = () => {
           </>
         )}
 
-
-        {/* Page 3: Add Child Info */}
+        {/* Page 2: Add Child Info */}
         {page === 2 && (
           <>
             <Typography variant="h5" color="#1F1463" gutterBottom fontWeight="bold">
               Add Child Info
             </Typography>
 
-            {/* Child #1 Birth Date */}
             {formData.children.map((child, index) => (
               <Box key={index} width="100%" mb={2}>
                 <Typography variant="body1" alignSelf="flex-start" mb={0.5}>
                   Birth Date of Child #{index + 1}
                 </Typography>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <Box width="100%" display="flex" flexDirection="column">
+                  <Box width="100%" display="flex" flexDirection="column">
                     <DatePicker
-                        value={child.birthDate}
-                        onChange={(date) => handleChildChange(index, date)}
-                        renderInput={(params) => <TextField {...params} fullWidth />}
-                        fullWidth
-                        />
-                    </Box>
-                    </LocalizationProvider>
+                      value={child.birthDate}
+                      onChange={(date) => handleChildChange(index, date)}
+                      renderInput={(params) => <TextField {...params} fullWidth />}
+                    />
+                  </Box>
+                </LocalizationProvider>
               </Box>
             ))}
-            
+
             {/* Add Another Child Button */}
             <Box width="100%" mb={2}>
               <IconButton onClick={addChild} sx={{ color: 'primary.main' }}>
@@ -342,32 +445,59 @@ const NewUser = () => {
               </Typography>
             </Box>
 
-            {/* Divider */}
             <Divider sx={{ width: '100%', marginBottom: 2 }} />
 
             {/* Expected Due Date */}
             <Box width="100%" mb={2}>
               <Typography variant="body1" alignSelf="flex-start" mb={0.5}>
-                Expected Due Date 
+                Expected Due Date
               </Typography>
-              <LocalizationProvider dateAdapter={AdapterDateFns} >
-              <Box width="100%" display="flex" flexDirection="column">
-
-                <DatePicker
-                  value={formData.dueDate}
-                  onChange={(date) => setFormData({ ...formData, dueDate: date })}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                  fullWidth
-                />
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <Box width="100%" display="flex" flexDirection="column">
+                  <DatePicker
+                    value={formData.dueDate}
+                    onChange={(date) => setFormData({ ...formData, dueDate: date })}
+                    renderInput={(params) => <TextField {...params} fullWidth />}
+                  />
                 </Box>
               </LocalizationProvider>
             </Box>
           </>
         )}
 
+        {/* Page 3: Email Verification */}
+        {page === 3 && (
+          <>
+            <Typography variant="body1" textAlign="center" mb={2}>
+              We sent a verification code to<br />
+              <strong>{userData?.email}</strong>
+            </Typography>
+
+            <Box width="100%" mb={2}>
+              <Typography variant="body1" alignSelf="flex-start" mb={0.5}>
+                Verification Code <span style={{ color: 'red' }}>*</span>
+              </Typography>
+              <TextField
+                placeholder="Enter 6-digit code"
+                variant="outlined"
+                fullWidth
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                sx={{
+                  backgroundColor: '#f0f0f0',
+                  borderRadius: '8px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                  },
+                }}
+              />
+            </Box>
+          </>
+        )}
+
         {/* Navigation Buttons */}
         <Box display="flex" width="100%" mt={3} gap={2}>
-          {page > 0 && (
+          {page > 0 && page < 3 && (
             <Button
               variant="outlined"
               fullWidth
@@ -389,6 +519,7 @@ const NewUser = () => {
             variant="contained"
             color="error"
             fullWidth
+            disabled={page === 3 && !verificationCode}
             sx={{
               borderRadius: '20px',
               backgroundColor: '#1F1463',
@@ -396,7 +527,7 @@ const NewUser = () => {
             }}
             onClick={handleNext}
           >
-            {page === totalPages - 1 ? 'Start Chat' : 'Next'}
+            {page === 2 ? 'Sign Up' : page === 3 ? 'Verify & Complete' : 'Next'}
           </Button>
         </Box>
       </Box>

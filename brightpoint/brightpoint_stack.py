@@ -170,7 +170,7 @@ class ApiGatewayComplete:
         # Resource: /addUser
         createUser__addUser = createUser_api.root.add_resource("addUser")
         createUser__addUser.add_method(
-            "POST",
+            "PUT",
             apigateway.LambdaIntegration(
                 self.lambda_functions.get('ProcessUserData'),
                 proxy=True
@@ -599,13 +599,33 @@ class BrightpointStack(Stack):
         )
 
         # --- Cognito User Pool ---
+
         user_pool = cognito.UserPool(
             self, "BrightpointUserPool",
             user_pool_name=f"BrightpointUserPool-{self.env_name}",
             self_sign_up_enabled=True,
-            sign_in_aliases=cognito.SignInAliases(email=True),
+            sign_in_aliases=cognito.SignInAliases(
+                username=True,
+                email=True
+            ),
             auto_verify=cognito.AutoVerifiedAttrs(email=True),
-            account_recovery=cognito.AccountRecovery.EMAIL_ONLY
+            standard_attributes=cognito.StandardAttributes(
+                email=cognito.StandardAttribute(required=True, mutable=True)
+            ),
+            password_policy=cognito.PasswordPolicy(
+                min_length=6,
+                require_digits=False,
+                require_lowercase=False,
+                require_uppercase=False,
+                require_symbols=False,
+            ),
+            account_recovery=cognito.AccountRecovery.EMAIL_ONLY,
+
+            user_verification=cognito.UserVerificationConfig(
+                email_subject="Verify your Brightpoint account",
+                email_body="Welcome to Brightpoint! Your verification code is {####}",
+                email_style=cognito.VerificationEmailStyle.CODE,
+            )
         )
 
         user_pool_client = cognito.UserPoolClient(
@@ -613,7 +633,39 @@ class BrightpointStack(Stack):
             user_pool_client_name=f"BrightpointUserPoolClient-{self.env_name}",
             user_pool=user_pool,
             generate_secret=False,
-            auth_flows=cognito.AuthFlow(user_password=True)
+            auth_flows=cognito.AuthFlow(
+                user_password=True,
+                user_srp=True,
+                admin_user_password=True
+            ),
+
+            id_token_validity=Duration.hours(24),
+            access_token_validity=Duration.hours(24),
+            refresh_token_validity=Duration.days(30),
+
+            o_auth=cognito.OAuthSettings(
+                flows=cognito.OAuthFlows(
+                    authorization_code_grant=True,
+                    implicit_code_grant=True
+                ),
+                scopes=[cognito.OAuthScope.EMAIL, cognito.OAuthScope.OPENID, cognito.OAuthScope.PROFILE],
+                callback_urls=[
+                    f"https://frontend-code.{self.env_name}.amplifyapp.com/",
+                    "http://localhost:3000/"  # For development
+                ],
+                logout_urls=[
+                    f"https://frontend-code.{self.env_name}.amplifyapp.com/",
+                    "http://localhost:3000/"  # For development
+                ]
+            )
+        )
+
+        user_pool_domain = cognito.UserPoolDomain(
+            self, "BrightpointUserPoolDomain",
+            user_pool=user_pool,
+            cognito_domain=cognito.CognitoDomainOptions(
+                domain_prefix=f"brightpoint-{self.env_name}"
+            )
         )
 
         identity_pool = cognito.CfnIdentityPool(
@@ -626,6 +678,45 @@ class BrightpointStack(Stack):
             }]
         )
 
+        authenticated_role = iam.Role(
+            self, "CognitoAuthenticatedRole",
+            role_name=f"Cognito_BrightpointIdentityPool_AuthRole_{self.env_name}",
+            assumed_by=iam.FederatedPrincipal(
+                "cognito-identity.amazonaws.com",
+                conditions={
+                    "StringEquals": {
+                        "cognito-identity.amazonaws.com:aud": identity_pool.ref
+                    },
+                    "ForAnyValue:StringLike": {
+                        "cognito-identity.amazonaws.com:amr": "authenticated"
+                    }
+                },
+                assume_role_action="sts:AssumeRoleWithWebIdentity"
+            )
+        )
+
+        # Add basic permissions for authenticated users
+        authenticated_role.add_to_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "mobileanalytics:PutEvents",
+                    "cognito-sync:*",
+                    "cognito-identity:*"
+                ],
+                resources=["*"]
+            )
+        )
+
+        # Attach roles to identity pool
+        cognito.CfnIdentityPoolRoleAttachment(
+            self, "IdentityPoolRoleAttachment",
+            identity_pool_id=identity_pool.ref,
+            roles={
+                "authenticated": authenticated_role.role_arn
+            }
+        )
+
         # --- Amplify Hosting ---
         amplify_app = amplify.App(
             self, "BrightpointManualAmplifyApp",
@@ -633,7 +724,7 @@ class BrightpointStack(Stack):
             description=f"Amplify App for manually deployed frontend - {self.env_name}",
             auto_branch_deletion=False
             # Note: No build_spec or source_code_provider needed for manual deployment
-        ) 
+        )
 
         # Connect to frontend-code branch
         env_branch = amplify_app.add_branch("frontend-code")
@@ -643,6 +734,8 @@ class BrightpointStack(Stack):
         env_branch.add_environment("REACT_APP_USER_POOL_CLIENT_ID", user_pool_client.user_pool_client_id)
         env_branch.add_environment("REACT_APP_IDENTITY_POOL_ID", identity_pool.ref)
         env_branch.add_environment("REACT_APP_REGION", self.target_region)
+        env_branch.add_environment("REACT_APP_USER_POOL_DOMAIN", f"https://brightpoint-{self.env_name}.auth.{self.target_region}.amazoncognito.com")
+
 
         # Create Lambda execution roles with environment-specific names
         referral_chatbot_role = iam.Role(
@@ -877,6 +970,22 @@ class BrightpointStack(Stack):
         # Create API Gateway configuration
         api_config = ApiGatewayComplete(self, self.account_id, lambda_functions, self.env_name)
 
+        env_branch.add_environment("REACT_APP_CHAT_API", f"wss://{api_config.websocket_apis['ReferralChatbotWebSocket'][0].api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}")
+        env_branch.add_environment("REACT_APP_USER_API", f"wss://{api_config.websocket_apis['UserFeedbackWebSocketAPI'][0].api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/")
+        env_branch.add_environment("REACT_APP_REFERRAL_MANAGEMENT_API", f"wss://{api_config.websocket_apis['ReferralsWebSocketAPI'][0].api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/")
+
+        env_branch.add_environment("REACT_APP_ANALYTICS_API", f"https://{api_config.rest_apis['QueryAnalyticsAPI1'].rest_api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/analytics/all")
+        env_branch.add_environment("REACT_APP_USER_ADD_API", f"https://{api_config.rest_apis['createUser'].rest_api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/")
+
+        env_branch.add_environment("REACT_APP_REFERRAL_CHATBOT_REST_API", f"https://{api_config.rest_apis['ReferralChatbotAPI'].rest_api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/chat")
+        env_branch.add_environment("REACT_APP_REFERRALS_REST_API", f"https://{api_config.rest_apis['ReferralsApi'].rest_api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/referrals")
+
+        env_branch.add_environment("REACT_APP_CHAT_API_ID", api_config.websocket_apis['ReferralChatbotWebSocket'][0].api_id)
+        env_branch.add_environment("REACT_APP_USER_API_ID", api_config.websocket_apis['UserFeedbackWebSocketAPI'][0].api_id)
+        env_branch.add_environment("REACT_APP_REFERRAL_MANAGEMENT_API_ID", api_config.websocket_apis['ReferralsWebSocketAPI'][0].api_id)
+        env_branch.add_environment("REACT_APP_ANALYTICS_API_ID", api_config.rest_apis['QueryAnalyticsAPI1'].rest_api_id)
+        env_branch.add_environment("REACT_APP_CREATE_USER_API_ID", api_config.rest_apis['createUser'].rest_api_id)
+
         # Add Lambda permissions for API Gateway invocations
         # REST API permissions
         for api_name, api in api_config.rest_apis.items():
@@ -889,10 +998,10 @@ class BrightpointStack(Stack):
                 )
             elif api_name == 'createUser':
                 process_user_data_fn.add_permission(
-                    "AllowCreateUserAPIInvoke",
+                    "AllowCreateUserAPIPutInvoke",
                     principal=iam.ServicePrincipal("apigateway.amazonaws.com"),
                     action="lambda:InvokeFunction",
-                    source_arn=f"arn:aws:execute-api:{self.target_region}:{self.account_id}:{api.rest_api_id}/*/POST/addUser"
+                    source_arn=f"arn:aws:execute-api:{self.target_region}:{self.account_id}:{api.rest_api_id}/*/PUT/addUser"
                 )
             elif api_name in ['QueryAnalyticsAPI1', 'QueryAnalyticsAPI2']:
                 query_analytics_api_fn.add_permission(
@@ -1002,7 +1111,7 @@ class BrightpointStack(Stack):
                 description=f"URL of the {api_name} REST API for {self.env_name}",
                 export_name=f"{self.stack_name}-{api_name}Url"
             )
-            
+
             CfnOutput(
                 self, f"{api_name}Id",
                 value=api.rest_api_id,
