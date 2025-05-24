@@ -727,7 +727,7 @@ class BrightpointStack(Stack):
         )
 
         # Connect to frontend-code branch
-        env_branch = amplify_app.add_branch("frontend-code")
+        env_branch = amplify_app.add_branch("backend_code")
 
         env_branch.add_environment("REACT_APP_ENVIRONMENT", self.env_name)
         env_branch.add_environment("REACT_APP_USER_POOL_ID", user_pool.user_pool_id)
