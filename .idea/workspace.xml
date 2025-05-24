@@ -4,7 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ff7ef2e-35a7-4c4d-bd94-9b3ea7ae56b2" name="Changes" comment="" />
+    <list default="true" id="3ff7ef2e-35a7-4c4d-bd94-9b3ea7ae56b2" name="Changes" comment="Changing github branch in stack">
+      <change afterPath="$PROJECT_DIR$/CDK/update-from-cdk.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/cdk-config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/brightpoint/brightpoint_stack.py" beforeDir="false" afterPath="$PROJECT_DIR$/brightpoint/brightpoint_stack.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.template.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.template.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdk.out/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdk.out/tree.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/tree.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/build.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/LandingPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/LandingPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/NewUser.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/NewUser.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/aws-exports.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/aws-exports.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utilities/constants.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utilities/constants.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,21 +60,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "backend__code",
-    "last_opened_file_path": "/Users/pratikshawadibhasme/Desktop/ASU CIC/Brightpoint/brightpoint",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/Applications/PyCharm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;backend__code&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/pratikshawadibhasme/Desktop/ASU CIC/Brightpoint/brightpoint&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Applications/PyCharm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/brightpoint" />
@@ -67,6 +84,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/frontend" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
@@ -97,11 +115,25 @@
       <workItem from="1746127095880" duration="8013000" />
       <workItem from="1746911500180" duration="37975000" />
       <workItem from="1747685946800" duration="6836000" />
-      <workItem from="1747931254031" duration="21896000" />
+      <workItem from="1747931254031" duration="29327000" />
+      <workItem from="1748072920946" duration="8308000" />
     </task>
+    <task id="LOCAL-00001" summary="Changing github branch in stack">
+      <option name="closed" value="true" />
+      <created>1748059732776</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1748059732776</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Changing github branch in stack" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changing github branch in stack" />
   </component>
 </project>

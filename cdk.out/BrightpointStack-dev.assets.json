@@ -121,7 +121,7 @@
         }
       }
     },
-    "ee95b455096649b14e90a589d566fb0865bca6ccea2e96bc298d6490253f4371": {
+    "a6154d48c9428ae82717f4c0f7b7f94be94df185eb5ca7d8b4a3bc185840a335": {
       "displayName": "BrightpointStack-dev Template",
       "source": {
         "path": "BrightpointStack-dev.template.json",
@@ -130,7 +130,7 @@
       "destinations": {
         "216989103356-us-east-1": {
           "bucketName": "cdk-hnb659fds-assets-216989103356-us-east-1",
-          "objectKey": "ee95b455096649b14e90a589d566fb0865bca6ccea2e96bc298d6490253f4371.json",
+          "objectKey": "a6154d48c9428ae82717f4c0f7b7f94be94df185eb5ca7d8b4a3bc185840a335.json",
           "region": "us-east-1",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-file-publishing-role-216989103356-us-east-1"
         }

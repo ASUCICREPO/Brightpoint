@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-deploy-role-216989103356-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-cfn-exec-role-216989103356-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-216989103356-us-east-1/ee95b455096649b14e90a589d566fb0865bca6ccea2e96bc298d6490253f4371.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-216989103356-us-east-1/a6154d48c9428ae82717f4c0f7b7f94be94df185eb5ca7d8b4a3bc185840a335.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -177,10 +177,10 @@
             "data": "BrightpointManualAmplifyApp4DC32DC0"
           }
         ],
-        "/BrightpointStack-dev/BrightpointManualAmplifyApp/frontend-code/Resource": [
+        "/BrightpointStack-dev/BrightpointManualAmplifyApp/backend_code/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "BrightpointManualAmplifyAppfrontendcode98B96F52"
+            "data": "BrightpointManualAmplifyAppbackendcode4B9792FF"
           }
         ],
         "/BrightpointStack-dev/ReferralChatbotRole/Resource": [
@@ -1315,6 +1315,54 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "UserDataTableName"
+          }
+        ],
+        "/BrightpointStack-dev/CDKConfigFile": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKConfigFile"
+          }
+        ],
+        "/BrightpointStack-dev/ChatWebSocketAPI": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ChatWebSocketAPI"
+          }
+        ],
+        "/BrightpointStack-dev/UserWebSocketAPI": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserWebSocketAPI"
+          }
+        ],
+        "/BrightpointStack-dev/ReferralManagementWebSocketAPI": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralManagementWebSocketAPI"
+          }
+        ],
+        "/BrightpointStack-dev/AnalyticsRestAPI": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AnalyticsRestAPI"
+          }
+        ],
+        "/BrightpointStack-dev/UserAddRestAPI": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAddRestAPI"
+          }
+        ],
+        "/BrightpointStack-dev/ReferralChatbotRestAPI": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralChatbotRestAPI"
+          }
+        ],
+        "/BrightpointStack-dev/ReferralsRestAPI": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReferralsRestAPI"
           }
         ],
         "/BrightpointStack-dev/CDKMetadata/Default": [

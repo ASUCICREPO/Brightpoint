@@ -24,8 +24,7 @@ from .config import EnvironmentConfig
 from aws_cdk.aws_amplify_alpha import App, GitHubSourceCodeProvider
 import json
 from aws_cdk import aws_secretsmanager as secretsmanager
-
-
+from datetime import datetime
 class ApiGatewayComplete:
     """Complete API Gateway configuration for BrightpointStack"""
 
@@ -516,6 +515,7 @@ class BrightpointStack(Stack):
         self.env_name = self.node.try_get_context("env")
         self.account_id = self.node.try_get_context("account")
         self.target_region = self.node.try_get_context("region")
+        self.profile = self.node.try_get_context("profile")
 
         if not self.env_name:
             raise ValueError("Environment must be provided via -c env=<env_name>")
@@ -538,6 +538,7 @@ class BrightpointStack(Stack):
 
         # Get the plaintext secret value
         github_token = github_token_secret.secret_value
+
 
         # Add tags to all resources in this stack
         Tags.of(self).add("Environment", self.env_name)
@@ -1171,6 +1172,108 @@ class BrightpointStack(Stack):
             description="User Data Table Name",
             export_name=f"{self.stack_name}-UserTableName"
         )
+
+        cdk_config = {
+            "stackName": self.stack_name,
+            "environment": self.env_name,
+            "region": self.target_region,
+            "accountId": self.account_id,
+            "lastUpdated": datetime.now().isoformat(),
+            "amplifyAppId": amplify_app.app_id
+        }
+
+        # Create config directory if it doesn't exist
+        config_dir = os.path.join(os.path.dirname(__file__), "..", "config")
+        os.makedirs(config_dir, exist_ok=True)
+
+        # Write config file that frontend can read
+        config_file_path = os.path.join(config_dir, "cdk-config.json")
+        with open(config_file_path, 'w') as f:
+            json.dump(cdk_config, f, indent=2)
+
+        print(f"✅ CDK config written to: {config_file_path}")
+
+        CfnOutput(
+            self, "CDKConfigFile",
+            value=config_file_path,
+            description="Path to CDK configuration file",
+            export_name=f"{self.stack_name}-ConfigFile"
+        )
+
+        CfnOutput(
+            self, "ChatWebSocketAPI",
+            value=f"wss://{api_config.websocket_apis['ReferralChatbotWebSocket'][0].api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/",
+            description="Chat WebSocket API URL",
+            export_name=f"{self.stack_name}-ChatWebSocketAPI"
+        )
+
+        CfnOutput(
+            self, "UserWebSocketAPI",
+            value=f"wss://{api_config.websocket_apis['UserFeedbackWebSocketAPI'][0].api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/",
+            description="User WebSocket API URL",
+            export_name=f"{self.stack_name}-UserWebSocketAPI"
+        )
+
+        CfnOutput(
+            self, "ReferralManagementWebSocketAPI",
+            value=f"wss://{api_config.websocket_apis['ReferralsWebSocketAPI'][0].api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/",
+            description="Referral Management WebSocket API URL",
+            export_name=f"{self.stack_name}-ReferralManagementWebSocketAPI"
+        )
+
+        CfnOutput(
+            self, "AnalyticsRestAPI",
+            value=f"https://{api_config.rest_apis['QueryAnalyticsAPI1'].rest_api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/analytics/all",
+            description="Analytics REST API URL",
+            export_name=f"{self.stack_name}-AnalyticsRestAPI"
+        )
+
+        CfnOutput(
+            self, "UserAddRestAPI",
+            value=f"https://{api_config.rest_apis['createUser'].rest_api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/addUser",
+            description="User Add REST API URL",
+            export_name=f"{self.stack_name}-UserAddRestAPI"
+        )
+
+        CfnOutput(
+            self, "ReferralChatbotRestAPI",
+            value=f"https://{api_config.rest_apis['ReferralChatbotAPI'].rest_api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/chat",
+            description="Referral Chatbot REST API URL",
+            export_name=f"{self.stack_name}-ReferralChatbotRestAPI"
+        )
+
+        CfnOutput(
+            self, "ReferralsRestAPI",
+            value=f"https://{api_config.rest_apis['ReferralsApi'].rest_api_id}.execute-api.{self.target_region}.amazonaws.com/{self.env_name}/referrals",
+            description="Referrals REST API URL",
+            export_name=f"{self.stack_name}-ReferralsRestAPI"
+        )
+
+        self.write_config_file()
+
+    def write_config_file(self):
+        import json
+        import os
+        from datetime import datetime
+
+        config = {
+            "stackName": self.stack_name,
+            "region": self.target_region or "us-east-1",
+            "environment": self.environment or "dev",
+            "profile": self.profile or "",
+            "lastUpdated": datetime.now().isoformat()
+        }
+
+        # Path to config file
+        config_dir = os.path.join(os.path.dirname(__file__), "../config")
+        os.makedirs(config_dir, exist_ok=True)
+
+        config_file = os.path.join(config_dir, "cdk-config.json")
+
+        with open(config_file, 'w') as f:
+            json.dump(config, f, indent=2)
+
+        print(f"✅ Config written to: {config_file}")
 
     # Keep all the existing role policy methods unchanged
     def add_referral_chatbot_role_policies(self, role, account_id):

@@ -33,7 +33,12 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "update-config": "cd ../CDK && chmod +x update-from-cdk.sh && ./update-from-cdk.sh",
+    "build-with-config": "npm run update-config && npm run build",
+    "zip": "cd build && zip -r ../build.zip . && cd .. && echo '📦 Updated build.zip'",
+    "deploy": "npm run build-with-config && npm run zip && echo '🚀 Ready to upload build.zip!'",
+    "show-config": "cat .env"
   },
   "eslintConfig": {
     "extends": [

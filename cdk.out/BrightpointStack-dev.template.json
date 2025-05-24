@@ -499,7 +499,7 @@
     "aws:cdk:path": "BrightpointStack-dev/BrightpointManualAmplifyApp/Resource"
    }
   },
-  "BrightpointManualAmplifyAppfrontendcode98B96F52": {
+  "BrightpointManualAmplifyAppbackendcode4B9792FF": {
    "Type": "AWS::Amplify::Branch",
    "Properties": {
     "AppId": {
@@ -508,7 +508,7 @@
       "AppId"
      ]
     },
-    "BranchName": "frontend-code",
+    "BranchName": "backend_code",
     "EnableAutoBuild": true,
     "EnablePullRequestPreview": true,
     "EnvironmentVariables": [
@@ -690,7 +690,7 @@
     ]
    },
    "Metadata": {
-    "aws:cdk:path": "BrightpointStack-dev/BrightpointManualAmplifyApp/frontend-code/Resource"
+    "aws:cdk:path": "BrightpointStack-dev/BrightpointManualAmplifyApp/backend_code/Resource"
    }
   },
   "ReferralChatbotRoleDD6FC688": {
@@ -6645,6 +6645,139 @@
    },
    "Export": {
     "Name": "BrightpointStack-dev-UserTableName"
+   }
+  },
+  "CDKConfigFile": {
+   "Description": "Path to CDK configuration file",
+   "Value": "/Users/pratikshawadibhasme/Desktop/ASU CIC/Brightpoint/brightpoint/../config/cdk-config.json",
+   "Export": {
+    "Name": "BrightpointStack-dev-ConfigFile"
+   }
+  },
+  "ChatWebSocketAPI": {
+   "Description": "Chat WebSocket API URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "wss://",
+      {
+       "Ref": "ReferralChatbotWebSocket4AF2CD48"
+      },
+      ".execute-api.us-east-1.amazonaws.com/dev/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-ChatWebSocketAPI"
+   }
+  },
+  "UserWebSocketAPI": {
+   "Description": "User WebSocket API URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "wss://",
+      {
+       "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
+      },
+      ".execute-api.us-east-1.amazonaws.com/dev/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-UserWebSocketAPI"
+   }
+  },
+  "ReferralManagementWebSocketAPI": {
+   "Description": "Referral Management WebSocket API URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "wss://",
+      {
+       "Ref": "ReferralsWebSocketAPI16F9DC58"
+      },
+      ".execute-api.us-east-1.amazonaws.com/dev/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-ReferralManagementWebSocketAPI"
+   }
+  },
+  "AnalyticsRestAPI": {
+   "Description": "Analytics REST API URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "QueryAnalyticsAPI12288DAE3"
+      },
+      ".execute-api.us-east-1.amazonaws.com/dev/analytics/all"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-AnalyticsRestAPI"
+   }
+  },
+  "UserAddRestAPI": {
+   "Description": "User Add REST API URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "createUserC6ED88E6"
+      },
+      ".execute-api.us-east-1.amazonaws.com/dev/addUser"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-UserAddRestAPI"
+   }
+  },
+  "ReferralChatbotRestAPI": {
+   "Description": "Referral Chatbot REST API URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "ReferralChatbotAPI978B0CF6"
+      },
+      ".execute-api.us-east-1.amazonaws.com/dev/chat"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-ReferralChatbotRestAPI"
+   }
+  },
+  "ReferralsRestAPI": {
+   "Description": "Referrals REST API URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "ReferralsApi2C829B6C"
+      },
+      ".execute-api.us-east-1.amazonaws.com/dev/referrals"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "BrightpointStack-dev-ReferralsRestAPI"
    }
   }
  },

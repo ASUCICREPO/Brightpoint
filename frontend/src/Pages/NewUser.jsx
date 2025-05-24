@@ -6,7 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../utilities/UserContext';
-import { signUp, confirmSignUp } from 'aws-amplify/auth';
+import { signUp, confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
 import { Amplify } from 'aws-amplify'; // ✅ Added missing import
 import { USER_API, USER_ADD_API } from '../utilities/constants';
 
@@ -131,6 +131,7 @@ const NewUser = () => {
     console.log("=".repeat(40));
   };
 
+  // ✅ FIXED EMAIL VERIFICATION FUNCTION
   const handleEmailVerification = async () => {
     const { username } = userData;
 
@@ -138,63 +139,109 @@ const NewUser = () => {
     console.log("- Username:", username);
     console.log("- Verification Code:", verificationCode);
 
+    let isUserConfirmed = false;
+
     try {
+      // Try to confirm the user
       await confirmSignUp({
         username: username,
         confirmationCode: verificationCode
       });
 
       console.log("✅ Email verification successful");
-
-      // Now call REST API to store additional profile data
-      const restPayload = {
-        user_id: username,
-        Zipcode: formData.zipcode,
-        Phone: formData.phonenumber,
-        Email: userData.email,
-        FirstName: formData.givenName, // ✅ Added missing fields
-        LastName: formData.lastName,   // ✅ Added missing fields
-        Language: formData.language,   // ✅ Added missing fields
-        operation: "PUT",
-      };
-
-      console.log("📤 SENDING TO REST API:");
-      console.log("- URL:", USER_ADD_API);
-      console.log("- Payload:", restPayload);
-
-      const restRes = await fetch(USER_ADD_API, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(restPayload),
-      });
-
-      const restData = await restRes.json();
-
-      if (!restRes.ok) {
-        console.error("❌ REST API ERROR:");
-        console.error("- Status:", restRes.status);
-        console.error("- Response:", restData);
-        throw new Error("REST API call failed.");
-      }
-
-      console.log("✅ REST API SUCCESS:");
-      console.log("- Response:", restData);
-
-      setSnackbarMessage("Account verified and profile saved successfully!");
-      setSnackbarOpen(true);
-
-      // Navigate to app after successful verification and profile save
-      setTimeout(() => {
-        navigate('/app');
-      }, 2000);
+      isUserConfirmed = true;
 
     } catch (error) {
       console.error("❌ VERIFICATION ERROR:");
       console.error("- Error message:", error.message);
-      console.error("- Full error:", error);
-      setSnackbarMessage(`Verification failed: ${error.message}`);
+      console.error("- Error name:", error.name);
+
+      // Check if user is already confirmed
+      if (error.name === 'NotAuthorizedException' && error.message.includes('Current status is CONFIRMED')) {
+        console.log("ℹ️ User is already confirmed, proceeding with profile save...");
+        isUserConfirmed = true;
+      } else if (error.name === 'CodeMismatchException') {
+        setSnackbarMessage("Invalid verification code. Please try again.");
+        setSnackbarOpen(true);
+        return;
+      } else if (error.name === 'ExpiredCodeException') {
+        setSnackbarMessage("Verification code has expired. Please request a new one.");
+        setSnackbarOpen(true);
+        return;
+      } else {
+        console.error("- Full error:", error);
+        setSnackbarMessage(`Verification failed: ${error.message}`);
+        setSnackbarOpen(true);
+        return;
+      }
+    }
+
+    // If user is confirmed (either just now or already was), proceed with REST API call
+    if (isUserConfirmed) {
+      try {
+        // Now call REST API to store additional profile data
+        const restPayload = {
+          user_id: username,
+          Zipcode: formData.zipcode,
+          Phone: formData.phonenumber,
+          Email: userData.email,
+          FirstName: formData.givenName,
+          LastName: formData.lastName,
+          Language: formData.language,
+          operation: "PUT",
+        };
+
+        console.log("📤 SENDING TO REST API:");
+        console.log("- URL:", USER_ADD_API);
+        console.log("- Payload:", restPayload);
+
+        const restRes = await fetch(USER_ADD_API, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(restPayload),
+        });
+
+        const restData = await restRes.json();
+
+        if (!restRes.ok) {
+          console.error("❌ REST API ERROR:");
+          console.error("- Status:", restRes.status);
+          console.error("- Response:", restData);
+          throw new Error(`REST API call failed: ${restData.message || 'Unknown error'}`);
+        }
+
+        console.log("✅ REST API SUCCESS:");
+        console.log("- Response:", restData);
+
+        setSnackbarMessage("Account verified and profile saved successfully!");
+        setSnackbarOpen(true);
+
+        // Navigate to app after successful verification and profile save
+        setTimeout(() => {
+          navigate('/app');
+        }, 2000);
+
+      } catch (error) {
+        console.error("❌ REST API ERROR:");
+        console.error("- Error message:", error.message);
+        console.error("- Full error:", error);
+        setSnackbarMessage(`Profile save failed: ${error.message}`);
+        setSnackbarOpen(true);
+      }
+    }
+  };
+
+  // ✅ OPTIONAL: Resend verification code function
+  const handleResendCode = async () => {
+    try {
+      await resendSignUpCode({ username: userData.username });
+      setSnackbarMessage("New verification code sent to your email!");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("❌ RESEND CODE ERROR:", error);
+      setSnackbarMessage(`Failed to resend code: ${error.message}`);
       setSnackbarOpen(true);
     }
   };
@@ -491,6 +538,21 @@ const NewUser = () => {
                   },
                 }}
               />
+            </Box>
+
+            {/* Resend Code Button */}
+            <Box width="100%" mb={2} textAlign="center">
+              <Button
+                variant="text"
+                onClick={handleResendCode}
+                sx={{
+                  color: 'primary.main',
+                  textTransform: 'none',
+                  fontSize: '0.9rem'
+                }}
+              >
+                Didn't receive code? Resend
+              </Button>
             </Box>
           </>
         )}
