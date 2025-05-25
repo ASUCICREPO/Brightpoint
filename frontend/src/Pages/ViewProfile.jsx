@@ -67,7 +67,7 @@ const UserProfile = () => {
               </>
             ) : (
               <>
-                {renderField("Username", userData.user_id)}
+                {renderField("Username", userData.username)}
                 {renderField("Email", userData.email)}
                 {renderField("ZipCode", userData.zipcode)}
                 {renderField("Phone Number", userData.phoneNumber)}

@@ -34,7 +34,7 @@ const LandingPage = () => {
     try {
       // Authenticate using Cognito
       const usernameL = username.toLowerCase();
-      const user = await signIn({ usernameL, password });
+      const user = await signIn({ username: usernameL, password });
       console.log('Cognito login success:', user);
       console.log('Cognito login success:', usernameL, password);
 
