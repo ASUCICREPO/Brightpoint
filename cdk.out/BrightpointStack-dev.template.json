@@ -778,7 +778,10 @@
       {
        "Action": "lambda:InvokeFunction",
        "Effect": "Allow",
-       "Resource": "arn:aws:lambda:us-east-1:216989103356:function:perplexityLambda*"
+       "Resource": [
+        "arn:aws:lambda:us-east-1:216989103356:function:perplexityLambda*",
+        "arn:aws:lambda:us-east-1:216989103356:function:referralChatbotLambda*"
+       ]
       },
       {
        "Action": "execute-api:ManageConnections",
@@ -1954,13 +1957,15 @@
     ],
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
-     "S3Key": "ab614132afb166e95138b2524d7e18af667d395202a9719da9b6d82f2d1ca0fa.zip"
+     "S3Key": "1127ed0f48b73272b7ae38efd146cbc58132420d7a596a73659512788df51709.zip"
     },
     "Environment": {
      "Variables": {
       "ENVIRONMENT": "dev",
       "REFERRAL_TABLE": "referral_data-dev",
-      "USER_TABLE": "user_data-dev"
+      "USER_TABLE": "user_data-dev",
+      "TARGET_ACCOUNT_ID": "216989103356",
+      "TARGET_REGION": "us-east-1"
      }
     },
     "FunctionName": "referralChatbotLambda-dev",
@@ -1991,7 +1996,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotLambdaFn/Resource",
-    "aws:asset:path": "asset.ab614132afb166e95138b2524d7e18af667d395202a9719da9b6d82f2d1ca0fa",
+    "aws:asset:path": "asset.1127ed0f48b73272b7ae38efd146cbc58132420d7a596a73659512788df51709",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }

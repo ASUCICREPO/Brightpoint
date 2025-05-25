@@ -817,7 +817,9 @@ class BrightpointStack(Stack):
             environment={
                 "ENVIRONMENT": self.env_name,
                 "REFERRAL_TABLE": f"referral_data-{self.env_name}",
-                "USER_TABLE": f"user_data-{self.env_name}"
+                "USER_TABLE": f"user_data-{self.env_name}",
+                "TARGET_ACCOUNT_ID": self.account_id,
+                "TARGET_REGION": self.target_region,
             }
         )
 
@@ -1275,9 +1277,7 @@ class BrightpointStack(Stack):
 
         print(f"✅ Config written to: {config_file}")
 
-    # Keep all the existing role policy methods unchanged
     def add_referral_chatbot_role_policies(self, role, account_id):
-        """Add all necessary policies to the referralChatbotLambda role"""
         role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole")
         )
@@ -1323,10 +1323,14 @@ class BrightpointStack(Stack):
             )
         )
 
+        # FIXED: Add permission to invoke both perplexity and referral chatbot functions
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["lambda:InvokeFunction"],
-                resources=[f"arn:aws:lambda:us-east-1:{account_id}:function:perplexityLambda*"]
+                resources=[
+                    f"arn:aws:lambda:us-east-1:{account_id}:function:perplexityLambda*",
+                    f"arn:aws:lambda:us-east-1:{account_id}:function:referralChatbotLambda*"
+                ]
             )
         )
 
@@ -1357,11 +1361,6 @@ class BrightpointStack(Stack):
                 ]
             )
         )
-
-    # Add all other role policy methods here (I'll skip them for brevity as they follow the same pattern)
-    # Just update the resource ARNs to include wildcards where appropriate
-    # For example: table/referral_data* instead of table/referral_data
-    # And: function:perplexityLambda* instead of function:perplexityLambda
 
     def add_perplexity_lambda_role_policies(self, role, account_id):
         """Add all necessary policies to the perplexityLambda role"""

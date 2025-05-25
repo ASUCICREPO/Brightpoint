@@ -34,8 +34,8 @@ USER_TABLE = f'user_data-{ENV}'
 # Initialize AWS Lambda client for calling Perplexity Lambda
 lambda_client = boto3.client('lambda', region_name="us-east-1")
 environment = os.environ.get('ENVIRONMENT')
-account_id = os.environ.get('TARGET_ACCOUNT_ID')
-region = os.environ.get('TARGET_REGION')
+account_id = os.environ.get('AWS_ACCOUNT_ID')
+region = os.environ.get('AWS_REGION')
 PERPLEXITY_LAMBDA_ARN = f"arn:aws:lambda:{region}:{account_id}:function:perplexityLambda-{environment}"
 
 
