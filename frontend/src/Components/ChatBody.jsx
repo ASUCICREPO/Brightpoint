@@ -52,6 +52,9 @@ const translations = {
 function ChatBody( language ) {
 
   const { userData } = useUser();
+
+  console.log('userData:', userData);
+
   const [messageList, setMessageList] = useState([]);
   const [processing, setProcessing] = useState(false);
   const [message, setMessage] = useState("");
@@ -89,7 +92,7 @@ function ChatBody( language ) {
     setProcessing(true);
     const newMessageBlock = createMessageBlock(msg, "USER", "TEXT", "SENT");
     setMessageList((prevList) => [...prevList, newMessageBlock]);
-    getBotResponse(setMessageList, setProcessing, msg, userData.username, userData.zipcode, language, lang);
+    getBotResponse(setMessageList, setProcessing, msg, userData.user_id, userData.zipcode, language, lang);
     setQuestionAsked(true);
   };
 
@@ -226,8 +229,8 @@ const getBotResponse = (setMessageList, setProcessing, message, username, zipcod
   socket.onopen = () => {
     const payload = {
       action: "query",
-      user_id: username || "user",
-      zipcode: zipcode || "62701",
+      user_id: username,
+      zipcode: zipcode,
       user_query: message,
       language: language.language|| "english"
     };
