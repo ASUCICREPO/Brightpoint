@@ -10,7 +10,7 @@ const UserProfile = () => {
   const isAdmin = location.pathname.startsWith('/admin');
 
   const { userData } = useUser(); // ✅ Use context
-  const userId = userData.user_id;
+  const userId = userData.user_id || userData.username;
 
   const renderField = (label, value) => (
     <Box mb={2}>
