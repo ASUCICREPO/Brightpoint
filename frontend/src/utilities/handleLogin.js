@@ -8,9 +8,9 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
       user_id: userId,
       username: '',
       language: 'english',
-      zipcode: '62701',
-      phoneNumber: '+19252048244',
-      email: 'user@example.com',
+      zipcode: '',
+      phoneNumber: '',
+      email: '',
       referrals: [],
       feedbackQuestions: [],
     };
