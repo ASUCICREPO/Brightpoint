@@ -26,7 +26,6 @@ const AdminLanding = () => {
     const logoutPreviousUser = async () => {
       try {
         await AmplifyAuth.signOut();
-        console.log("Previous user logged out successfully.");
       } catch (error) {
         console.error("Error signing out the previous user:", error.message || error);
       }
@@ -38,8 +37,7 @@ const AdminLanding = () => {
   const handleLogin = async () => {
     try {
       const response = await AmplifyAuth.signIn({ username, password });
-      console.log('Cognito login success:', response);
-  
+
       if (!response.isSignedIn) {
         const step = response.nextStep?.signInStep;
         
@@ -55,12 +53,9 @@ const AdminLanding = () => {
   
       const session = await AmplifyAuth.fetchAuthSession();
   
-      // ✅ getAccessToken now works because user is fully signed in
       const payload = session.tokens?.accessToken?.payload;
       const groups = payload?.["cognito:groups"];
       const userGroups = Array.isArray(groups) ? groups : groups ? [groups] : [];
-  
-      console.log('User groups:', userGroups);
   
       if (!userGroups.includes("Admin")) {
         alert("Access denied: You are not authorized to access this admin portal.");
@@ -73,7 +68,6 @@ const AdminLanding = () => {
       handleReferralOnLogin(username, (referrals) => {
         if (referrals?.length) {
           updateUser({ referrals });
-          console.log('Referrals updated in user context:', referrals);
         } else {
           console.error('Error: No referral data returned');
         }

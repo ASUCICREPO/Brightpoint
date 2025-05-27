@@ -68,7 +68,6 @@ const LandingPage = ({ setOpenModal }) => {
       // Attempt Cognito authentication
       const user = await signIn({ username: cleanUsername, password });
 
-      console.log('Login successful for user:', cleanUsername);
 
       // Clear session flags for fresh login
       sessionStorage.removeItem('feedbackModalDismissed');
@@ -79,7 +78,6 @@ const LandingPage = ({ setOpenModal }) => {
       // Fetch feedback questions
       try {
         const userDataWithFeedback = await fetchUserWithFeedback(cleanUsername, 'english');
-        console.log("Feedback questions found:", userDataWithFeedback.feedbackQuestions?.length || 0);
       } catch (feedbackError) {
         console.error("Error fetching feedback questions:", feedbackError);
         // Don't block login if feedback fetch fails

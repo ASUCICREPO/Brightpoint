@@ -22,7 +22,6 @@ const NewSignUp = () => {
     const logoutPreviousUser = async () => {
       try {
         await signOut();
-        console.log("Previous user logged out successfully.");
       } catch (error) {
         console.error("Error signing out the previous user:", error.message || error);
       }
@@ -44,7 +43,6 @@ const NewSignUp = () => {
       password
     });
 
-    console.log("Signup data stored in context:", { username, email });
     navigate('/newusersignup'); // Navigate to profile completion page
   };
 

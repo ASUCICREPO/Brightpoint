@@ -59,30 +59,8 @@ const UserProfile = () => {
   );
 
   const handleBack = () => {
-    console.log("Navigating back");
     navigate(-1);
   };
-
-  // ✅ Comprehensive debug logging
-  console.log('🔍 UserProfile userData debug:', {
-    userData,
-    availableKeys: Object.keys(userData || {}),
-    phoneFields: {
-      phoneNumber: userData?.phoneNumber,
-      Phone: userData?.Phone,
-      phone: userData?.phone,
-      phonenumber: userData?.phonenumber,
-    },
-    userIdFields: {
-      username: userData?.username,
-      user_id: userData?.user_id,
-    },
-    chosenValues: {
-      displayUsername: getDisplayUsername(),
-      phoneNumber: getPhoneNumber(),
-      zipcode: getZipcode(),
-    }
-  });
 
   return (
     <Box bgcolor="white" minHeight="100vh">

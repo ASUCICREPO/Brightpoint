@@ -38,63 +38,29 @@ const NewUser = () => {
 
   // ✅ COMPLETE COGNITO POOL VERIFICATION
   useEffect(() => {
-    console.log("🔍 COGNITO POOL VERIFICATION:");
-    console.log("=".repeat(50));
-
-    // Check environment variables
-    console.log("Environment Variables:");
-    console.log("- REACT_APP_USER_POOL_ID:", process.env.REACT_APP_USER_POOL_ID);
-    console.log("- REACT_APP_USER_POOL_CLIENT_ID:", process.env.REACT_APP_USER_POOL_CLIENT_ID);
-    console.log("- REACT_APP_REGION:", process.env.REACT_APP_REGION);
-    console.log("- REACT_APP_USER_ADD_API:", process.env.REACT_APP_USER_ADD_API);
-    console.log("- REACT_APP_USER_API:", process.env.REACT_APP_USER_API);
 
     // Check Amplify configuration
     const config = Amplify.getConfig();
-    console.log("Amplify Configuration:");
-    console.log("- User Pool ID:", config.Auth?.Cognito?.userPoolId);
-    console.log("- Client ID:", config.Auth?.Cognito?.userPoolClientId);
-    console.log("- Region:", config.Auth?.Cognito?.region);
 
     // Verify it's YOUR pool (should be different from old wrong one)
     const poolId = config.Auth?.Cognito?.userPoolId;
     if (poolId) {
-      console.log("✅ Pool Verification:");
-      console.log(`- Pool ID: ${poolId}`);
-      console.log(`- Is correct region: ${poolId.startsWith('us-east-1_') ? '✅ YES' : '❌ NO'}`);
-      console.log(`- Is old wrong pool: ${poolId === 'us-east-1_umBuF7Dx8' ? '❌ YES (WRONG!)' : '✅ NO (GOOD!)'}`);
-
       if (poolId === 'us-east-1_umBuF7Dx8') {
         console.error("🚨 CRITICAL: Still using the WRONG Cognito pool!");
         console.error("🚨 This means environment variables are not being picked up correctly.");
       } else {
-        console.log("🎉 SUCCESS: Using a different pool - likely the correct one!");
       }
     } else {
       console.error("❌ CRITICAL: No Cognito pool configured!");
     }
 
-    // Check API URLs
-    console.log("API URLs Verification:");
-    console.log("- USER_ADD_API:", USER_ADD_API);
-    console.log("- USER_API:", USER_API);
-    console.log(`- Is using old hardcoded API: ${USER_ADD_API?.includes('f6mk2ph20e') ? '❌ YES (WRONG!)' : '✅ NO (GOOD!)'}`);
-
-    console.log("=".repeat(50));
   }, []);
 
   const handleCompleteSignup = async () => {
     const { username, password, email } = userData;
     const { givenName, lastName, zipcode, phonenumber } = formData;
 
-    console.log("🚀 STARTING COGNITO SIGNUP:");
-    console.log("=".repeat(40));
-    console.log("Signup credentials:", { username, password: "***", email });
-
-    // ✅ VERIFY TARGET POOL RIGHT BEFORE SIGNUP
     const targetPool = Amplify.getConfig().Auth?.Cognito?.userPoolId;
-    console.log("🎯 TARGET POOL ID:", targetPool);
-    console.log("🔍 Is this your CDK pool?", targetPool !== 'us-east-1_umBuF7Dx8' ? '✅ YES' : '❌ NO - STILL WRONG!');
 
     try {
       const response = await signUp({
@@ -106,12 +72,6 @@ const NewUser = () => {
           },
         },
       });
-
-      console.log("✅ COGNITO SIGNUP RESPONSE:");
-      console.log("- User ID:", response.userId);
-      console.log("- Is Sign Up Complete:", response.isSignUpComplete);
-      console.log("- Next Step:", response.nextStep);
-      console.log("- Full Response:", response);
 
       setIsSignUpComplete(true);
       setSnackbarMessage("Signup successful! Please check your email for verification code.");
@@ -128,16 +88,10 @@ const NewUser = () => {
       setSnackbarMessage(`Signup failed: ${error.message}`);
       setSnackbarOpen(true);
     }
-    console.log("=".repeat(40));
   };
 
   const handleEmailVerification = async () => {
     const { username } = userData;
-
-    console.log("🔐 STARTING EMAIL VERIFICATION:");
-    console.log("- Username:", username);
-    console.log("- Verification Code:", verificationCode);
-    console.log("- Form Data:", formData);
 
     let isUserConfirmed = false;
 
@@ -147,7 +101,6 @@ const NewUser = () => {
         confirmationCode: verificationCode
       });
 
-      console.log("✅ Email verification successful");
       isUserConfirmed = true;
 
     } catch (error) {
@@ -156,7 +109,6 @@ const NewUser = () => {
       console.error("- Error name:", error.name);
 
       if (error.name === 'NotAuthorizedException' && error.message.includes('Current status is CONFIRMED')) {
-        console.log("ℹ️ User is already confirmed, proceeding with profile save...");
         isUserConfirmed = true;
       } else if (error.name === 'CodeMismatchException') {
         setSnackbarMessage("Invalid verification code. Please try again.");
@@ -189,15 +141,6 @@ const NewUser = () => {
           operation: "PUT",
         };
 
-        console.log("📤 SENDING TO REST API:");
-        console.log("- URL:", USER_ADD_API);
-        console.log("- Payload:", restPayload);
-
-        // ✅ DEBUG: Show exactly what phone number we're sending
-        console.log("🔍 PHONE NUMBER DEBUG:");
-        console.log("- formData.phonenumber:", formData.phonenumber);
-        console.log("- Payload.Phone:", restPayload.Phone);
-
         const restRes = await fetch(USER_ADD_API, {
           method: 'PUT',
           headers: {
@@ -215,9 +158,6 @@ const NewUser = () => {
           throw new Error(`REST API call failed: ${restData.message || 'Unknown error'}`);
         }
 
-        console.log("✅ REST API SUCCESS:");
-        console.log("- Response:", restData);
-
         // ✅ UPDATE USER CONTEXT with complete profile data
         const completeUserData = {
           username: username,
@@ -230,9 +170,6 @@ const NewUser = () => {
           lastName: formData.lastName,
           language: formData.language,
         };
-
-        console.log("🔄 UPDATING USER CONTEXT:");
-        console.log("- Complete User Data:", completeUserData);
 
         updateUser(completeUserData);
 
@@ -287,17 +224,13 @@ const NewUser = () => {
   const handleChange = (field) => (event) => {
     const value = event.target.value;
 
-    console.log(`Updating field: ${field}, New Value: ${value}`);
-
     setFormData((prev) => {
       const updatedForm = { ...prev, [field]: value };
-      console.log("Updated formData:", updatedForm);
       return updatedForm;
     });
 
     if (field === 'zipcode') {
       updateUser({ ...userData, zipcode: value });
-      console.log("User Context after zipCode update:", userData);
     }
   };
 

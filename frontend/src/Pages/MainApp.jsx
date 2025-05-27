@@ -26,18 +26,6 @@ const MainApp = () => {
   useEffect(() => {
     const feedbackQuestions = userData?.feedbackQuestions || [];
 
-    console.log("🔍 MainApp: User data updated:", {
-      questionsLength: feedbackQuestions.length,
-      currentModalState: openModal,
-      sessionDismissed: sessionStorage.getItem('feedbackModalDismissed')
-    });
-
-    // ✅ REMOVED: The problematic auto-opening logic
-    // This was conflicting with ModalComponent's session tracking
-    // if (feedbackQuestions.length > 0 && !openModal) {
-    //   console.log("🚀 MainApp: Auto-opening modal with", feedbackQuestions.length, "questions");
-    //   setOpenModal(true);
-    // }
   }, [userData, openModal]);
 
   return (
