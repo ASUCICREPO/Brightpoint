@@ -76,6 +76,7 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
 
           // Update user context with new data after feedback submission
           if (response.user) {
+            updateUser({
               ...response.user,
               feedbackQuestions: response.feedback_questions || []
             });
@@ -171,11 +172,13 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
 
   // ✅ ENHANCED: Better conditions for when to render modal
   if (!openModal || referralQuestions.length === 0) {
+    console.log("🚫 Modal not rendering:", {
       openModal,
       questionsLength: referralQuestions.length
     });
     return null;
   }
+
 
   return (
     <>
