@@ -51,24 +51,6 @@ def create_response(status_code, body, additional_headers=None):
         'body': body
     }
 
-def validate_language(language):
-    """
-    Validate and normalize language input
-
-    Args:
-        language: The language string to validate
-
-    Returns:
-        Validated language string (english, spanish, polish) or 'english' as default
-    """
-    if not language:
-        return 'english'
-
-    language = language.lower().strip()
-    valid_languages = ['english', 'spanish', 'polish']
-
-    return language if language in valid_languages else 'english'
-
 def lambda_handler(event, context):
     """
     Lambda handler to process both WebSocket and REST API events
@@ -117,7 +99,7 @@ def handle_websocket_event(event, context):
 
             # Extract common parameters
             user_id = body.get('user_id')
-            language = validate_language(body.get('language', 'english'))
+            language = body.get('language', 'english').lower()  # Default to English
 
             if not user_id:
                 send_websocket_response(connection_id, domain_name, stage, {
@@ -142,7 +124,7 @@ def handle_websocket_event(event, context):
                 phone = body.get('Phone')
                 email = body.get('Email')
 
-                result = create_or_update_user(user_id, zipcode, phone, email, language)
+                result = create_or_update_user(user_id, zipcode, phone, email)
                 status_code = result.get('statusCode', 500)
                 response_body = json.loads(result.get('body', '{}'))
 
@@ -158,7 +140,7 @@ def handle_websocket_event(event, context):
 
                 # Check for multiple feedback format
                 if 'feedback_list' in body and isinstance(body['feedback_list'], list):
-                    result = store_multiple_feedbacks(user_id, body['feedback_list'], zipcode, phone, email, language)
+                    result = store_multiple_feedbacks(user_id, body['feedback_list'], zipcode, phone, email)
                 else:
                     # Legacy single feedback
                     referral_id = body.get('referral_id')
@@ -166,7 +148,7 @@ def handle_websocket_event(event, context):
 
                     # First update user info if provided
                     if zipcode or phone or email:
-                        create_or_update_user(user_id, zipcode, phone, email, language)
+                        create_or_update_user(user_id, zipcode, phone, email)
 
                     result = store_referral_feedback(user_id, referral_id, feedback)
 
@@ -252,7 +234,7 @@ def handle_rest_event(event, context):
             if not user_id:
                 return create_response(400, {'error': 'user_id is required'})
 
-            language = validate_language(body.get('language', 'english'))
+            language = body.get('language', 'english').lower()
             result = get_user_with_feedback_questions(user_id, language)
             return create_response(result['statusCode'], result['body'])
 
@@ -265,7 +247,7 @@ def handle_rest_event(event, context):
             zipcode = body.get('Zipcode')
             phone = body.get('Phone')
             email = body.get('Email')
-            language = validate_language(body.get('language', 'english'))
+            language = body.get('language', 'english').lower()
 
             # Determine which operation to perform based on body content
             if 'operation' in body:
@@ -274,11 +256,11 @@ def handle_rest_event(event, context):
                 if operation == 'GET':
                     result = get_user_with_feedback_questions(user_id, language)
                 elif operation == 'PUT':
-                    result = create_or_update_user(user_id, zipcode, phone, email, language)
+                    result = create_or_update_user(user_id, zipcode, phone, email)
                 elif operation == 'FEEDBACK':
                     # Check for multiple feedback format
                     if 'feedback_list' in body and isinstance(body['feedback_list'], list):
-                        result = store_multiple_feedbacks(user_id, body['feedback_list'], zipcode, phone, email, language)
+                        result = store_multiple_feedbacks(user_id, body['feedback_list'], zipcode, phone, email)
                     else:
                         # Legacy single feedback
                         referral_id = body.get('referral_id')
@@ -286,14 +268,14 @@ def handle_rest_event(event, context):
 
                         # First update user info if provided
                         if zipcode or phone or email:
-                            create_or_update_user(user_id, zipcode, phone, email, language)
+                            create_or_update_user(user_id, zipcode, phone, email)
 
                         result = store_referral_feedback(user_id, referral_id, feedback)
                 else:
                     return create_response(400, {'error': f'Unsupported operation: {operation}'})
             else:
                 # Default POST behavior - create/update user
-                result = create_or_update_user(user_id, zipcode, phone, email, language)
+                result = create_or_update_user(user_id, zipcode, phone, email)
 
             return create_response(result['statusCode'], result['body'])
 
@@ -305,9 +287,8 @@ def handle_rest_event(event, context):
             zipcode = body.get('Zipcode')
             phone = body.get('Phone')
             email = body.get('Email')
-            language = validate_language(body.get('language', 'english'))
 
-            result = create_or_update_user(user_id, zipcode, phone, email, language)
+            result = create_or_update_user(user_id, zipcode, phone, email)
             return create_response(result['statusCode'], result['body'])
 
         else:
@@ -362,7 +343,7 @@ def get_language_code(language):
     }
     return language_map.get(language.lower(), 'en')
 
-def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, email=None, language='english'):
+def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, email=None):
     """
     Stores feedback for multiple referrals/services at once (up to 5) and updates user info if provided.
 
@@ -372,14 +353,10 @@ def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, e
         zipcode: User's zipcode (optional)
         phone: User's phone number (optional)
         email: User's email (optional)
-        language: User's preferred language (english, spanish, polish)
 
     Returns:
         Response indicating success or failure
     """
-    # Validate and normalize language
-    language = validate_language(language)
-
     # Limit to max 5 feedback entries
     feedback_list = feedback_list[:5]
 
@@ -395,7 +372,7 @@ def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, e
     try:
         # First update the user profile if any info is provided
         if zipcode or phone or email:
-            update_result = create_or_update_user(user_id, zipcode, phone, email, language)
+            update_result = create_or_update_user(user_id, zipcode, phone, email)
             if update_result.get('statusCode') not in [200, 201]:
                 # If user update/creation failed, return the error
                 return update_result
@@ -519,6 +496,11 @@ def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, e
 
         # Get updated user data with feedback questions
         if success_count > 0:
+            # Get the language from the response item if it exists
+            language = 'english'
+            if 'language' in user_data:
+                language = user_data['language']['S']
+
             user_result = get_user_with_feedback_questions(user_id, language)
             updated_data = json.loads(user_result.get('body', '{}'))
 
@@ -645,8 +627,8 @@ def store_referral_feedback(user_id, referral_id, feedback):
                                     feedback_stored = True
                                     service_found = True
                                     break
-                        if service_found:
-                            break
+                            if service_found:
+                                break
                     except (json.JSONDecodeError, KeyError):
                         continue
 
@@ -687,21 +669,17 @@ def store_referral_feedback(user_id, referral_id, feedback):
 
 def get_user_with_feedback_questions(user_id, language='english'):
     """
-    ✅ SIMPLIFIED: Fetches user details and only returns referrals that need feedback.
-    Also generates top 5 feedback questions for referrals without feedback.
-    NOTE: Only processes referrals, skips queries entirely.
+    ✅ ENHANCED: Fetches user details with all referrals AND query services from DynamoDB.
+    Also generates top 5 feedback questions for referrals/services without feedback.
 
     Args:
         user_id: The ID of the user to fetch
         language: The language for translation (english, spanish, polish)
 
     Returns:
-        Response with user details, only referrals needing feedback, and top 5 feedback questions
+        Response with user details, formatted referrals+services, and top 5 feedback questions
     """
     try:
-        # Validate and normalize language
-        language = validate_language(language)
-
         # Get the language code for translations
         lang_code = get_language_code(language)
         needs_translation = language.lower() in ['spanish', 'polish']
@@ -740,11 +718,11 @@ def get_user_with_feedback_questions(user_id, language='english'):
         if 'Email' in user_data:
             formatted_user['Email'] = user_data['Email']['S']
 
-        # ✅ SIMPLIFIED: Only collect referrals that need feedback
+        # ✅ ENHANCED: Process both referrals AND query services
+        formatted_referrals = []
         referrals_needing_feedback = []
-        items_with_feedback = []  # For reference/history
 
-        # ✅ Process traditional referrals only
+        # ✅ 1. Process traditional referrals
         if 'referrals' in user_data and 'M' in user_data['referrals']:
             referrals_map = user_data['referrals']['M']
 
@@ -776,15 +754,17 @@ def get_user_with_feedback_questions(user_id, language='english'):
                     'serviceCategory': service_category,
                     'state': state,
                     'timestamp': timestamp,
-                    'source': 'referral'
+                    'source': 'referral'  # ✅ Mark source
                 }
 
-                # ✅ Only add to appropriate list based on feedback status
+                # Add feedback if it exists
                 if has_feedback:
                     formatted_referral['feedback'] = feedback_value
-                    items_with_feedback.append(formatted_referral)
-                else:
-                    # Add to list of referrals needing feedback
+
+                formatted_referrals.append(formatted_referral)
+
+                # Add to list of referrals needing feedback if no feedback exists
+                if not has_feedback:
                     try:
                         ts = datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f').timestamp() if timestamp else 0
                     except ValueError:
@@ -793,17 +773,114 @@ def get_user_with_feedback_questions(user_id, language='english'):
                         except ValueError:
                             ts = 0
 
-                    formatted_referral['ts'] = ts
-                    referrals_needing_feedback.append(formatted_referral)
+                    referrals_needing_feedback.append({
+                        'referral_id': referral_id,
+                        'agency': agency,
+                        'address': address,
+                        'zipcode': zipcode,
+                        'service_category': service_category,
+                        'timestamp': timestamp,
+                        'ts': ts,
+                        'source': 'referral'
+                    })
 
-        # ✅ Sort referrals needing feedback by timestamp (newest first) and generate questions
+        # ✅ 2. Process query services
+        if 'queries' in user_data and 'M' in user_data['queries']:
+            queries_map = user_data['queries']['M']
+
+            # Get existing service feedback
+            service_feedback = {}
+            if 'service_feedback' in user_data and 'M' in user_data['service_feedback']:
+                service_feedback = user_data['service_feedback']['M']
+
+            for query_id, query_data in queries_map.items():
+                query_content = query_data['M']
+                query_timestamp = query_content.get('timestamp', {}).get('S', '')
+
+                # Parse the response JSON to extract services
+                if 'response' in query_content:
+                    try:
+                        response_json = json.loads(query_content['response']['S'])
+                        if 'services' in response_json and isinstance(response_json['services'], list):
+
+                            for service in response_json['services']:
+                                # Extract service details
+                                agency = service.get('agency', '')
+                                service_details = service.get('details', {})
+
+                                service_id = service_details.get('id') or service.get('id')
+                                address = service_details.get('address', '')
+                                zipcode = service_details.get('zipcode', '')
+                                service_category = service_details.get('service_category', '') or service_details.get('service_category_type', '')
+                                state = service_details.get('state', '')
+
+                                # Skip if no service_id (can't track feedback)
+                                if not service_id:
+                                    continue
+
+                                # Translate agency and service_category if needed
+                                if needs_translation:
+                                    agency = translate_text(agency, lang_code)
+                                    service_category = translate_text(service_category, lang_code)
+
+                                # Check if feedback exists for this service
+                                has_feedback = service_id in service_feedback
+                                feedback_value = None
+                                if has_feedback:
+                                    feedback_value = service_feedback[service_id]['M'].get('feedback', {}).get('S', '')
+
+                                formatted_service = {
+                                    'referral_id': service_id,  # Use service_id as referral_id for consistency
+                                    'agency': agency,
+                                    'address': address,
+                                    'zipcode': zipcode,
+                                    'serviceCategory': service_category,
+                                    'state': state,
+                                    'timestamp': query_timestamp,
+                                    'source': 'query',  # ✅ Mark source
+                                    'query_id': query_id  # ✅ Additional info
+                                }
+
+                                # Add feedback if it exists
+                                if has_feedback:
+                                    formatted_service['feedback'] = feedback_value
+
+                                formatted_referrals.append(formatted_service)
+
+                                # Add to list needing feedback if no feedback exists
+                                if not has_feedback:
+                                    try:
+                                        ts = datetime.strptime(query_timestamp, '%Y-%m-%dT%H:%M:%S.%f').timestamp() if query_timestamp else 0
+                                    except ValueError:
+                                        try:
+                                            ts = datetime.strptime(query_timestamp, '%Y-%m-%dT%H:%M:%S.%fZ').timestamp() if query_timestamp else 0
+                                        except ValueError:
+                                            ts = 0
+
+                                    referrals_needing_feedback.append({
+                                        'referral_id': service_id,
+                                        'agency': agency,
+                                        'address': address,
+                                        'zipcode': zipcode,
+                                        'service_category': service_category,
+                                        'timestamp': query_timestamp,
+                                        'ts': ts,
+                                        'source': 'query',
+                                        'query_id': query_id
+                                    })
+
+                    except (json.JSONDecodeError, KeyError) as e:
+                        print(f"Error parsing query response for query_id {query_id}: {str(e)}")
+                        continue
+
+        # ✅ 3. Sort all referrals needing feedback by timestamp (newest first) and generate questions
         referrals_needing_feedback.sort(key=lambda x: x['ts'], reverse=True)
 
         feedback_questions = []
         # Generate feedback questions for the top 5 referrals/services
         for item in referrals_needing_feedback[:5]:
             # Create the base question in English
-            english_question = f"Hi {user_id}, Did the referral {item['agency']}, {item['address']}, {item['zipcode']} help you in {item['serviceCategory']}? Please reply with yes or no."
+            english_question = f"Hi {user_id}, Did the referral {item['agency']}, {item['address']}, {item['zipcode']} help you in {item['service_category']}? Please reply with yes or no."
 
             # Translate the question if needed
             question = english_question
@@ -814,19 +891,12 @@ def get_user_with_feedback_questions(user_id, language='english'):
                 'referral_id': item['referral_id'],
                 'question': question,
                 'agency': item['agency'],
-                'service_category': item['serviceCategory'],
-                'source': item['source']
+                'service_category': item['service_category'],
+                'source': item['source']  # ✅ Include source info
             })
 
-        # ✅ Only return referrals that need feedback (remove 'ts' field for clean response)
-        referrals_needing_feedback_clean = []
-        for item in referrals_needing_feedback:
-            clean_item = {k: v for k, v in item.items() if k != 'ts'}
-            referrals_needing_feedback_clean.append(clean_item)
-
-        # Add only referrals needing feedback to user data
-        formatted_user['referrals'] = referrals_needing_feedback_clean  # ✅ Only referrals needing feedback
-        formatted_user['items_with_feedback_count'] = len(items_with_feedback)  # ✅ Count for reference
+        # Add formatted referrals to user data
+        formatted_user['referrals'] = formatted_referrals
 
         # Prepare the success message
         success_message = 'User data retrieved successfully.'
@@ -852,8 +922,7 @@ def get_user_with_feedback_questions(user_id, language='english'):
             except Exception as e:
                 print(f"Error updating language preference: {str(e)}")
 
-        print(f"✅ Found {len(referrals_needing_feedback_clean)} referrals needing feedback")
-        print(f"✅ Found {len(items_with_feedback)} referrals with existing feedback")
+        print(f"✅ Found {len(formatted_referrals)} total items ({len([r for r in formatted_referrals if r.get('source') == 'referral'])} referrals + {len([r for r in formatted_referrals if r.get('source') == 'query'])} query services)")
         print(f"✅ Generated {len(feedback_questions)} feedback questions")
 
         return {
@@ -862,12 +931,7 @@ def get_user_with_feedback_questions(user_id, language='english'):
                 'user': formatted_user,
                 'feedback_questions': feedback_questions,
                 'message': success_message,
-                'language': language,
-                'summary': {
-                    'referrals_needing_feedback': len(referrals_needing_feedback_clean),
-                    'referrals_with_feedback': len(items_with_feedback),
-                    'feedback_questions_generated': len(feedback_questions)
-                }
+                'language': language
             })
         }
 
@@ -881,16 +945,15 @@ def get_user_with_feedback_questions(user_id, language='english'):
             'body': json.dumps({'error': error_message})
         }
 
-def create_or_update_user(user_id, zipcode, phone=None, email=None, language='english'):
+def create_or_update_user(user_id, zipcode, phone, email):
     """
-    Creates or updates a user in DynamoDB with language support.
+    Creates or updates a user in DynamoDB.
 
     Args:
         user_id: The ID of the user
         zipcode: User's zipcode
         phone: User's phone number (optional)
         email: User's email (optional)
-        language: User's preferred language (english, spanish, polish) - defaults to english
 
     Returns:
         Response indicating success or failure
@@ -901,9 +964,6 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
             'statusCode': 400,
             'body': json.dumps({'error': 'Zipcode is required for creating/updating a user'})
         }
-
-    # Validate and normalize language
-    language = validate_language(language)
 
     try:
         # Check if user exists
@@ -933,15 +993,8 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
                 update_expressions.append("Email = :email")
                 expression_attribute_values[':email'] = {'S': email}
 
-            # Always update language preference
-            update_expressions.append("#lang = :language")
-            expression_attribute_values[':language'] = {'S': language}
-
             if update_expressions:
                 update_expression = "SET " + ", ".join(update_expressions)
-
-                # Handle language as a reserved keyword
-                expression_attribute_names = {'#lang': 'language'}
 
                 dynamodb_client.update_item(
                     TableName=USER_DATA_TABLE,
@@ -949,24 +1002,18 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
                         'user_id': {'S': user_id}
                     },
                     UpdateExpression=update_expression,
-                    ExpressionAttributeNames=expression_attribute_names,
                     ExpressionAttributeValues=expression_attribute_values
                 )
 
             return {
                 'statusCode': 200,
-                'body': json.dumps({
-                    'message': 'User data updated successfully.',
-                    'user_id': user_id,
-                    'language': language
-                })
+                'body': json.dumps({'message': 'User data updated successfully.'})
             }
         else:
             # Create new user
             item = {
                 'user_id': {'S': user_id},
-                'Zipcode': {'S': zipcode},
-                'language': {'S': language}  # Always include language for new users
+                'Zipcode': {'S': zipcode}
             }
 
             if phone:
@@ -981,11 +1028,7 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
 
             return {
                 'statusCode': 201,
-                'body': json.dumps({
-                    'message': 'User data created successfully.',
-                    'user_id': user_id,
-                    'language': language
-                })
+                'body': json.dumps({'message': 'User data created successfully.'})
             }
 
     except Exception as e:

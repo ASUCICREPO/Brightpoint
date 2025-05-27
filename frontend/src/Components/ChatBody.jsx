@@ -7,7 +7,7 @@ import { useUser } from "../utilities/UserContext";
 import { ALLOW_FILE_UPLOAD, ALLOW_VOICE_RECOGNITION } from "../utilities/constants";
 import FirstBotMessage from './FirstBotMessage';
 import { CHAT_API } from "../utilities/constants";
-import { useLocation } from "react-router-dom"; // <-- Import location hook
+import { useLocation } from "react-router-dom";
 import BotFileCheckReply from "./BotFileCheckReply";
 
 const translations = {
@@ -21,7 +21,11 @@ const translations = {
     hours: "Hours:",
     phone: "Phone:",
     address: "Address:",
-    additionalInfo: "Additional Info:"
+    additionalInfo: "Additional Info:",
+    processing: "Processing your request...",
+    searching: "Searching for relevant information...",
+    analyzing: "Analyzing results...",
+    connecting: "Connecting to services..."
   },
   ES: {
     networkError: "Error de red. Por favor, inténtalo de nuevo más tarde.",
@@ -33,7 +37,11 @@ const translations = {
     hours: "Horario:",
     phone: "Teléfono:",
     address: "Dirección:",
-    additionalInfo: "Información Adicional:"
+    additionalInfo: "Información Adicional:",
+    processing: "Procesando tu solicitud...",
+    searching: "Buscando información relevante...",
+    analyzing: "Analizando resultados...",
+    connecting: "Conectando a servicios..."
   },
   PL: {
     networkError: "Błąd sieci. Spróbuj ponownie później.",
@@ -45,22 +53,79 @@ const translations = {
     hours: "Godziny:",
     phone: "Telefon:",
     address: "Adres:",
-    additionalInfo: "Dodatkowe informacje:"
+    additionalInfo: "Dodatkowe informacje:",
+    processing: "Przetwarzanie twojego żądania...",
+    searching: "Wyszukiwanie odpowiednich informacji...",
+    analyzing: "Analizowanie wyników...",
+    connecting: "Łączenie z usługami..."
   }
 };
 
-function ChatBody( language ) {
+// ✅ DEFINE ProcessingMessage COMPONENT FIRST
+const ProcessingMessage = ({ message }) => {
+  const [dots, setDots] = useState("");
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots(prev => {
+        if (prev === "...") return "";
+        return prev + ".";
+      });
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        fontStyle: 'italic',
+        color: '#666',
+        padding: '8px 0'
+      }}
+    >
+      <Typography variant="body1" component="span">
+        {message}
+      </Typography>
+      <Typography
+        component="span"
+        sx={{
+          display: 'inline-block',
+          width: '20px',
+          textAlign: 'left',
+          fontSize: '1.2em',
+          fontWeight: 'bold'
+        }}
+      >
+        {dots}
+      </Typography>
+    </Box>
+  );
+};
+
+function ChatBody(language) {
   const { userData } = useUser();
 
   console.log('userData:', userData);
+
+  // Helper function to get the user identifier
+  const getUserIdentifier = () => {
+    const username = userData?.username?.toString().trim();
+    const user_id = userData?.user_id?.toString().trim();
+
+    const identifier = username || user_id || null;
+    console.log('getUserIdentifier:', { username, user_id, chosen: identifier });
+    return identifier;
+  };
 
   const [messageList, setMessageList] = useState([]);
   const [processing, setProcessing] = useState(false);
   const [message, setMessage] = useState("");
   const [questionAsked, setQuestionAsked] = useState(false);
   const messagesEndRef = useRef(null);
-  const location = useLocation(); // <-- Get current path
+  const location = useLocation();
 
   // === Determine language from path ===
   const path = location.pathname;
@@ -70,7 +135,6 @@ function ChatBody( language ) {
   } else if (path.startsWith("/plapp")) {
     lang = "PL";
   }
-
 
   useEffect(() => {
     const firstBotMessage = createMessageBlock(
@@ -88,11 +152,30 @@ function ChatBody( language ) {
   };
 
   const handleSendMessage = (msg) => {
-    if (processing) return; // Prevent sending new messages while processing
+    if (processing) return;
     setProcessing(true);
     const newMessageBlock = createMessageBlock(msg, "USER", "TEXT", "SENT");
     setMessageList((prevList) => [...prevList, newMessageBlock]);
-    getBotResponse(setMessageList, setProcessing, msg, userData.user_id, userData.zipcode, language, lang);
+
+    const userIdentifier = getUserIdentifier();
+    const userZipcode = userData?.zipcode;
+
+    console.log('Sending message with user data:', {
+      userIdentifier,
+      userZipcode,
+      message: msg,
+      language: language
+    });
+
+    getBotResponse(
+      setMessageList,
+      setProcessing,
+      msg,
+      userIdentifier,
+      userZipcode,
+      language,
+      lang
+    );
     setQuestionAsked(true);
   };
 
@@ -122,60 +205,57 @@ function ChatBody( language ) {
 
   return (
     <Box
-  display="flex"
-  flexDirection="column"
-  sx={{
-    height: '100vh',
-    overflow: 'hidden', // ensure children don’t overflow
-  }}
->
-
-
-
-<Box
-  flex={1}
-  overflow="auto"
-  className="chatScrollContainer"
-  sx={{
-    pb: '100px', // enough space to avoid input overlay
-  }}
->
+      display="flex"
+      flexDirection="column"
+      sx={{
+        height: '100vh',
+        overflow: 'hidden',
+      }}
+    >
+      <Box
+        flex={1}
+        overflow="auto"
+        className="chatScrollContainer"
+        sx={{
+          pb: '100px',
+        }}
+      >
         {messageList.map((msg, index) => (
           <Box key={index} mb={2}>
-          {msg.sentBy === "USER" ? (
-            <UserReply message={msg.message} />
-          ) : msg.sentBy === "BOT" && msg.state === "PROCESSING" ? (
-            <StreamingResponse initialMessage={msg.message} setProcessing={setProcessing} />
-          ) : (
-            <BotFileCheckReply message={msg.message} fileName={msg.fileName} fileStatus={msg.fileStatus} messageType={msg.sentBy === "USER" ? "user_doc_upload" : "bot_response"} />
-          )}
-        </Box>
-        
+            {msg.sentBy === "USER" ? (
+              <UserReply message={msg.message} />
+            ) : msg.sentBy === "BOT" && msg.state === "PROCESSING" ? (
+              // ✅ FIXED: Use our own processing component instead of StreamingResponse
+              <BotProcessingReply message={msg.message} />
+            ) : (
+              <BotFileCheckReply message={msg.message} fileName={msg.fileName} fileStatus={msg.fileStatus} messageType={msg.sentBy === "USER" ? "user_doc_upload" : "bot_response"} />
+            )}
+          </Box>
         ))}
         <div ref={messagesEndRef} />
       </Box>
 
       <Box
-  sx={{
-    position: 'fixed',
-    width:"60%",
-    bottom: 0,
-    backgroundColor: 'white',
-    borderTop: '1px solid #ccc',
-    px: 2,
-    py: 1,
-    zIndex: 1000,
-  }}
->
-  <ChatInput
-    onSendMessage={handleSendMessage}
-    processing={processing}
-    message={message}
-    setMessage={setMessage}
-    language={lang} // make sure this passes correctly
-  />
-</Box>
-</Box>
+        sx={{
+          position: 'fixed',
+          width: "60%",
+          bottom: 0,
+          backgroundColor: 'white',
+          borderTop: '1px solid #ccc',
+          px: 2,
+          py: 1,
+          zIndex: 1000,
+        }}
+      >
+        <ChatInput
+          onSendMessage={handleSendMessage}
+          processing={processing}
+          message={message}
+          setMessage={setMessage}
+          language={lang}
+        />
+      </Box>
+    </Box>
   );
 }
 
@@ -183,7 +263,7 @@ export default ChatBody;
 
 function parseMarkdownBold(text) {
   if (!text) return null;
-  const parts = text.split(/\*\*(.*?)\*\*/g); // Split by **bold**
+  const parts = text.split(/\*\*(.*?)\*\*/g);
   return parts.map((part, index) =>
     index % 2 === 1 ? <strong key={index}>{part}</strong> : part
   );
@@ -192,52 +272,100 @@ function parseMarkdownBold(text) {
 function UserReply({ message }) {
   return (
     <Grid
-  container
-  direction="row"
-  justifyContent="flex-end"
-  alignItems="flex-end"
-  sx={{ maxWidth: '100%' }}
->
-  <Grid
-    item
-    sx={{
-      backgroundColor: (theme) => theme.palette.background.userMessage,
-      borderRadius: 2,
-      px: 2,
-      py: 1,
-      maxWidth: { xs: '80%', sm: '60%', md: '50%' },
-      wordWrap: 'break-word',
-    }}
-  >
-    <Typography variant="body2" sx={{ fontSize: '1rem' }}>
-      {message}
-    </Typography>
-  </Grid>
-</Grid>
-
+      container
+      direction="row"
+      justifyContent="flex-end"
+      alignItems="flex-end"
+      sx={{ maxWidth: '100%' }}
+    >
+      <Grid
+        item
+        sx={{
+          backgroundColor: (theme) => theme.palette.background.userMessage,
+          borderRadius: 2,
+          px: 2,
+          py: 1,
+          maxWidth: { xs: '80%', sm: '60%', md: '50%' },
+          wordWrap: 'break-word',
+        }}
+      >
+        <Typography variant="body2" sx={{ fontSize: '1rem' }}>
+          {message}
+        </Typography>
+      </Grid>
+    </Grid>
   );
 }
 
-const getBotResponse = (setMessageList, setProcessing, message, username, zipcode, language, lang ) => {
+// ✅ NEW: Bot processing reply component (replaces StreamingResponse for processing)
+function BotProcessingReply({ message }) {
+  return (
+    <Grid
+      container
+      direction="row"
+      justifyContent="flex-start"
+      alignItems="flex-end"
+      sx={{ maxWidth: '100%' }}
+    >
+      <Grid
+        item
+        sx={{
+          backgroundColor: (theme) => theme.palette.background.botMessage || '#f5f5f5',
+          borderRadius: 2,
+          px: 2,
+          py: 1,
+          maxWidth: { xs: '80%', sm: '60%', md: '50%' },
+          wordWrap: 'break-word',
+        }}
+      >
+        {/* Render the ProcessingMessage component or regular text */}
+        {typeof message === 'string' ? (
+          <ProcessingMessage message={message} />
+        ) : (
+          message
+        )}
+      </Grid>
+    </Grid>
+  );
+}
+
+const getBotResponse = (setMessageList, setProcessing, message, userIdentifier, zipcode, language, lang) => {
   const t = translations[lang];
-  const processingMessageBlock = createMessageBlock(t.thinking, "BOT", "TEXT", "PROCESSING");
+
+  // ✅ Create initial processing message with unique ID for tracking
+  const processingId = Date.now();
+  const processingMessageBlock = createMessageBlock(
+    t.thinking,
+    "BOT",
+    "TEXT",
+    "PROCESSING"
+  );
+  processingMessageBlock.id = processingId; // Add unique ID
+
   setMessageList((prevList) => [...prevList, processingMessageBlock]);
 
+  console.log('getBotResponse called with:', {
+    message,
+    userIdentifier,
+    zipcode,
+    language,
+    lang,
+    processingId
+  });
 
   const socket = new WebSocket(CHAT_API);
 
   socket.onopen = () => {
     const payload = {
       action: "query",
-      user_id: username,
+      user_id: userIdentifier,
       zipcode: zipcode,
       user_query: message,
-      language: language.language|| "english"
+      language: language?.language || "english"
     };
-    console.log("language, ", language);
-    console.log("language, ", language.language);
+
+    console.log("📤 Sending WebSocket payload:", payload);
     socket.send(JSON.stringify(payload));
-    console.log("📤 Sending request:", payload);
   };
 
   socket.onmessage = (event) => {
@@ -264,19 +392,63 @@ const getBotResponse = (setMessageList, setProcessing, message, username, zipcod
 
     const status = data?.status?.toLowerCase();
 
+    // ✅ ENHANCED: Handle processing/searching states with real-time updates
     if (status === "processing" || status === "searching") {
-      // Do not display or update UI for these states.
-      return;
+      const serverMessage = data?.message || data?.response_data?.message;
+
+      let processingMessage;
+      if (serverMessage) {
+        processingMessage = serverMessage;
+      } else {
+        processingMessage = t[status] || t.processing;
+      }
+
+      console.log("🔄 Processing update:", {
+        status,
+        serverMessage,
+        processingMessage,
+        messageListLength: 'checking update'
+      });
+
+      // ✅ FIXED: Force update with new message and trigger re-render
+      setMessageList((prevList) => {
+        const updatedList = prevList.map((msg, index) => {
+          if (msg.state === "PROCESSING") {
+            console.log(`✅ Updating processing message at index ${index}:`, processingMessage);
+            return createMessageBlock(
+              processingMessage,
+              "BOT",
+              "TEXT",
+              "PROCESSING"
+            );
+          }
+          return msg;
+        });
+
+        console.log("📝 Updated message list length:", updatedList.length);
+        return updatedList;
+      });
+
+      // ✅ Force scroll to bottom after update
+      setTimeout(() => {
+        const container = document.querySelector('.chatScrollContainer');
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      }, 50);
+
+      return; // Continue waiting for more updates
     }
 
-    if (status === "complete" || status == "success") {
+    // ✅ Handle final completion
+    if (status === "complete" || status === "success") {
       const { message: mainMessage, services, source } = data.response_data || {};
-    
+
       let prefixText = "";
       if (source && source.toLowerCase().includes("perplexity")) {
         prefixText = t.prefixText;
       }
-    
+
       if (services && Array.isArray(services)) {
         const servicesUI = services.map((service) => {
           const { agency, details = {}, address, city, state, zipcode } = service;
@@ -286,7 +458,7 @@ const getBotResponse = (setMessageList, setProcessing, message, username, zipcod
             phone,
             additional_information
           } = details;
-    
+
           return (
             <Box key={service.id || Math.random()} sx={{ mb: 3 }}>
               {agency && <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{agency}</Typography>}
@@ -299,12 +471,12 @@ const getBotResponse = (setMessageList, setProcessing, message, username, zipcod
                 </Typography>
               )}
               {additional_information && (
-                <Typography><strong>Additional Info:</strong> {parseMarkdownBold(additional_information)}</Typography>
+                <Typography><strong>{t.additionalInfo}</strong> {parseMarkdownBold(additional_information)}</Typography>
               )}
             </Box>
           );
         });
-    
+
         const botMessageBlock = createMessageBlock(
           <div>
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
@@ -314,35 +486,48 @@ const getBotResponse = (setMessageList, setProcessing, message, username, zipcod
           </div>,
           "BOT", "TEXT", "RECEIVED"
         );
-    
-        // Replace "Thinking..." message
+
         setMessageList((prevList) =>
           prevList.map((msg) =>
             msg.state === "PROCESSING" ? botMessageBlock : msg
           )
         );
       } else {
-        // Response doesn't contain expected structure
         setMessageList((prevList) =>
           prevList.map((msg) =>
             msg.state === "PROCESSING"
-              ? createMessageBlock("Sorry, I couldn't understand that.", "BOT", "TEXT", "RECEIVED")
+              ? createMessageBlock(mainMessage || t.noUnderstanding, "BOT", "TEXT", "RECEIVED")
               : msg
           )
         );
       }
-    
+
       setProcessing(false);
       socket.close();
     }
-    
+
+    // ✅ Handle error states
+    if (status === "error" || status === "failed") {
+      const errorMessage = data?.message || data?.response_data?.message || t.errorProcessing;
+
+      setMessageList((prevList) =>
+        prevList.map((msg) =>
+          msg.state === "PROCESSING"
+            ? createMessageBlock(errorMessage, "BOT", "TEXT", "RECEIVED")
+            : msg
+        )
+      );
+      setProcessing(false);
+      socket.close();
+    }
   };
 
-  socket.onerror = () => {
+  socket.onerror = (error) => {
+    console.error("❌ WebSocket Error:", error);
     setMessageList((prevList) =>
       prevList.map((msg) =>
         msg.state === "PROCESSING"
-          ? createMessageBlock("There was some issue processing your request. Please try again.", "BOT", "TEXT", "RECEIVED")
+          ? createMessageBlock(t.networkError, "BOT", "TEXT", "RECEIVED")
           : msg
       )
     );

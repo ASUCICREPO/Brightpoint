@@ -5,7 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ff7ef2e-35a7-4c4d-bd94-9b3ea7ae56b2" name="Changes" comment="Changing github branch in stack">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/brightpoint/process_user_data/lambda_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/brightpoint/process_user_data/lambda_function.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.template.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.template.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdk.out/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdk.out/tree.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/tree.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/cdk-config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/cdk-config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/Components/ChatBody.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Components/ChatBody.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Components/ModalComponent.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Components/ModalComponent.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/AdminLanding.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/AdminLanding.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/LandingPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/LandingPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/MainApp.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/MainApp.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/NewUser.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/NewUser.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/ViewProfile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/ViewProfile.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utilities/UserContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utilities/UserContext.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,7 +116,7 @@
       <workItem from="1746911500180" duration="37975000" />
       <workItem from="1747685946800" duration="6836000" />
       <workItem from="1747931254031" duration="29327000" />
-      <workItem from="1748072920946" duration="16758000" />
+      <workItem from="1748072920946" duration="32906000" />
     </task>
     <task id="LOCAL-00001" summary="Changing github branch in stack">
       <option name="closed" value="true" />

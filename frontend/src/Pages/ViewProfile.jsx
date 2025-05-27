@@ -2,15 +2,52 @@ import React from 'react';
 import { Box, Typography, Divider } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppHeader from '../Components/AppHeader';
-import { useUser } from '../utilities/UserContext'; // ✅ Use context
+import { useUser } from '../utilities/UserContext';
 
 const UserProfile = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = location.pathname.startsWith('/admin');
 
-  const { userData } = useUser(); // ✅ Use context
-  const userId = userData.user_id || userData.username;
+  const { userData } = useUser();
+
+  // ✅ Helper function to get the username display value (username or user_id)
+  const getDisplayUsername = () => {
+    const username = userData?.username?.toString().trim();
+    const user_id = userData?.user_id?.toString().trim();
+
+    // Return username if it exists and is not empty, otherwise return user_id
+    return username || user_id || "-";
+  };
+
+  // ✅ Helper function to get phone number with all possible field variations
+  const getPhoneNumber = () => {
+    // Try all possible phone number field names
+    const phoneFields = [
+      userData?.phoneNumber,      // camelCase (most common in React)
+      userData?.Phone,           // API format (capital P)
+      userData?.phone,           // lowercase
+      userData?.phonenumber,     // form field name
+      userData?.phoneNum,        // another variation
+      userData?.mobile,          // alternative field name
+    ];
+
+    // Return the first non-empty value
+    const phoneNumber = phoneFields.find(field =>
+      field && field.toString().trim() !== ''
+    );
+
+    return phoneNumber?.toString().trim() || "-";
+  };
+
+  // ✅ Helper function to get zipcode with variations
+  const getZipcode = () => {
+    return userData?.zipcode ||
+           userData?.Zipcode ||
+           userData?.zip ||
+           userData?.postalCode ||
+           "-";
+  };
 
   const renderField = (label, value) => (
     <Box mb={2}>
@@ -26,10 +63,31 @@ const UserProfile = () => {
     navigate(-1);
   };
 
+  // ✅ Comprehensive debug logging
+  console.log('🔍 UserProfile userData debug:', {
+    userData,
+    availableKeys: Object.keys(userData || {}),
+    phoneFields: {
+      phoneNumber: userData?.phoneNumber,
+      Phone: userData?.Phone,
+      phone: userData?.phone,
+      phonenumber: userData?.phonenumber,
+    },
+    userIdFields: {
+      username: userData?.username,
+      user_id: userData?.user_id,
+    },
+    chosenValues: {
+      displayUsername: getDisplayUsername(),
+      phoneNumber: getPhoneNumber(),
+      zipcode: getZipcode(),
+    }
+  });
+
   return (
     <Box bgcolor="white" minHeight="100vh">
       <AppHeader
-        username={userData.username || userData.user_id || "Admin"}
+        username={getDisplayUsername()}
         showSwitch={true}
         style={{ position: 'sticky', top: 0, zIndex: 999 }}
       />
@@ -67,10 +125,10 @@ const UserProfile = () => {
               </>
             ) : (
               <>
-                {renderField("Username", userData.username)}
-                {renderField("Email", userData.email)}
-                {renderField("ZipCode", userData.zipcode)}
-                {renderField("Phone Number", userData.phoneNumber)}
+                {renderField("Username", getDisplayUsername())}
+                {renderField("Email", userData?.email)}
+                {renderField("ZipCode", getZipcode())}
+                {renderField("Phone Number", getPhoneNumber())}
               </>
             )}
           </Box>
@@ -88,8 +146,8 @@ const UserProfile = () => {
               </Box>
 
               <Box display="flex" flexDirection="column" gap={1}>
-                {renderField("Child Info", userData.childInfo)}
-                {renderField("Expected Due Date", userData.dueDate)}
+                {renderField("Child Info", userData?.childInfo)}
+                {renderField("Expected Due Date", userData?.dueDate)}
               </Box>
             </>
           )}

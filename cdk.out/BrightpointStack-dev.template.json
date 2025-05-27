@@ -2115,7 +2115,7 @@
     ],
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
-     "S3Key": "10180beb24391cc6957d5afd53c193e1cc3f278db7b658c6c5f53209111adf42.zip"
+     "S3Key": "87f538fdafaf9fda939e75d7c4af8dfaa73ec52d07cac3fa73a138f985e06a74.zip"
     },
     "Environment": {
      "Variables": {
@@ -2152,7 +2152,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "BrightpointStack-dev/ProcessUserDataFn/Resource",
-    "aws:asset:path": "asset.10180beb24391cc6957d5afd53c193e1cc3f278db7b658c6c5f53209111adf42",
+    "aws:asset:path": "asset.87f538fdafaf9fda939e75d7c4af8dfaa73ec52d07cac3fa73a138f985e06a74",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }

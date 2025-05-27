@@ -21,45 +21,24 @@ const MainApp = () => {
   const [openModal, setOpenModal] = useState(false);
   const [referralQuestions, setReferralQuestions] = useState([]);
 
+  // ✅ REMOVED: Auto-opening logic (let ModalComponent handle this with proper session tracking)
+  // ✅ OPTIONAL: Keep this effect only for debugging/logging
   useEffect(() => {
-    const referrals = userData?.referrals || [];
-    const maxAttempts = 3;
+    const feedbackQuestions = userData?.feedbackQuestions || [];
 
-    const processReferrals = async () => {
-      const processed = [];
+    console.log("🔍 MainApp: User data updated:", {
+      questionsLength: feedbackQuestions.length,
+      currentModalState: openModal,
+      sessionDismissed: sessionStorage.getItem('feedbackModalDismissed')
+    });
 
-      for (const referral of referrals) {
-        let attempts = 0;
-        let updatedReferral = referral;
-
-        while (attempts < maxAttempts && updatedReferral.status !== "completed") {
-          await new Promise((res) => setTimeout(res, 1000));
-          attempts++;
-
-          // Simulate no change for now
-          updatedReferral = { ...updatedReferral };
-        }
-
-        if (updatedReferral.status === "completed") {
-          processed.push(updatedReferral);
-        } else {
-          processed.push({
-            ...updatedReferral,
-            message: "There was some issue processing your request please try again",
-          });
-        }
-      }
-
-      if (processed.length > 0) {
-        setReferralQuestions(processed.slice(0, 5));
-        setOpenModal(true);
-      }
-    };
-
-    if (referrals.length > 0) {
-      processReferrals();
-    }
-  }, [userData]);
+    // ✅ REMOVED: The problematic auto-opening logic
+    // This was conflicting with ModalComponent's session tracking
+    // if (feedbackQuestions.length > 0 && !openModal) {
+    //   console.log("🚀 MainApp: Auto-opening modal with", feedbackQuestions.length, "questions");
+    //   setOpenModal(true);
+    // }
+  }, [userData, openModal]);
 
   return (
     <Grid container direction="column" className="appHeight100">
@@ -153,12 +132,10 @@ const MainApp = () => {
         </Grid>
       </Grid>
 
-      {/* Modal */}
+      {/* ✅ Modal - Now fully controlled by ModalComponent's internal logic */}
       <ModalComponent
         openModal={openModal}
         setOpenModal={setOpenModal}
-        referralQuestions={userData?.feedbackQuestions || []}
-        userData={userData}
       />
     </Grid>
   );

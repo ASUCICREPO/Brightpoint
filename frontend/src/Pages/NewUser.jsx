@@ -131,18 +131,17 @@ const NewUser = () => {
     console.log("=".repeat(40));
   };
 
-  // ✅ FIXED EMAIL VERIFICATION FUNCTION
   const handleEmailVerification = async () => {
     const { username } = userData;
 
     console.log("🔐 STARTING EMAIL VERIFICATION:");
     console.log("- Username:", username);
     console.log("- Verification Code:", verificationCode);
+    console.log("- Form Data:", formData);
 
     let isUserConfirmed = false;
 
     try {
-      // Try to confirm the user
       await confirmSignUp({
         username: username,
         confirmationCode: verificationCode
@@ -156,7 +155,6 @@ const NewUser = () => {
       console.error("- Error message:", error.message);
       console.error("- Error name:", error.name);
 
-      // Check if user is already confirmed
       if (error.name === 'NotAuthorizedException' && error.message.includes('Current status is CONFIRMED')) {
         console.log("ℹ️ User is already confirmed, proceeding with profile save...");
         isUserConfirmed = true;
@@ -176,14 +174,14 @@ const NewUser = () => {
       }
     }
 
-    // If user is confirmed (either just now or already was), proceed with REST API call
+    // If user is confirmed, proceed with REST API call
     if (isUserConfirmed) {
       try {
-        // Now call REST API to store additional profile data
+        // ✅ FIXED: Ensure consistent field mapping
         const restPayload = {
           user_id: username,
           Zipcode: formData.zipcode,
-          Phone: formData.phonenumber,
+          Phone: formData.phonenumber,  // API expects "Phone"
           Email: userData.email,
           FirstName: formData.givenName,
           LastName: formData.lastName,
@@ -194,6 +192,11 @@ const NewUser = () => {
         console.log("📤 SENDING TO REST API:");
         console.log("- URL:", USER_ADD_API);
         console.log("- Payload:", restPayload);
+
+        // ✅ DEBUG: Show exactly what phone number we're sending
+        console.log("🔍 PHONE NUMBER DEBUG:");
+        console.log("- formData.phonenumber:", formData.phonenumber);
+        console.log("- Payload.Phone:", restPayload.Phone);
 
         const restRes = await fetch(USER_ADD_API, {
           method: 'PUT',
@@ -214,6 +217,24 @@ const NewUser = () => {
 
         console.log("✅ REST API SUCCESS:");
         console.log("- Response:", restData);
+
+        // ✅ UPDATE USER CONTEXT with complete profile data
+        const completeUserData = {
+          username: username,
+          user_id: username,  // ✅ Fix: Set user_id to username
+          email: userData.email,
+          zipcode: formData.zipcode,
+          phoneNumber: formData.phonenumber,  // ✅ Fix: Use camelCase for context
+          Phone: formData.phonenumber,        // ✅ Also keep API format for compatibility
+          firstName: formData.givenName,
+          lastName: formData.lastName,
+          language: formData.language,
+        };
+
+        console.log("🔄 UPDATING USER CONTEXT:");
+        console.log("- Complete User Data:", completeUserData);
+
+        updateUser(completeUserData);
 
         setSnackbarMessage("Account verified and profile saved successfully!");
         setSnackbarOpen(true);
@@ -324,27 +345,6 @@ const NewUser = () => {
 
       {/* Logo */}
       <img src={BrightpointLogo} alt="Brightpoint Logo" height="60" style={{ marginBottom: 10 }} />
-
-      {/* ✅ Debug Info Panel (remove in production) */}
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 10,
-          left: 10,
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          color: 'white',
-          padding: 1,
-          borderRadius: 1,
-          fontSize: '10px',
-          zIndex: 9999,
-          maxWidth: '300px'
-        }}
-      >
-        <div><strong>🔍 Pool Debug:</strong></div>
-        <div>Pool: {Amplify.getConfig().Auth?.Cognito?.userPoolId || 'Not configured'}</div>
-        <div>API: {USER_ADD_API?.substring(8, 25) || 'Not configured'}...</div>
-        <div>Status: {Amplify.getConfig().Auth?.Cognito?.userPoolId === 'us-east-1_umBuF7Dx8' ? '❌ WRONG' : '✅ GOOD'}</div>
-      </Box>
 
       {/* Container */}
       <Box

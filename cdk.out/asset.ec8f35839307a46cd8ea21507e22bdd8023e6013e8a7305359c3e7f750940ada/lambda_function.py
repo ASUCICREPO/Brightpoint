@@ -51,24 +51,6 @@ def create_response(status_code, body, additional_headers=None):
         'body': body
     }
 
-def validate_language(language):
-    """
-    Validate and normalize language input
-
-    Args:
-        language: The language string to validate
-
-    Returns:
-        Validated language string (english, spanish, polish) or 'english' as default
-    """
-    if not language:
-        return 'english'
-
-    language = language.lower().strip()
-    valid_languages = ['english', 'spanish', 'polish']
-
-    return language if language in valid_languages else 'english'
-
 def lambda_handler(event, context):
     """
     Lambda handler to process both WebSocket and REST API events
@@ -117,7 +99,7 @@ def handle_websocket_event(event, context):
 
             # Extract common parameters
             user_id = body.get('user_id')
-            language = validate_language(body.get('language', 'english'))
+            language = body.get('language', 'english').lower()  # Default to English
 
             if not user_id:
                 send_websocket_response(connection_id, domain_name, stage, {
@@ -142,7 +124,7 @@ def handle_websocket_event(event, context):
                 phone = body.get('Phone')
                 email = body.get('Email')
 
-                result = create_or_update_user(user_id, zipcode, phone, email, language)
+                result = create_or_update_user(user_id, zipcode, phone, email)
                 status_code = result.get('statusCode', 500)
                 response_body = json.loads(result.get('body', '{}'))
 
@@ -158,7 +140,7 @@ def handle_websocket_event(event, context):
 
                 # Check for multiple feedback format
                 if 'feedback_list' in body and isinstance(body['feedback_list'], list):
-                    result = store_multiple_feedbacks(user_id, body['feedback_list'], zipcode, phone, email, language)
+                    result = store_multiple_feedbacks(user_id, body['feedback_list'], zipcode, phone, email)
                 else:
                     # Legacy single feedback
                     referral_id = body.get('referral_id')
@@ -166,7 +148,7 @@ def handle_websocket_event(event, context):
 
                     # First update user info if provided
                     if zipcode or phone or email:
-                        create_or_update_user(user_id, zipcode, phone, email, language)
+                        create_or_update_user(user_id, zipcode, phone, email)
 
                     result = store_referral_feedback(user_id, referral_id, feedback)
 
@@ -252,7 +234,7 @@ def handle_rest_event(event, context):
             if not user_id:
                 return create_response(400, {'error': 'user_id is required'})
 
-            language = validate_language(body.get('language', 'english'))
+            language = body.get('language', 'english').lower()
             result = get_user_with_feedback_questions(user_id, language)
             return create_response(result['statusCode'], result['body'])
 
@@ -265,7 +247,7 @@ def handle_rest_event(event, context):
             zipcode = body.get('Zipcode')
             phone = body.get('Phone')
             email = body.get('Email')
-            language = validate_language(body.get('language', 'english'))
+            language = body.get('language', 'english').lower()
 
             # Determine which operation to perform based on body content
             if 'operation' in body:
@@ -274,11 +256,11 @@ def handle_rest_event(event, context):
                 if operation == 'GET':
                     result = get_user_with_feedback_questions(user_id, language)
                 elif operation == 'PUT':
-                    result = create_or_update_user(user_id, zipcode, phone, email, language)
+                    result = create_or_update_user(user_id, zipcode, phone, email)
                 elif operation == 'FEEDBACK':
                     # Check for multiple feedback format
                     if 'feedback_list' in body and isinstance(body['feedback_list'], list):
-                        result = store_multiple_feedbacks(user_id, body['feedback_list'], zipcode, phone, email, language)
+                        result = store_multiple_feedbacks(user_id, body['feedback_list'], zipcode, phone, email)
                     else:
                         # Legacy single feedback
                         referral_id = body.get('referral_id')
@@ -286,14 +268,14 @@ def handle_rest_event(event, context):
 
                         # First update user info if provided
                         if zipcode or phone or email:
-                            create_or_update_user(user_id, zipcode, phone, email, language)
+                            create_or_update_user(user_id, zipcode, phone, email)
 
                         result = store_referral_feedback(user_id, referral_id, feedback)
                 else:
                     return create_response(400, {'error': f'Unsupported operation: {operation}'})
             else:
                 # Default POST behavior - create/update user
-                result = create_or_update_user(user_id, zipcode, phone, email, language)
+                result = create_or_update_user(user_id, zipcode, phone, email)
 
             return create_response(result['statusCode'], result['body'])
 
@@ -305,9 +287,8 @@ def handle_rest_event(event, context):
             zipcode = body.get('Zipcode')
             phone = body.get('Phone')
             email = body.get('Email')
-            language = validate_language(body.get('language', 'english'))
 
-            result = create_or_update_user(user_id, zipcode, phone, email, language)
+            result = create_or_update_user(user_id, zipcode, phone, email)
             return create_response(result['statusCode'], result['body'])
 
         else:
@@ -362,7 +343,7 @@ def get_language_code(language):
     }
     return language_map.get(language.lower(), 'en')
 
-def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, email=None, language='english'):
+def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, email=None):
     """
     Stores feedback for multiple referrals/services at once (up to 5) and updates user info if provided.
 
@@ -372,14 +353,10 @@ def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, e
         zipcode: User's zipcode (optional)
         phone: User's phone number (optional)
         email: User's email (optional)
-        language: User's preferred language (english, spanish, polish)
 
     Returns:
         Response indicating success or failure
     """
-    # Validate and normalize language
-    language = validate_language(language)
-
     # Limit to max 5 feedback entries
     feedback_list = feedback_list[:5]
 
@@ -395,7 +372,7 @@ def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, e
     try:
         # First update the user profile if any info is provided
         if zipcode or phone or email:
-            update_result = create_or_update_user(user_id, zipcode, phone, email, language)
+            update_result = create_or_update_user(user_id, zipcode, phone, email)
             if update_result.get('statusCode') not in [200, 201]:
                 # If user update/creation failed, return the error
                 return update_result
@@ -519,6 +496,11 @@ def store_multiple_feedbacks(user_id, feedback_list, zipcode=None, phone=None, e
 
         # Get updated user data with feedback questions
         if success_count > 0:
+            # Get the language from the response item if it exists
+            language = 'english'
+            if 'language' in user_data:
+                language = user_data['language']['S']
+
             user_result = get_user_with_feedback_questions(user_id, language)
             updated_data = json.loads(user_result.get('body', '{}'))
 
@@ -645,8 +627,8 @@ def store_referral_feedback(user_id, referral_id, feedback):
                                     feedback_stored = True
                                     service_found = True
                                     break
-                        if service_found:
-                            break
+                            if service_found:
+                                break
                     except (json.JSONDecodeError, KeyError):
                         continue
 
@@ -699,9 +681,6 @@ def get_user_with_feedback_questions(user_id, language='english'):
         Response with user details, only referrals needing feedback, and top 5 feedback questions
     """
     try:
-        # Validate and normalize language
-        language = validate_language(language)
-
         # Get the language code for translations
         lang_code = get_language_code(language)
         needs_translation = language.lower() in ['spanish', 'polish']
@@ -881,16 +860,15 @@ def get_user_with_feedback_questions(user_id, language='english'):
             'body': json.dumps({'error': error_message})
         }
 
-def create_or_update_user(user_id, zipcode, phone=None, email=None, language='english'):
+def create_or_update_user(user_id, zipcode, phone, email):
     """
-    Creates or updates a user in DynamoDB with language support.
+    Creates or updates a user in DynamoDB.
 
     Args:
         user_id: The ID of the user
         zipcode: User's zipcode
         phone: User's phone number (optional)
         email: User's email (optional)
-        language: User's preferred language (english, spanish, polish) - defaults to english
 
     Returns:
         Response indicating success or failure
@@ -901,9 +879,6 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
             'statusCode': 400,
             'body': json.dumps({'error': 'Zipcode is required for creating/updating a user'})
         }
-
-    # Validate and normalize language
-    language = validate_language(language)
 
     try:
         # Check if user exists
@@ -933,15 +908,8 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
                 update_expressions.append("Email = :email")
                 expression_attribute_values[':email'] = {'S': email}
 
-            # Always update language preference
-            update_expressions.append("#lang = :language")
-            expression_attribute_values[':language'] = {'S': language}
-
             if update_expressions:
                 update_expression = "SET " + ", ".join(update_expressions)
-
-                # Handle language as a reserved keyword
-                expression_attribute_names = {'#lang': 'language'}
 
                 dynamodb_client.update_item(
                     TableName=USER_DATA_TABLE,
@@ -949,24 +917,18 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
                         'user_id': {'S': user_id}
                     },
                     UpdateExpression=update_expression,
-                    ExpressionAttributeNames=expression_attribute_names,
                     ExpressionAttributeValues=expression_attribute_values
                 )
 
             return {
                 'statusCode': 200,
-                'body': json.dumps({
-                    'message': 'User data updated successfully.',
-                    'user_id': user_id,
-                    'language': language
-                })
+                'body': json.dumps({'message': 'User data updated successfully.'})
             }
         else:
             # Create new user
             item = {
                 'user_id': {'S': user_id},
-                'Zipcode': {'S': zipcode},
-                'language': {'S': language}  # Always include language for new users
+                'Zipcode': {'S': zipcode}
             }
 
             if phone:
@@ -981,11 +943,7 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
 
             return {
                 'statusCode': 201,
-                'body': json.dumps({
-                    'message': 'User data created successfully.',
-                    'user_id': user_id,
-                    'language': language
-                })
+                'body': json.dumps({'message': 'User data created successfully.'})
             }
 
     except Exception as e:

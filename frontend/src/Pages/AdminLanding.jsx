@@ -20,7 +20,7 @@ const AdminLanding = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const zipcode = "62701";
+  const zipcode = "";
 
   useEffect(() => {
     const logoutPreviousUser = async () => {
