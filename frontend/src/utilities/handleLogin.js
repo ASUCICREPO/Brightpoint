@@ -31,6 +31,7 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
     
       try {
         const data = JSON.parse(event.data);
+        console.log("Data recieved: ", data);
     
         if (data && data.user) {
           const {
