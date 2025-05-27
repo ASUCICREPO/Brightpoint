@@ -158,13 +158,13 @@ const DashboardTab = () => {
     
         console.log("Received response:", data);
     
-        setFaqData(data.referral_counts?.map(item => ({
-          service: item.category,
+        setFaqData(data.query_frequency?.map(item => ({
+          service: item.query,
           count: item.count,
         })) || []);
         setPerplexityData(data.perplexity_queries || []);
         setTotalUsers(data.user_count || 0);
-        setTotalReferrals(data.total_queries || 0);
+        setTotalReferrals(data.referral_counts?.length || 0);
         setFeedbackStats(data.feedback_statistics || { useful: 0, not_useful: 0, pending: 0, total: 0 });
     
       } catch (error) {
@@ -261,8 +261,8 @@ const DashboardTab = () => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Service Category</TableCell>
-              <TableCell align="right">Times asked</TableCell>
+              <TableCell fontWeight="bold">Question asked</TableCell>
+              <TableCell align="right" fontWeight="bold">Times asked</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

@@ -8,7 +8,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/cdk-config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/cdk-config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Components/ModalComponent.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Components/ModalComponent.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Components/DashboardTab.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Components/DashboardTab.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +104,7 @@
       <workItem from="1746911500180" duration="37975000" />
       <workItem from="1747685946800" duration="6836000" />
       <workItem from="1747931254031" duration="29327000" />
-      <workItem from="1748072920946" duration="34553000" />
+      <workItem from="1748072920946" duration="38349000" />
     </task>
     <task id="LOCAL-00001" summary="Changing github branch in stack">
       <option name="closed" value="true" />
