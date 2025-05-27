@@ -7,7 +7,7 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
     const fallbackUser = {
       user_id: userId,
       username: '',
-      language: 'english',
+      language: '',
       zipcode: '',
       phoneNumber: '',
       email: '',
@@ -31,7 +31,6 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
     
       try {
         const data = JSON.parse(event.data);
-        console.log("Data recieved: ", data);
     
         if (data && data.user) {
           const {
