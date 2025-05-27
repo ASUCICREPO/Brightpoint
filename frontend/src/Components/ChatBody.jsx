@@ -108,7 +108,6 @@ const ProcessingMessage = ({ message }) => {
 function ChatBody(language) {
   const { userData } = useUser();
 
-  console.log('userData:', userData);
 
   // Helper function to get the user identifier
   const getUserIdentifier = () => {
@@ -116,7 +115,6 @@ function ChatBody(language) {
     const user_id = userData?.user_id?.toString().trim();
 
     const identifier = username || user_id || null;
-    console.log('getUserIdentifier:', { username, user_id, chosen: identifier });
     return identifier;
   };
 
@@ -160,12 +158,6 @@ function ChatBody(language) {
     const userIdentifier = getUserIdentifier();
     const userZipcode = userData?.zipcode;
 
-    console.log('Sending message with user data:', {
-      userIdentifier,
-      userZipcode,
-      message: msg,
-      language: language
-    });
 
     getBotResponse(
       setMessageList,
@@ -344,15 +336,6 @@ const getBotResponse = (setMessageList, setProcessing, message, userIdentifier, 
 
   setMessageList((prevList) => [...prevList, processingMessageBlock]);
 
-  console.log('getBotResponse called with:', {
-    message,
-    userIdentifier,
-    zipcode,
-    language,
-    lang,
-    processingId
-  });
-
   const socket = new WebSocket(CHAT_API);
 
   socket.onopen = () => {
@@ -364,7 +347,6 @@ const getBotResponse = (setMessageList, setProcessing, message, userIdentifier, 
       language: language?.language || "english"
     };
 
-    console.log("📤 Sending WebSocket payload:", payload);
     socket.send(JSON.stringify(payload));
   };
 
@@ -388,7 +370,6 @@ const getBotResponse = (setMessageList, setProcessing, message, userIdentifier, 
       return;
     }
 
-    console.log("📩 Received parsed response:", data);
 
     const status = data?.status?.toLowerCase();
 
@@ -403,18 +384,10 @@ const getBotResponse = (setMessageList, setProcessing, message, userIdentifier, 
         processingMessage = t[status] || t.processing;
       }
 
-      console.log("🔄 Processing update:", {
-        status,
-        serverMessage,
-        processingMessage,
-        messageListLength: 'checking update'
-      });
 
-      // ✅ FIXED: Force update with new message and trigger re-render
       setMessageList((prevList) => {
         const updatedList = prevList.map((msg, index) => {
           if (msg.state === "PROCESSING") {
-            console.log(`✅ Updating processing message at index ${index}:`, processingMessage);
             return createMessageBlock(
               processingMessage,
               "BOT",
@@ -425,7 +398,6 @@ const getBotResponse = (setMessageList, setProcessing, message, userIdentifier, 
           return msg;
         });
 
-        console.log("📝 Updated message list length:", updatedList.length);
         return updatedList;
       });
 

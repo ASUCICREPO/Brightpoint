@@ -38,7 +38,6 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
         referralQuestions.length > 0 &&
         !openModal) {
 
-      console.log("🎯 Auto-opening feedback modal for first time this session");
       setOpenModal(true);
       setAutoShowAttempted(true); // Mark that we've attempted auto-show
     }
@@ -48,7 +47,6 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
   useEffect(() => {
     if (hasSubmittedFeedback) {
       const timer = setTimeout(() => {
-        console.log("🔄 Resetting submission flag");
         setHasSubmittedFeedback(false);
       }, 3000);
 
@@ -56,58 +54,28 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
     }
   }, [hasSubmittedFeedback]);
 
-  // Debug logging
-  useEffect(() => {
-    console.log("🔍 ModalComponent debug:", {
-      openModal,
-      questionsLength: referralQuestions.length,
-      hasSubmittedFeedback,
-      modalDismissedThisSession,
-      autoShowAttempted,
-      userDataExists: !!userData
-    });
-  }, [userData, openModal, hasSubmittedFeedback, modalDismissedThisSession, autoShowAttempted, referralQuestions]);
-
   // Initialize feedback list when modal opens
   useEffect(() => {
-    console.log("📝 ModalComponent opened:", openModal);
     if (openModal && referralQuestions.length > 0) {
       const initialFeedback = referralQuestions.map((q) => ({
         referral_id: q.referral_id,
         feedback: "",
       }));
       setFeedbackList(initialFeedback);
-      console.log("✅ Initialized feedback list:", initialFeedback);
     }
   }, [openModal, referralQuestions]);
 
   // WebSocket connection management
   useEffect(() => {
     if (openModal) {
-      console.log("🔌 Opening WebSocket connection to:", USER_API);
       wsRef.current = new WebSocket(USER_API);
-
-      wsRef.current.onopen = () => {
-        console.log("✅ WebSocket opened successfully");
-      };
-
-      wsRef.current.onerror = (err) => {
-        console.error("❌ WebSocket error:", err);
-      };
-
-      wsRef.current.onclose = (event) => {
-        console.log("🔌 WebSocket closed:", event.code, event.reason);
-      };
 
       wsRef.current.onmessage = (event) => {
         try {
           const response = JSON.parse(event.data);
-          console.log("📩 Received feedback response:", response);
 
           // Update user context with new data after feedback submission
           if (response.user) {
-            console.log("🔄 Updating user context after feedback submission");
-            updateUser({
               ...response.user,
               feedbackQuestions: response.feedback_questions || []
             });
@@ -115,7 +83,6 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
 
           // Track successful feedback submission
           if (response.message && response.message.includes('Successfully recorded')) {
-            console.log("✅ Feedback submission confirmed by backend");
             setHasSubmittedFeedback(true);
           }
         } catch (error) {
@@ -126,14 +93,12 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
 
     return () => {
       if (wsRef.current) {
-        console.log("🔌 Closing WebSocket connection");
         wsRef.current.close();
       }
     };
   }, [openModal, updateUser]);
 
   const handleFeedbackChange = (referral_id, answer) => {
-    console.log("📝 Feedback changed:", { referral_id, answer });
     setFeedbackList((prev) =>
       prev.map((item) =>
         item.referral_id === referral_id ? { ...item, feedback: answer } : item
@@ -157,11 +122,9 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
       feedback_list: feedbackList,
     };
 
-    console.log("📤 Sending feedback payload:", payload);
 
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(payload));
-      console.log("✅ Feedback sent via WebSocket");
     } else {
       console.error("❌ WebSocket not open. State:", wsRef.current?.readyState);
     }
@@ -174,13 +137,11 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
     setTimeout(() => {
       setOpenModal(false);
       setIsLoading(false);
-      console.log("✅ Modal closed after feedback submission and marked as dismissed");
     }, 500);
   };
 
   // ✅ FIXED: Enhanced skip function that permanently dismisses modal for this session
   const handleSkip = () => {
-    console.log("⏭️ User skipped feedback - permanently dismissing for this session");
 
     // Set loading state to prevent double-clicks
     setIsLoading(true);
@@ -198,7 +159,6 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
     // Reset loading state after a short delay
     setTimeout(() => {
       setIsLoading(false);
-      console.log("✅ Skip completed, modal permanently dismissed for session");
     }, 100);
   };
 
@@ -207,19 +167,15 @@ const ModalComponent = ({ openModal, setOpenModal }) => {
     sessionStorage.removeItem('feedbackModalDismissed');
     setModalDismissedThisSession(false);
     setAutoShowAttempted(false);
-    console.log("🧹 Session modal flags cleared - modal can show again");
   };
 
   // ✅ ENHANCED: Better conditions for when to render modal
   if (!openModal || referralQuestions.length === 0) {
-    console.log("🚫 Modal not rendering:", {
       openModal,
       questionsLength: referralQuestions.length
     });
     return null;
   }
-
-  console.log("🎯 Rendering modal with", referralQuestions.length, "questions");
 
   return (
     <>

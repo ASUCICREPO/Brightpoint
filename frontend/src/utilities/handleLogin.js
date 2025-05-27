@@ -23,12 +23,10 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
     }, 3000);
 
     socket.onopen = () => {
-      console.log("WebSocket connected. Sending user fetch request for:", userId);
       socket.send(JSON.stringify({ action: 'getUser', user_id: userId }));
     };
 
     socket.onmessage = (event) => {
-      console.log("WebSocket message received:", event.data);
       clearTimeout(timeout);
     
       try {
@@ -64,7 +62,6 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
             feedbackQuestions: formattedFeedback,
           });
     
-          console.log("User context updated:", formattedFeedback, referrals);
         } else {
           console.warn('WebSocket response missing user. Using fallback.');
           updateUser(fallbackUser);
