@@ -36,7 +36,7 @@ export const fetchAndStoreUserData = async (userId, updateUser) => {
           const {
             user_id,
             username = '',
-            language = 'english',
+            language = '',
             Zipcode: zipcode = '',          // Notice 'Zipcode' from server
             Phone: phoneNumber = '',         // 'Phone' from server
             Email: email = '',               // 'Email' from server

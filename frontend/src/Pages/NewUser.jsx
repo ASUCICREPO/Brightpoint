@@ -176,9 +176,16 @@ const NewUser = () => {
         setSnackbarMessage("Account verified and profile saved successfully!");
         setSnackbarOpen(true);
 
-        // Navigate to app after successful verification and profile save
+        // Navigate to language-specific route after successful verification and profile save
         setTimeout(() => {
-          navigate('/app');
+          const lang = formData.language.toLowerCase();
+          if (lang === 'spanish') {
+            navigate('/esapp');
+          } else if (lang === 'polish') {
+            navigate('/plapp');
+          } else {
+            navigate('/app'); // default to English
+          }
         }, 2000);
 
       } catch (error) {
