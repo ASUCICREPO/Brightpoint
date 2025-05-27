@@ -54,7 +54,7 @@ export const UserProvider = ({ children }) => {
               email: response.user?.Email || response.user?.email || '',
               zipcode: response.user?.Zipcode || response.user?.zipcode || '',
               phoneNumber: response.user?.Phone || response.user?.phoneNumber || '',
-              language: response.language || 'english',
+              language: response.user?.language || response.user?.Language || response.language || 'english',
               referrals: response.user?.referrals || [],
               feedbackQuestions: response.feedback_questions || [],
               feedback_questions: response.feedback_questions || []
