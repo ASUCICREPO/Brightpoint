@@ -75,16 +75,28 @@ const LandingPage = ({ setOpenModal }) => {
       // Fetch user data
       await fetchAndStoreUserData(cleanUsername, updateUser);
 
-      // Fetch feedback questions
+      let userDataWithFeedback = null;
+
+      // Fetch feedback questions and determine language
       try {
-        const userDataWithFeedback = await fetchUserWithFeedback(cleanUsername, 'english');
+        userDataWithFeedback = await fetchUserWithFeedback(cleanUsername, 'english');
       } catch (feedbackError) {
         console.error("Error fetching feedback questions:", feedbackError);
         // Don't block login if feedback fetch fails
       }
 
-      // Navigate to main app
-      navigate('/app');
+      // Determine navigation path based on language
+      const lang = userDataWithFeedback?.language || 'english';
+      let langPath = '/app';
+
+      if (lang.toLowerCase() === 'spanish') {
+        langPath = '/esapp';
+      } else if (lang.toLowerCase() === 'polish') {
+        langPath = '/plapp';
+      }
+
+      navigate(langPath);
+
 
     } catch (error) {
       console.error('Login error:', error);
