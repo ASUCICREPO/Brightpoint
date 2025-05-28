@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { getCurrentUser } from 'aws-amplify/auth';
+import { Auth } from "aws-amplify";
 import { USER_API } from "./constants";
 
 const UserContext = createContext();
@@ -92,7 +92,7 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const checkUserSession = async () => {
       try {
-        const currentUser = await getCurrentUser();
+        const currentUser = await Auth.currentAuthenticatedUser();
         const userId = currentUser?.attributes?.sub;
         const language = currentUser?.attributes?.locale || 'english';
 
