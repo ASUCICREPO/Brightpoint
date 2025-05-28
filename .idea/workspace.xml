@@ -6,17 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="3ff7ef2e-35a7-4c4d-bd94-9b3ea7ae56b2" name="Changes" comment="Changing github branch in stack">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CDK/importFromCSVtoDDBtables.py" beforeDir="false" afterPath="$PROJECT_DIR$/CDK/importFromCSVtoDDBtables.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CDK/setup_api_gw_logs.sh" beforeDir="false" afterPath="$PROJECT_DIR$/CDK/setup_api_gw_logs.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/brightpoint/brightpoint_stack.py" beforeDir="false" afterPath="$PROJECT_DIR$/brightpoint/brightpoint_stack.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/brightpoint/perplexity_lambda/lambda_function.py" beforeDir="false" afterPath="$PROJECT_DIR$/brightpoint/perplexity_lambda/lambda_function.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/brightpoint/referral_chatbot/referralChatbotLambda.py" beforeDir="false" afterPath="$PROJECT_DIR$/brightpoint/referral_chatbot/referralChatbotLambda.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.template.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/BrightpointStack-dev.template.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cdk.out/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cdk.out/tree.json" beforeDir="false" afterPath="$PROJECT_DIR$/cdk.out/tree.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/cdk-config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/cdk-config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
