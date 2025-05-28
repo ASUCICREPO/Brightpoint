@@ -18,21 +18,18 @@ export const UserProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false); // ✅ Add loading state
 
   const updateUser = (newData) => {
-    console.log("🔄 Updating user context with:", newData);
     setUserData((prev) => ({ ...prev, ...newData }));
   };
 
   // ✅ ADD: Function to fetch user data with feedback questions
   const fetchUserWithFeedback = async (userId, language = 'english') => {
     setIsLoading(true);
-    console.log("📡 Fetching user data with feedback questions:", { userId, language });
 
     try {
       const ws = new WebSocket(USER_API);
 
       return new Promise((resolve, reject) => {
         ws.onopen = () => {
-          console.log("📡 WebSocket opened for user fetch");
           const payload = {
             action: "getUser",
             user_id: userId,
@@ -44,7 +41,6 @@ export const UserProvider = ({ children }) => {
         ws.onmessage = (event) => {
           try {
             const response = JSON.parse(event.data);
-            console.log("📩 Received user data response:", response);
 
             if (response.error) {
               reject(new Error(response.error));
@@ -58,15 +54,12 @@ export const UserProvider = ({ children }) => {
               email: response.user?.Email || response.user?.email || '',
               zipcode: response.user?.Zipcode || response.user?.zipcode || '',
               phoneNumber: response.user?.Phone || response.user?.phoneNumber || '',
-              language: response.language || 'english',
+              language: response.user?.language || response.user?.Language || response.language || 'english',
               referrals: response.user?.referrals || [],
-              // ✅ Map feedback_questions to feedbackQuestions for your existing structure
               feedbackQuestions: response.feedback_questions || [],
-              // ✅ Keep original field names for compatibility
               feedback_questions: response.feedback_questions || []
             };
 
-            console.log("✅ Mapped user data for context:", mappedUserData);
             setUserData(prev => ({ ...prev, ...mappedUserData }));
             setIsLoading(false);
             ws.close();
@@ -86,7 +79,6 @@ export const UserProvider = ({ children }) => {
         };
 
         ws.onclose = (event) => {
-          console.log("🔌 WebSocket closed after user fetch:", event.code);
           setIsLoading(false);
         };
       });
@@ -97,11 +89,6 @@ export const UserProvider = ({ children }) => {
       throw error;
     }
   };
-
-  useEffect(() => {
-    console.log("📊 Updated User Context:", userData);
-    console.log("🎯 Feedback Questions Count:", userData.feedbackQuestions?.length || 0);
-  }, [userData]);
 
   return (
     <UserContext.Provider value={{
