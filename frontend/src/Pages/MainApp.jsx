@@ -37,9 +37,38 @@ const MainApp = () => {
           return;
         }
 
-        // Check if we already have user data
+        // ✅ FIXED: Check if we have persisted user data first
+        const persistedUserData = localStorage.getItem('userData');
+        let hasPersistedUser = false;
+
+        if (persistedUserData) {
+          try {
+            const parsedData = JSON.parse(persistedUserData);
+            if (parsedData.username || parsedData.user_id) {
+              hasPersistedUser = true;
+              // If userData context is empty but we have persisted data, restore it
+              if (!userData.username && !userData.user_id) {
+                console.log("Restoring user data from localStorage");
+                updateUser(parsedData);
+              }
+            }
+          } catch (error) {
+            console.error("Error parsing persisted user data:", error);
+            localStorage.removeItem('userData');
+          }
+        }
+
+        // Check if we already have user data (either from context or just restored)
         if (userData.username && userData.user_id) {
           setIsInitializing(false);
+          return;
+        }
+
+        // If we have persisted data, wait a moment for context to update
+        if (hasPersistedUser && (!userData.username || !userData.user_id)) {
+          setTimeout(() => {
+            setIsInitializing(false);
+          }, 100);
           return;
         }
 
@@ -62,14 +91,36 @@ const MainApp = () => {
             });
           }
         } else {
-          // No authenticated user found, redirect to login
-          console.log("No authenticated user found, redirecting to login");
-          navigate('/');
-          return;
+          // ✅ FIXED: Only redirect if we don't have persisted user data
+          if (!hasPersistedUser) {
+            console.log("No authenticated user found and no persisted data, redirecting to login");
+            navigate('/');
+            return;
+          }
         }
       } catch (error) {
         console.error("Error getting current user:", error);
-        // Redirect to login if user is not authenticated
+
+        // ✅ FIXED: Check for persisted data before redirecting
+        const persistedUserData = localStorage.getItem('userData');
+        if (persistedUserData) {
+          try {
+            const parsedData = JSON.parse(persistedUserData);
+            if (parsedData.username || parsedData.user_id) {
+              console.log("Auth failed but user data exists in localStorage, continuing");
+              if (!userData.username && !userData.user_id) {
+                updateUser(parsedData);
+              }
+              setIsInitializing(false);
+              return;
+            }
+          } catch (parseError) {
+            console.error("Error parsing persisted user data:", parseError);
+          }
+        }
+
+        // Only redirect to login if no persisted user data exists
+        console.log("Auth error and no persisted user data, redirecting to login");
         navigate('/');
         return;
       } finally {

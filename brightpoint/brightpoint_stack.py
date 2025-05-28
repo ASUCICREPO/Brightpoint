@@ -665,7 +665,7 @@ class BrightpointStack(Stack):
             self, "BrightpointUserPoolDomain",
             user_pool=user_pool,
             cognito_domain=cognito.CognitoDomainOptions(
-                domain_prefix=f"brightpoint-2025-{self.env_name}"
+                domain_prefix=f"brightpoint-{self.env_name}"
             )
         )
 

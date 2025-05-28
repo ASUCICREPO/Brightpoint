@@ -11,7 +11,7 @@
     },
     "BrightpointStack-dev": {
       "type": "aws:cloudformation:stack",
-      "environment": "aws://108782065617/us-east-1",
+      "environment": "aws://216989103356/us-east-1",
       "properties": {
         "templateFile": "BrightpointStack-dev.template.json",
         "terminationProtection": false,
@@ -20,16 +20,16 @@
           "Environment": "dev"
         },
         "validateOnSynth": false,
-        "assumeRoleArn": "arn:${AWS::Partition}:iam::108782065617:role/cdk-hnb659fds-deploy-role-108782065617-us-east-1",
-        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::108782065617:role/cdk-hnb659fds-cfn-exec-role-108782065617-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-108782065617-us-east-1/cdf10197210bda5c305b687bcb3c5e5b959bd71097126a3c52eef6aac433b1aa.json",
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-deploy-role-216989103356-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-cfn-exec-role-216989103356-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-216989103356-us-east-1/aea25a17534be6e05b754cf2417bea72658487dc8f6b433da3376037db413b32.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
           "BrightpointStack-dev.assets"
         ],
         "lookupRole": {
-          "arn": "arn:${AWS::Partition}:iam::108782065617:role/cdk-hnb659fds-lookup-role-108782065617-us-east-1",
+          "arn": "arn:${AWS::Partition}:iam::216989103356:role/cdk-hnb659fds-lookup-role-216989103356-us-east-1",
           "requiresBootstrapStackVersion": 8,
           "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
         }
