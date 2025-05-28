@@ -308,7 +308,7 @@
   "BrightpointUserPoolDomain9D141311": {
    "Type": "AWS::Cognito::UserPoolDomain",
    "Properties": {
-    "Domain": "brightpoint-dev",
+    "Domain": "brightpoint-v1-dev",
     "UserPoolId": {
      "Ref": "BrightpointUserPoolF24B41F9"
     }
@@ -771,27 +771,32 @@
        ],
        "Effect": "Allow",
        "Resource": [
-        "arn:aws:dynamodb:us-east-1:216989103356:table/referral_data*",
-        "arn:aws:dynamodb:us-east-1:216989103356:table/user_data*"
+        "arn:aws:dynamodb:us-east-1:108782065617:table/referral_data*",
+        "arn:aws:dynamodb:us-east-1:108782065617:table/user_data*"
        ]
       },
       {
        "Action": "lambda:InvokeFunction",
        "Effect": "Allow",
        "Resource": [
-        "arn:aws:lambda:us-east-1:216989103356:function:perplexityLambda*",
-        "arn:aws:lambda:us-east-1:216989103356:function:referralChatbotLambda*"
+        "arn:aws:lambda:us-east-1:108782065617:function:perplexityLambda*",
+        "arn:aws:lambda:us-east-1:108782065617:function:referralChatbotLambda*"
        ]
       },
       {
        "Action": "execute-api:ManageConnections",
        "Effect": "Allow",
-       "Resource": "arn:aws:execute-api:*:*:*/*/POST/@connections/*"
+       "Resource": [
+        "arn:aws:execute-api:*:*:*/*/@connections/*",
+        "arn:aws:execute-api:*:*:*/*/DELETE/@connections/*",
+        "arn:aws:execute-api:*:*:*/*/GET/@connections/*",
+        "arn:aws:execute-api:*:*:*/*/POST/@connections/*"
+       ]
       },
       {
        "Action": "logs:CreateLogGroup",
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:*"
       },
       {
        "Action": [
@@ -799,7 +804,7 @@
         "logs:PutLogEvents"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/referralChatbotLambda*:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:log-group:/aws/lambda/referralChatbotLambda*:*"
       }
      ],
      "Version": "2012-10-17"
@@ -886,7 +891,7 @@
       {
        "Action": "logs:CreateLogGroup",
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:*"
       },
       {
        "Action": [
@@ -894,7 +899,7 @@
         "logs:PutLogEvents"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/perplexityLambda*:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:log-group:/aws/lambda/perplexityLambda*:*"
       },
       {
        "Action": [
@@ -902,7 +907,7 @@
         "secretsmanager:GetSecretValue"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:secretsmanager:us-east-1:216989103356:secret:perplexity_api_key-??????"
+       "Resource": "arn:aws:secretsmanager:us-east-1:108782065617:secret:perplexity_api_key-??????"
       }
      ],
      "Version": "2012-10-17"
@@ -994,7 +999,7 @@
       {
        "Action": "logs:CreateLogGroup",
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:*"
       },
       {
        "Action": [
@@ -1002,7 +1007,7 @@
         "logs:PutLogEvents"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/ProcessUserData*:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:log-group:/aws/lambda/ProcessUserData*:*"
       }
      ],
      "Version": "2012-10-17"
@@ -1164,7 +1169,7 @@
       {
        "Action": "logs:CreateLogGroup",
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:*"
       },
       {
        "Action": [
@@ -1172,7 +1177,7 @@
         "logs:PutLogEvents"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/query-analytics-backfill*:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:log-group:/aws/lambda/query-analytics-backfill*:*"
       }
      ],
      "Version": "2012-10-17"
@@ -1334,7 +1339,7 @@
       {
        "Action": "logs:CreateLogGroup",
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:*"
       },
       {
        "Action": [
@@ -1342,7 +1347,7 @@
         "logs:PutLogEvents"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/query-analytics-api*:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:log-group:/aws/lambda/query-analytics-api*:*"
       }
      ],
      "Version": "2012-10-17"
@@ -1552,7 +1557,7 @@
         "dynamodb:Scan"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:dynamodb:us-east-1:216989103356:table/referral_data*"
+       "Resource": "arn:aws:dynamodb:us-east-1:108782065617:table/referral_data*"
       }
      ],
      "Version": "2012-10-17"
@@ -1750,7 +1755,7 @@
       {
        "Action": "logs:CreateLogGroup",
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:*"
       },
       {
        "Action": [
@@ -1758,7 +1763,7 @@
         "logs:PutLogEvents"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/smsChatIntegration*:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:log-group:/aws/lambda/smsChatIntegration*:*"
       },
       {
        "Action": "sts:AssumeRole",
@@ -1925,7 +1930,7 @@
       {
        "Action": "logs:CreateLogGroup",
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:*"
       },
       {
        "Action": [
@@ -1933,7 +1938,7 @@
         "logs:PutLogEvents"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:logs:us-east-1:216989103356:log-group:/aws/lambda/query-analytics-stream-processor*:*"
+       "Resource": "arn:aws:logs:us-east-1:108782065617:log-group:/aws/lambda/query-analytics-stream-processor*:*"
       }
      ],
      "Version": "2012-10-17"
@@ -1956,15 +1961,15 @@
      "x86_64"
     ],
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
-     "S3Key": "1127ed0f48b73272b7ae38efd146cbc58132420d7a596a73659512788df51709.zip"
+     "S3Bucket": "cdk-hnb659fds-assets-108782065617-us-east-1",
+     "S3Key": "294993d826228eda4af5ab26e67cba9bca6e866f7c24d0cd8bae06d67511932d.zip"
     },
     "Environment": {
      "Variables": {
       "ENVIRONMENT": "dev",
       "REFERRAL_TABLE": "referral_data-dev",
       "USER_TABLE": "user_data-dev",
-      "TARGET_ACCOUNT_ID": "216989103356",
+      "TARGET_ACCOUNT_ID": "108782065617",
       "TARGET_REGION": "us-east-1"
      }
     },
@@ -1996,7 +2001,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "BrightpointStack-dev/ReferralChatbotLambdaFn/Resource",
-    "aws:asset:path": "asset.1127ed0f48b73272b7ae38efd146cbc58132420d7a596a73659512788df51709",
+    "aws:asset:path": "asset.294993d826228eda4af5ab26e67cba9bca6e866f7c24d0cd8bae06d67511932d",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -2016,7 +2021,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralChatbotAPI978B0CF6"
        },
@@ -2044,7 +2049,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralChatbotWebSocket4AF2CD48"
        },
@@ -2064,14 +2069,16 @@
      "x86_64"
     ],
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
-     "S3Key": "314287476f1e775a638942dca09224acce80f83077242c864041548a74bb2d64.zip"
+     "S3Bucket": "cdk-hnb659fds-assets-108782065617-us-east-1",
+     "S3Key": "47d957bf1b188b3e93fd3cf70d1cff1e3cd6d6826c3b5dd318840d5530e91378.zip"
     },
     "Environment": {
      "Variables": {
       "ENVIRONMENT": "dev",
-      "PERPLEXITY_API_KEY_SECRET_ARN": "arn:aws:secretsmanager:us-east-1:216989103356:secret:perplexity_api_key",
-      "CACHE_TABLE": "perplexity_query_cache-dev"
+      "PERPLEXITY_API_KEY_SECRET_ARN": "arn:aws:secretsmanager:us-east-1:108782065617:secret:perplexity_api_key",
+      "CACHE_TABLE": "perplexity_query_cache-dev",
+      "HTTP_TIMEOUT": "45",
+      "MAX_PROCESSING_TIME": "80"
      }
     },
     "FunctionName": "perplexityLambda-dev",
@@ -2102,7 +2109,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "BrightpointStack-dev/PerplexityLambdaFn/Resource",
-    "aws:asset:path": "asset.314287476f1e775a638942dca09224acce80f83077242c864041548a74bb2d64",
+    "aws:asset:path": "asset.47d957bf1b188b3e93fd3cf70d1cff1e3cd6d6826c3b5dd318840d5530e91378",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -2114,7 +2121,7 @@
      "x86_64"
     ],
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Bucket": "cdk-hnb659fds-assets-108782065617-us-east-1",
      "S3Key": "f7fd30d5cb81401e4c3af094dbf2e1bd74fd6e9a6351d56cce2d635f99f5ffc4.zip"
     },
     "Environment": {
@@ -2172,7 +2179,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "createUserC6ED88E6"
        },
@@ -2200,7 +2207,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
        },
@@ -2220,7 +2227,7 @@
      "x86_64"
     ],
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Bucket": "cdk-hnb659fds-assets-108782065617-us-east-1",
      "S3Key": "d163344f845ef5794d840052bf02c3ab330d47d8a96945012b437979381f4119.zip"
     },
     "Environment": {
@@ -2277,7 +2284,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "QueryAnalyticsAPI12288DAE3"
        },
@@ -2305,7 +2312,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "QueryAnalyticsAPI2645EC6E1"
        },
@@ -2333,7 +2340,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "AnalyticsWebSocketAPI8F36832A"
        },
@@ -2353,7 +2360,7 @@
      "x86_64"
     ],
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Bucket": "cdk-hnb659fds-assets-108782065617-us-east-1",
      "S3Key": "2bb799a09384f665dc5c9eff9ba628f979826d9477c82850b2d0504b925bdec0.zip"
     },
     "Environment": {
@@ -2411,7 +2418,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -2439,7 +2446,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsWebSocketAPI16F9DC58"
        },
@@ -2459,7 +2466,7 @@
      "x86_64"
     ],
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Bucket": "cdk-hnb659fds-assets-108782065617-us-east-1",
      "S3Key": "1e2ea28dd1059b4d8690844db5bf6ff9413bbb84b5866f14d5d2a750ab4869bf.zip"
     },
     "Environment": {
@@ -2507,7 +2514,7 @@
      "x86_64"
     ],
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Bucket": "cdk-hnb659fds-assets-108782065617-us-east-1",
      "S3Key": "b2570e986ae8444382bf03b67a0dc58732795289d4e7ca54affbfb1083783ea0.zip"
     },
     "Environment": {
@@ -2578,7 +2585,7 @@
      "x86_64"
     ],
     "Code": {
-     "S3Bucket": "cdk-hnb659fds-assets-216989103356-us-east-1",
+     "S3Bucket": "cdk-hnb659fds-assets-108782065617-us-east-1",
      "S3Key": "f6d58c19f005adbbb598da50bb467caf7ff24936d25d81f163c0afb7029eb5ee.zip"
     },
     "Environment": {
@@ -2844,7 +2851,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "UserDashboardAPIAB9DEF4E"
        },
@@ -2876,7 +2883,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "UserDashboardAPIAB9DEF4E"
        },
@@ -3178,7 +3185,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "QueryAnalyticsAPI12288DAE3"
        },
@@ -3210,7 +3217,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "QueryAnalyticsAPI12288DAE3"
        },
@@ -3512,7 +3519,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "QueryAnalyticsAPI2645EC6E1"
        },
@@ -3544,7 +3551,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "QueryAnalyticsAPI2645EC6E1"
        },
@@ -3786,7 +3793,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "createUserC6ED88E6"
        },
@@ -3818,7 +3825,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "createUserC6ED88E6"
        },
@@ -4060,7 +4067,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralChatbotAPI978B0CF6"
        },
@@ -4092,7 +4099,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralChatbotAPI978B0CF6"
        },
@@ -4346,7 +4353,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4378,7 +4385,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4441,7 +4448,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4473,7 +4480,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4536,7 +4543,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4568,7 +4575,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4631,7 +4638,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4663,7 +4670,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4784,7 +4791,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4816,7 +4823,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4879,7 +4886,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4911,7 +4918,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -4974,7 +4981,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -5006,7 +5013,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -5069,7 +5076,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -5101,7 +5108,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -5222,7 +5229,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -5254,7 +5261,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsApi2C829B6C"
        },
@@ -5333,7 +5340,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "AnalyticsWebSocketAPI8F36832A"
        },
@@ -5517,7 +5524,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralChatbotWebSocket4AF2CD48"
        },
@@ -5677,7 +5684,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "UserFeedbackWebSocketAPIAC8C1AA7"
        },
@@ -5885,7 +5892,7 @@
      "Fn::Join": [
       "",
       [
-       "arn:aws:execute-api:us-east-1:216989103356:",
+       "arn:aws:execute-api:us-east-1:108782065617:",
        {
         "Ref": "ReferralsWebSocketAPI16F9DC58"
        },

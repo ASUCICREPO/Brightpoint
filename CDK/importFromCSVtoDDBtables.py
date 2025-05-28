@@ -6,41 +6,101 @@ import uuid
 import subprocess
 import sys
 import os
+import json
+from pathlib import Path
 from decimal import Decimal
 from botocore.exceptions import ProfileNotFound, ClientError
 from boto3.session import Session
 
-def check_specific_profile(profile_name):
+def read_cdk_config():
+    """Read CDK configuration file to get profile and region"""
+    script_dir = Path(__file__).parent.absolute()
+    project_root = script_dir.parent
+    config_file = project_root / "config" / "cdk-config.json"
+
+    if config_file.exists():
+        try:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+
+            profile = config.get('profile', '')
+            region = config.get('region', 'us-east-1')
+
+            # Handle null values similar to bash script
+            if profile in [None, 'null', '']:
+                profile = None
+
+            print(f"📖 Reading CDK configuration...")
+            print(f"✅ Found profile: {profile or '(default)'}")
+            print(f"✅ Found region: {region}")
+
+            return profile, region
+
+        except (json.JSONDecodeError, KeyError) as e:
+            print(f"⚠️  Error reading CDK config file: {e}")
+            print("💡 Using default profile and region")
+            return None, 'us-east-1'
+    else:
+        print(f"⚠️  CDK config file not found: {config_file}")
+        print("💡 Using default profile and region")
+        return None, 'us-east-1'
+
+def check_specific_profile(profile_name=None):
     """Check if a specific profile exists and is valid"""
     try:
-        # Explicitly create session with ONLY the profile - no instance metadata
-        session = Session(profile_name=profile_name)
+        # Create session with or without profile
+        if profile_name:
+            # Explicitly create session with ONLY the profile - no instance metadata
+            session = Session(profile_name=profile_name)
+            profile_text = f"profile '{profile_name}'"
+        else:
+            # Use default profile/credentials
+            session = Session()
+            profile_text = "default profile"
+
         sts = session.client('sts')
         identity = sts.get_caller_identity()
-        print(f"Successfully connected using profile '{profile_name}'")
+        print(f"Successfully connected using {profile_text}")
         print(f"AWS Account: {identity['Account']}")
         return True, session
     except (ProfileNotFound, ClientError) as e:
-        print(f"Error with profile '{profile_name}': {str(e)}")
+        print(f"Error with {profile_text}: {str(e)}")
         return False, None
 
-def configure_aws_profile(profile_name):
+def configure_aws_profile(profile_name=None):
     """Configure AWS profile with aws configure"""
-    print(f"Setting up AWS profile '{profile_name}'...")
-    try:
-        subprocess.run(['aws', 'configure', '--profile', profile_name], check=True)
-        print(f"Profile '{profile_name}' configured successfully.")
+    if profile_name:
+        print(f"Setting up AWS profile '{profile_name}'...")
+        try:
+            subprocess.run(['aws', 'configure', '--profile', profile_name], check=True)
+            print(f"Profile '{profile_name}' configured successfully.")
 
-        # Verify the newly configured profile
-        valid, session = check_specific_profile(profile_name)
-        if valid:
-            return session
-        else:
-            print("Profile was created but validation failed. Please check your credentials.")
+            # Verify the newly configured profile
+            valid, session = check_specific_profile(profile_name)
+            if valid:
+                return session
+            else:
+                print("Profile was created but validation failed. Please check your credentials.")
+                sys.exit(1)
+        except subprocess.CalledProcessError:
+            print(f"Error configuring AWS profile '{profile_name}'.")
             sys.exit(1)
-    except subprocess.CalledProcessError:
-        print(f"Error configuring AWS profile '{profile_name}'.")
-        sys.exit(1)
+    else:
+        print("Setting up default AWS profile...")
+        try:
+            subprocess.run(['aws', 'configure'], check=True)
+            print("Default profile configured successfully.")
+
+            # Verify the newly configured profile
+            valid, session = check_specific_profile(None)
+            if valid:
+                return session
+            else:
+                print("Profile was created but validation failed. Please check your credentials.")
+                sys.exit(1)
+        except subprocess.CalledProcessError:
+            print("Error configuring default AWS profile.")
+            sys.exit(1)
 
 def list_available_tables(session, region):
     """List available DynamoDB tables to help with troubleshooting"""
@@ -56,7 +116,7 @@ def list_available_tables(session, region):
     except Exception as e:
         print(f"Error listing tables: {str(e)}")
 
-def import_csv_to_dynamodb(csv_file_path, table_name, region='us-east-1', profile_name='Brightpoint_User'):
+def import_csv_to_dynamodb(csv_file_path, table_name, region='us-east-1', profile_name=None):
     """Import data from a CSV file to a DynamoDB table."""
 
     # First check if the specific profile exists and is valid
@@ -163,11 +223,21 @@ def import_csv_to_dynamodb(csv_file_path, table_name, region='us-east-1', profil
         print(f"Import complete: {item_count} items imported successfully, {error_count} errors")
 
 if __name__ == "__main__":
+    # Read configuration from CDK config file
+    profile_name, region = read_cdk_config()
+
     # Define your variables here
     csv_file_path = "../ProviderReferralData.csv"
     table_name = "referral_data-dev"
-    region = "us-east-1"
-    profile_name = "Brightpoint_User"
+
+    print("")
+    print("📋 Configuration Summary:")
+    print("========================")
+    print(f"Profile: {profile_name or '(default)'}")
+    print(f"Region: {region}")
+    print(f"Table: {table_name}")
+    print(f"CSV File: {csv_file_path}")
+    print("")
 
     # Run the import
     import_csv_to_dynamodb(csv_file_path, table_name, region, profile_name)

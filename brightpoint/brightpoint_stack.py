@@ -665,7 +665,7 @@ class BrightpointStack(Stack):
             self, "BrightpointUserPoolDomain",
             user_pool=user_pool,
             cognito_domain=cognito.CognitoDomainOptions(
-                domain_prefix=f"brightpoint-2025-{self.env_name}"
+                domain_prefix=f"brightpoint-v1-{self.env_name}"
             )
         )
 
@@ -836,7 +836,9 @@ class BrightpointStack(Stack):
             environment={
                 "ENVIRONMENT": self.env_name,
                 "PERPLEXITY_API_KEY_SECRET_ARN": perplexity_secret.secret_arn,
-                "CACHE_TABLE": f"perplexity_query_cache-{self.env_name}"
+                "CACHE_TABLE": f"perplexity_query_cache-{self.env_name}",
+                "HTTP_TIMEOUT": "45",
+                "MAX_PROCESSING_TIME": "80"
             }
         )
 
@@ -1337,7 +1339,12 @@ class BrightpointStack(Stack):
         role.add_to_policy(
             iam.PolicyStatement(
                 actions=["execute-api:ManageConnections"],
-                resources=["arn:aws:execute-api:*:*:*/*/POST/@connections/*"]
+                resources=[
+                "arn:aws:execute-api:*:*:*/*/@connections/*",  # All operations on connections
+                "arn:aws:execute-api:*:*:*/*/POST/@connections/*",  # Explicit POST
+                "arn:aws:execute-api:*:*:*/*/GET/@connections/*",   # Explicit GET
+                "arn:aws:execute-api:*:*:*/*/DELETE/@connections/*" # Explicit DELETE
+                ]
             )
         )
 
