@@ -4,6 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme, Drawer } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import AppHeader from "../Components/AppHeader";
 import LeftNav from "../Components/LeftNav";
 import ChatHeader from "../Components/ChatHeader";
@@ -11,16 +12,64 @@ import ChatBody from "../Components/ChatBody";
 import LanguageDropdown from "../Components/LanguageDropDown";
 import ModalComponent from "../Components/ModalComponent";
 import { useUser } from "../utilities/UserContext";
+import { getCurrentUser } from 'aws-amplify/auth';
 
-const MainApp = () => {
-  const { userData } = useUser();
+const SpanishApp = () => {
+  const { userData, updateUser, fetchUserWithFeedback, isLoading } = useUser();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const navigate = useNavigate();
 
   const [showLeftNav, setLeftNav] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [referralQuestions, setReferralQuestions] = useState([]);
+  const [isInitializing, setIsInitializing] = useState(true);
 
+  // Initialize user data on component mount or page reload
+  useEffect(() => {
+    const initializeUserData = async () => {
+      try {
+        // Check if we already have user data
+        if (userData.username && userData.user_id) {
+          setIsInitializing(false);
+          return;
+        }
+
+        // Try to get current authenticated user from Amplify
+        const currentUser = await getCurrentUser();
+
+        if (currentUser?.username) {
+          // Fetch complete user data including feedback questions
+          try {
+            await fetchUserWithFeedback(currentUser.username, 'spanish');
+          } catch (fetchError) {
+            console.error("Error fetching user data:", fetchError);
+            // If fetch fails, at least set the username from Amplify
+            updateUser({
+              username: currentUser.username,
+              user_id: currentUser.username
+            });
+          }
+        } else {
+          // No authenticated user found, redirect to login
+          console.log("No authenticated user found, redirecting to login");
+          navigate('/');
+          return;
+        }
+      } catch (error) {
+        console.error("Error getting current user:", error);
+        // Redirect to login if user is not authenticated
+        navigate('/');
+        return;
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    initializeUserData();
+  }, [userData.username, userData.user_id, fetchUserWithFeedback, updateUser, navigate]);
+
+  // Process referrals for modal
   useEffect(() => {
     const referrals = userData?.referrals || [];
     const maxAttempts = 3;
@@ -56,17 +105,26 @@ const MainApp = () => {
       }
     };
 
-    if (referrals.length > 0) {
+    if (referrals.length > 0 && !isInitializing) {
       processReferrals();
     }
-  }, [userData]);
+  }, [userData, isInitializing]);
+
+  // Show loading state while initializing
+  if (isInitializing || isLoading) {
+    return (
+      <Grid container direction="column" className="appHeight100" justifyContent="center" alignItems="center">
+        <div>Loading...</div>
+      </Grid>
+    );
+  }
 
   return (
     <Grid container direction="column" className="appHeight100">
       {/* App Header */}
       <Grid item sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 10 }}>
         <AppHeader
-          username={userData?.username || userData?.user_id || "johndoe"}
+          username={userData?.username || userData?.user_id || "User"}
           showSwitch={true}
           leftNavToggle={
             isMobile && (
@@ -163,4 +221,4 @@ const MainApp = () => {
   );
 };
 
-export default MainApp;
+export default SpanishApp;

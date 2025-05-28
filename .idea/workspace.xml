@@ -5,6 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ff7ef2e-35a7-4c4d-bd94-9b3ea7ae56b2" name="Changes" comment="Changing github branch in stack">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Components/AppHeader.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Components/AppHeader.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/AdminDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/AdminDashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/LandingPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/LandingPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/MainApp.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/MainApp.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/NewUser.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/NewUser.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/PolishApp.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/PolishApp.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/ReferralApp.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/ReferralApp.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Pages/SpanishApp.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Pages/SpanishApp.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/utilities/UserContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utilities/UserContext.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -49,7 +58,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "Merging backend__code",
+    "git-widget-placeholder": "backend__code",
     "last_opened_file_path": "/Users/pratikshawadibhasme/Desktop/ASU CIC/Brightpoint/brightpoint",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",

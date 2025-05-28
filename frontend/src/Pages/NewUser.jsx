@@ -35,27 +35,6 @@ const NewUser = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const navigate = useNavigate();
-
-  // ✅ COMPLETE COGNITO POOL VERIFICATION
-  useEffect(() => {
-
-    // Check Amplify configuration
-    const config = Amplify.getConfig();
-
-    // Verify it's YOUR pool (should be different from old wrong one)
-    const poolId = config.Auth?.Cognito?.userPoolId;
-    if (poolId) {
-      if (poolId === 'us-east-1_umBuF7Dx8') {
-        console.error("🚨 CRITICAL: Still using the WRONG Cognito pool!");
-        console.error("🚨 This means environment variables are not being picked up correctly.");
-      } else {
-      }
-    } else {
-      console.error("❌ CRITICAL: No Cognito pool configured!");
-    }
-
-  }, []);
-
   const handleCompleteSignup = async () => {
     const { username, password, email } = userData;
     const { givenName, lastName, zipcode, phonenumber } = formData;

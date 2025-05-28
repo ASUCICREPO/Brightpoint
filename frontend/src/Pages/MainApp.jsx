@@ -4,6 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme, Drawer } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import AppHeader from "../Components/AppHeader";
 import LeftNav from "../Components/LeftNav";
 import ChatHeader from "../Components/ChatHeader";
@@ -11,29 +12,95 @@ import ChatBody from "../Components/ChatBody";
 import LanguageDropdown from "../Components/LanguageDropDown";
 import ModalComponent from "../Components/ModalComponent";
 import { useUser } from "../utilities/UserContext";
+import { getCurrentUser } from 'aws-amplify/auth';
 
 const MainApp = () => {
-  const { userData } = useUser();
+  const { userData, updateUser, fetchUserWithFeedback, isLoading } = useUser();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const navigate = useNavigate();
 
   const [showLeftNav, setLeftNav] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [referralQuestions, setReferralQuestions] = useState([]);
+  const [isInitializing, setIsInitializing] = useState(true);
 
-  // ✅ REMOVED: Auto-opening logic (let ModalComponent handle this with proper session tracking)
-  // ✅ OPTIONAL: Keep this effect only for debugging/logging
+  // Initialize user data on component mount or page reload
+  useEffect(() => {
+    const initializeUserData = async () => {
+      try {
+        // Check if user was explicitly logged out
+        const wasLoggedOut = sessionStorage.getItem('userLoggedOut');
+        if (wasLoggedOut === 'true') {
+          console.log("User was logged out, redirecting to login");
+          navigate('/');
+          return;
+        }
+
+        // Check if we already have user data
+        if (userData.username && userData.user_id) {
+          setIsInitializing(false);
+          return;
+        }
+
+        // Try to get current authenticated user from Amplify
+        const currentUser = await getCurrentUser();
+
+        if (currentUser?.username) {
+          // Clear logout flag since user is authenticated
+          sessionStorage.removeItem('userLoggedOut');
+
+          // Fetch complete user data including feedback questions
+          try {
+            await fetchUserWithFeedback(currentUser.username, 'english');
+          } catch (fetchError) {
+            console.error("Error fetching user data:", fetchError);
+            // If fetch fails, at least set the username from Amplify
+            updateUser({
+              username: currentUser.username,
+              user_id: currentUser.username
+            });
+          }
+        } else {
+          // No authenticated user found, redirect to login
+          console.log("No authenticated user found, redirecting to login");
+          navigate('/');
+          return;
+        }
+      } catch (error) {
+        console.error("Error getting current user:", error);
+        // Redirect to login if user is not authenticated
+        navigate('/');
+        return;
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    initializeUserData();
+  }, [userData.username, userData.user_id, fetchUserWithFeedback, updateUser, navigate]);
+
+  // Update referral questions when userData changes
   useEffect(() => {
     const feedbackQuestions = userData?.feedbackQuestions || [];
-
+    setReferralQuestions(feedbackQuestions);
   }, [userData, openModal]);
+
+  // Show loading state while initializing
+  if (isInitializing || isLoading) {
+    return (
+      <Grid container direction="column" className="appHeight100" justifyContent="center" alignItems="center">
+        <div>Loading...</div>
+      </Grid>
+    );
+  }
 
   return (
     <Grid container direction="column" className="appHeight100">
       {/* App Header */}
       <Grid item sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 10 }}>
         <AppHeader
-          username={userData?.username || userData?.user_id || "johndoe"}
+          username={userData?.username || userData?.user_id || "User"}
           showSwitch={true}
           leftNavToggle={
             isMobile && (
@@ -120,7 +187,7 @@ const MainApp = () => {
         </Grid>
       </Grid>
 
-      {/* ✅ Modal - Now fully controlled by ModalComponent's internal logic */}
+      {/* Modal Component */}
       <ModalComponent
         openModal={openModal}
         setOpenModal={setOpenModal}

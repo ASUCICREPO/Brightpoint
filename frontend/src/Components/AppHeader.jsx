@@ -12,16 +12,19 @@ import {
 import Logo from "../Assets/Brightpoint_logo.svg";
 import accountIcon from "../Assets/account_icon.svg";
 import dropdownIcon from "../Assets/dropdown.svg";
-import { useNavigate, useLocation } from "react-router-dom";  // <-- import useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { useUser } from "../utilities/UserContext"; // Import UserContext
 
 function AppHeader({ username, isCollapsed, onNavToggle }) {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();  // <-- get current location
+  const location = useLocation();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const { logout } = useUser(); // Get logout function from context
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -33,10 +36,43 @@ function AppHeader({ username, isCollapsed, onNavToggle }) {
 
   const handleProfile = () => {
     navigate("/userprofile");
+    handleMenuClose();
   };
 
-  const handleLogout = () => {
-    navigate("/");
+  const handleLogout = async () => {
+    if (isLoggingOut) return; // Prevent multiple logout attempts
+
+    setIsLoggingOut(true);
+    handleMenuClose();
+
+    try {
+      console.log("Starting logout process...");
+
+      // Call the proper logout function from UserContext
+      const success = await logout();
+
+      if (success) {
+        console.log("Logout successful, redirecting to login...");
+
+        // Navigate to login page
+        navigate('/', { replace: true });
+
+        // Force a complete page reload to ensure clean state
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 100);
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+
+      // Even if logout fails, force redirect to login
+      navigate('/', { replace: true });
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 100);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   // Check if current path starts with /admin
@@ -77,12 +113,14 @@ function AppHeader({ username, isCollapsed, onNavToggle }) {
         <Grid item>
           <IconButton
             onClick={handleMenuOpen}
+            disabled={isLoggingOut}
             sx={{
               display: "flex",
               alignItems: "center",
               gap: 1,
               "&:hover": { backgroundColor: "transparent" },
               padding: isSmallScreen ? "4px" : "8px",
+              opacity: isLoggingOut ? 0.6 : 1,
             }}
           >
             <img src={accountIcon} alt="Profile Icon" height={28} />
@@ -99,7 +137,7 @@ function AppHeader({ username, isCollapsed, onNavToggle }) {
 
           <Menu
             anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
+            open={Boolean(anchorEl) && !isLoggingOut}
             onClose={handleMenuClose}
             PaperProps={{
               elevation: 0,
@@ -108,15 +146,26 @@ function AppHeader({ username, isCollapsed, onNavToggle }) {
                 boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                 minWidth: 150,
                 "& .MuiMenuItem-root": {
-                  "&:hover": { backgroundColor: "transparent" },
+                  "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.04)" },
                 },
               },
             }}
           >
             {/* Conditionally render View Profile only if NOT on /admin path */}
-            {!isAdminRoute && <MenuItem onClick={handleProfile}>View Profile</MenuItem>}
-            <MenuItem onClick={handleLogout} sx={{ color: "red" }}>
-              Logout
+            {!isAdminRoute && (
+              <MenuItem onClick={handleProfile}>
+                View Profile
+              </MenuItem>
+            )}
+            <MenuItem
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              sx={{
+                color: isLoggingOut ? "gray" : "red",
+                opacity: isLoggingOut ? 0.6 : 1
+              }}
+            >
+              {isLoggingOut ? "Logging out..." : "Logout"}
             </MenuItem>
           </Menu>
         </Grid>

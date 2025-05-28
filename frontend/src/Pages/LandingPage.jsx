@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import BrightpointLogo from '../Assets/Brightpoint_logo.svg';
 import { useUser } from '../utilities/UserContext';
 import { handleReferralOnLogin } from "../utilities/userReferralHandler";
-import { signIn, signOut } from 'aws-amplify/auth';
+import { signIn, signOut, getCurrentUser } from 'aws-amplify/auth';
 import { fetchAndStoreUserData } from '../utilities/handleLogin';
 
 const LandingPage = ({ setOpenModal }) => {
@@ -17,24 +17,67 @@ const LandingPage = ({ setOpenModal }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showError, setShowError] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const navigate = useNavigate();
+
+  // Check if user is already authenticated on component mount
+  useEffect(() => {
+    const checkExistingAuth = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        if (currentUser?.username) {
+          // User is already authenticated, fetch their data and redirect
+          try {
+            const userDataWithFeedback = await fetchUserWithFeedback(currentUser.username, 'english');
+            const lang = userDataWithFeedback?.language || 'english';
+
+            let langPath = '/app';
+            if (lang.toLowerCase() === 'spanish') {
+              langPath = '/esapp';
+            } else if (lang.toLowerCase() === 'polish') {
+              langPath = '/plapp';
+            }
+
+            navigate(langPath);
+            return;
+          } catch (fetchError) {
+            console.error("Error fetching user data on auth check:", fetchError);
+            // Continue to login page if data fetch fails
+          }
+        }
+      } catch (error) {
+        // User is not authenticated, continue to login page
+        console.log("No existing authentication found");
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkExistingAuth();
+  }, [fetchUserWithFeedback, navigate]);
 
   // Clear session storage on component mount
   useEffect(() => {
     sessionStorage.removeItem('feedbackModalDismissed');
   }, []);
 
-  // Log out previous user when page loads
+  // Log out previous user when page loads (only if not checking auth)
   useEffect(() => {
-    const logoutPreviousUser = async () => {
-      try {
-        await signOut();
-      } catch (error) {
-        console.error("Error signing out previous user:", error.message || error);
-      }
-    };
-    logoutPreviousUser();
-  }, []);
+    if (!isCheckingAuth) {
+      const logoutPreviousUser = async () => {
+        try {
+          // Only sign out if we're not redirecting an authenticated user
+          const currentUser = await getCurrentUser();
+          if (!currentUser) {
+            await signOut();
+          }
+        } catch (error) {
+          console.error("Error signing out previous user:", error.message || error);
+        }
+      };
+      logoutPreviousUser();
+    }
+  }, [isCheckingAuth]);
 
   // Show error popup
   const showErrorPopup = (message) => {
@@ -68,9 +111,9 @@ const LandingPage = ({ setOpenModal }) => {
       // Attempt Cognito authentication
       const user = await signIn({ username: cleanUsername, password });
 
-
       // Clear session flags for fresh login
       sessionStorage.removeItem('feedbackModalDismissed');
+      sessionStorage.removeItem('userLoggedOut'); // Clear logout flag
 
       // Fetch user data
       await fetchAndStoreUserData(cleanUsername, updateUser);
@@ -82,7 +125,11 @@ const LandingPage = ({ setOpenModal }) => {
         userDataWithFeedback = await fetchUserWithFeedback(cleanUsername, 'english');
       } catch (feedbackError) {
         console.error("Error fetching feedback questions:", feedbackError);
-        // Don't block login if feedback fetch fails
+        // Don't block login if feedback fetch fails, but set basic user data
+        updateUser({
+          username: cleanUsername,
+          user_id: cleanUsername
+        });
       }
 
       // Determine navigation path based on language
@@ -96,7 +143,6 @@ const LandingPage = ({ setOpenModal }) => {
       }
 
       navigate(langPath);
-
 
     } catch (error) {
       console.error('Login error:', error);
@@ -168,6 +214,18 @@ const LandingPage = ({ setOpenModal }) => {
   };
 
   const isButtonDisabled = !username || !password || isLoading || contextLoading;
+
+  // Show loading state while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <Box height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" bgcolor="white">
+        <img src={BrightpointLogo} alt="Brightpoint Logo" height="6%" style={{ marginBottom: 20 }} />
+        <Typography variant="h6" color="#1F1463">
+          Loading...
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" bgcolor="white">
