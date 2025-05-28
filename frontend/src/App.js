@@ -16,12 +16,12 @@ import awsExports from './aws-exports';
 import AdminLanding from './Pages/AdminLanding';
 import AdminDashboard from './Pages/AdminDashboard';
 import UserProfilePage from "./Pages/ViewProfile";
+import { Dashboard } from "@mui/icons-material";
+import DashboardTab from "./Components/DashboardTab";
+import ReferralDatabase from "./Components/ReferralDatabaseTab";
 import SpanishApp from "./Pages/SpanishApp";
 import PolishApp from "./Pages/PolishApp";
-import RequireUserAuth from "./utilities/RequireUserAuth";
-import RequireAdminAuth from "./utilities/RequireAdminAuth";
-
-
+import NewAdmin from "./Pages/NewAdmin";
 Amplify.configure(awsExports);
 
 function App() {
@@ -40,33 +40,18 @@ function App() {
             <Router>
               <Routes>
                 <Route path="/" element={<LandingPage setOpenModal={setOpenModal} />} />
-                <Route path="/app" element={
-                  <RequireUserAuth>
-                    <MainApp />
-                  </RequireUserAuth>
-                } />
-                <Route path="/esapp" element={
-                  <RequireUserAuth>
-                    <SpanishApp />
-                  </RequireUserAuth>
-                } />
-                <Route path="/plapp" element={
-                  <RequireUserAuth>
-                    <PolishApp />
-                  </RequireUserAuth>
-                } />
+                <Route path="/app" element={<MainApp />} />
+                <Route path="/esapp" element={<SpanishApp />} />
+                <Route path="/plapp" element={<PolishApp />} />
                 <Route path="/newsignup" element={<NewSignUp />} />
                 <Route path="/newusersignup" element={<NewUser />} />
-                <Route path="/userprofile" element={ <RequireUserAuth>
-                    <UserProfilePage />
-                  </RequireUserAuth>} />
+                <Route path="/referralapp" element={<ReferralApp />} />
+                <Route path="/userprofile" element={<UserProfilePage />} />
                 <Route path="/admin" element={<AdminLanding />} />
-                <Route path="/admindashboard" element={
-                  <RequireAdminAuth>
-                    <AdminDashboard />
-                  </RequireAdminAuth>
-                } />
-
+                <Route path="/admindashboard" element={<AdminDashboard />} />
+                <Route path="/analytics" element={<DashboardTab />} />
+                <Route path="/referral" element={<ReferralDatabase />} />
+                <Route path="/newadmin" element={<NewAdmin />} />
 
               </Routes>
             </Router>
