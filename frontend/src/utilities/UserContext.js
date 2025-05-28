@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { USER_API } from "./constants"; // ✅ Add this import
+import { Auth } from "aws-amplify";
+import { USER_API } from "./constants";
 
 const UserContext = createContext();
 
@@ -15,16 +16,14 @@ export const UserProvider = ({ children }) => {
     feedbackQuestions: [],
   });
 
-  const [isLoading, setIsLoading] = useState(false); // ✅ Add loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const updateUser = (newData) => {
     setUserData((prev) => ({ ...prev, ...newData }));
   };
 
-  // ✅ ADD: Function to fetch user data with feedback questions
   const fetchUserWithFeedback = async (userId, language = 'english') => {
     setIsLoading(true);
-
     try {
       const ws = new WebSocket(USER_API);
 
@@ -33,7 +32,7 @@ export const UserProvider = ({ children }) => {
           const payload = {
             action: "getUser",
             user_id: userId,
-            language: language
+            language
           };
           ws.send(JSON.stringify(payload));
         };
@@ -47,7 +46,6 @@ export const UserProvider = ({ children }) => {
               return;
             }
 
-            // ✅ Map backend response to your existing userData structure
             const mappedUserData = {
               user_id: response.user?.user_id || '',
               username: response.user?.username || '',
@@ -78,7 +76,7 @@ export const UserProvider = ({ children }) => {
           reject(error);
         };
 
-        ws.onclose = (event) => {
+        ws.onclose = () => {
           setIsLoading(false);
         };
       });
@@ -90,12 +88,31 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  // ✅ Automatically fetch user on mount if logged in
+  useEffect(() => {
+    const checkUserSession = async () => {
+      try {
+        const currentUser = await Auth.currentAuthenticatedUser();
+        const userId = currentUser?.attributes?.sub;
+        const language = currentUser?.attributes?.locale || 'english';
+
+        if (userId) {
+          await fetchUserWithFeedback(userId, language);
+        }
+      } catch (err) {
+        console.log("Not logged in or failed to fetch session:", err);
+      }
+    };
+
+    checkUserSession();
+  }, []);
+
   return (
     <UserContext.Provider value={{
       userData,
       updateUser,
-      fetchUserWithFeedback, // ✅ Add new function to context
-      isLoading // ✅ Add loading state to context
+      fetchUserWithFeedback,
+      isLoading
     }}>
       {children}
     </UserContext.Provider>
