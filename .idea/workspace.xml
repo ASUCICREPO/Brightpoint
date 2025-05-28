@@ -7,6 +7,13 @@
     <list default="true" id="3ff7ef2e-35a7-4c4d-bd94-9b3ea7ae56b2" name="Changes" comment="Changing github branch in stack">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/brightpoint/brightpoint_stack.py" beforeDir="false" afterPath="$PROJECT_DIR$/brightpoint/brightpoint_stack.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/cdk-config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/cdk-config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/node_modules/.cache/.eslintcache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utilities/RequireAdminAuth.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utilities/RequireUserAuth.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utilities/UserContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utilities/UserContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utilities/api.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utilities/auth.js" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,6 +124,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Changing github branch in stack" />
