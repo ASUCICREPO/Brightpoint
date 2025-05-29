@@ -13,6 +13,11 @@ export const UserProvider = ({ children }) => {
     language: '',
     referrals: [],
     feedbackQuestions: [],
+    // ✅ NEW: Add children and due date fields
+    firstName: '',
+    lastName: '',
+    children_birth_dates: [],
+    expected_due_date: null,
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +75,11 @@ export const UserProvider = ({ children }) => {
       language: '',
       referrals: [],
       feedbackQuestions: [],
+      // ✅ NEW: Clear children and due date fields
+      firstName: '',
+      lastName: '',
+      children_birth_dates: [],
+      expected_due_date: null,
     });
 
     try {
@@ -137,7 +147,7 @@ export const UserProvider = ({ children }) => {
               return;
             }
 
-            // Map backend response to your existing userData structure
+            // ✅ ENHANCED: Map backend response to include children and due date data
             const mappedUserData = {
               user_id: response.user?.user_id || userId,
               username: response.user?.username || userId,
@@ -147,8 +157,21 @@ export const UserProvider = ({ children }) => {
               language: response.user?.language || response.user?.Language || response.language || 'english',
               referrals: response.user?.referrals || [],
               feedbackQuestions: response.feedback_questions || [],
-              feedback_questions: response.feedback_questions || []
+              feedback_questions: response.feedback_questions || [],
+              // ✅ NEW: Map children and due date data from backend
+              firstName: response.user?.FirstName || response.user?.firstName || '',
+              lastName: response.user?.LastName || response.user?.lastName || '',
+              children_birth_dates: response.user?.children_birth_dates || [],
+              expected_due_date: response.user?.expected_due_date || null,
             };
+
+            console.log("✅ Mapped user data with children info:", {
+              children_count: mappedUserData.children_birth_dates.length,
+              children_dates: mappedUserData.children_birth_dates,
+              due_date: mappedUserData.expected_due_date,
+              firstName: mappedUserData.firstName,
+              lastName: mappedUserData.lastName
+            });
 
             // Update state and persist to localStorage
             setUserData(prev => {

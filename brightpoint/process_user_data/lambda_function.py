@@ -141,8 +141,14 @@ def handle_websocket_event(event, context):
                 zipcode = body.get('Zipcode')
                 phone = body.get('Phone')
                 email = body.get('Email')
+                # ✅ NEW: Extract children and due date data
+                first_name = body.get('FirstName')
+                last_name = body.get('LastName')
+                children_birth_dates = body.get('children_birth_dates', [])
+                expected_due_date = body.get('expected_due_date')
 
-                result = create_or_update_user(user_id, zipcode, phone, email, language)
+                result = create_or_update_user(user_id, zipcode, phone, email, language,
+                                             first_name, last_name, children_birth_dates, expected_due_date)
                 status_code = result.get('statusCode', 500)
                 response_body = json.loads(result.get('body', '{}'))
 
@@ -266,6 +272,11 @@ def handle_rest_event(event, context):
             phone = body.get('Phone')
             email = body.get('Email')
             language = validate_language(body.get('language', 'english'))
+            # ✅ NEW: Extract children and due date data
+            first_name = body.get('FirstName')
+            last_name = body.get('LastName')
+            children_birth_dates = body.get('children_birth_dates', [])
+            expected_due_date = body.get('expected_due_date')
 
             # Determine which operation to perform based on body content
             if 'operation' in body:
@@ -274,7 +285,8 @@ def handle_rest_event(event, context):
                 if operation == 'GET':
                     result = get_user_with_feedback_questions(user_id, language)
                 elif operation == 'PUT':
-                    result = create_or_update_user(user_id, zipcode, phone, email, language)
+                    result = create_or_update_user(user_id, zipcode, phone, email, language,
+                                                 first_name, last_name, children_birth_dates, expected_due_date)
                 elif operation == 'FEEDBACK':
                     # Check for multiple feedback format
                     if 'feedback_list' in body and isinstance(body['feedback_list'], list):
@@ -293,7 +305,8 @@ def handle_rest_event(event, context):
                     return create_response(400, {'error': f'Unsupported operation: {operation}'})
             else:
                 # Default POST behavior - create/update user
-                result = create_or_update_user(user_id, zipcode, phone, email, language)
+                result = create_or_update_user(user_id, zipcode, phone, email, language,
+                                             first_name, last_name, children_birth_dates, expected_due_date)
 
             return create_response(result['statusCode'], result['body'])
 
@@ -306,8 +319,14 @@ def handle_rest_event(event, context):
             phone = body.get('Phone')
             email = body.get('Email')
             language = validate_language(body.get('language', 'english'))
+            # ✅ NEW: Extract children and due date data
+            first_name = body.get('FirstName')
+            last_name = body.get('LastName')
+            children_birth_dates = body.get('children_birth_dates', [])
+            expected_due_date = body.get('expected_due_date')
 
-            result = create_or_update_user(user_id, zipcode, phone, email, language)
+            result = create_or_update_user(user_id, zipcode, phone, email, language,
+                                         first_name, last_name, children_birth_dates, expected_due_date)
             return create_response(result['statusCode'], result['body'])
 
         else:
@@ -757,6 +776,15 @@ def get_user_with_feedback_questions(user_id, language='english'):
             formatted_user['Phone'] = user_data['Phone']['S']
         if 'Email' in user_data:
             formatted_user['Email'] = user_data['Email']['S']
+        # ✅ NEW: Add children and due date data to response
+        if 'FirstName' in user_data:
+            formatted_user['FirstName'] = user_data['FirstName']['S']
+        if 'LastName' in user_data:
+            formatted_user['LastName'] = user_data['LastName']['S']
+        if 'children_birth_dates' in user_data:
+            formatted_user['children_birth_dates'] = [date['S'] for date in user_data['children_birth_dates']['L']]
+        if 'expected_due_date' in user_data:
+            formatted_user['expected_due_date'] = user_data['expected_due_date']['S']
 
         # ✅ SIMPLIFIED: Only collect referrals that need feedback
         referrals_needing_feedback = []
@@ -881,9 +909,10 @@ def get_user_with_feedback_questions(user_id, language='english'):
             'body': json.dumps({'error': error_message})
         }
 
-def create_or_update_user(user_id, zipcode, phone=None, email=None, language='english'):
+def create_or_update_user(user_id, zipcode, phone=None, email=None, language='english',
+                         first_name=None, last_name=None, children_birth_dates=None, expected_due_date=None):
     """
-    Creates or updates a user in DynamoDB with language support.
+    ✅ ENHANCED: Creates or updates a user in DynamoDB with language support and children/due date data.
 
     Args:
         user_id: The ID of the user
@@ -891,6 +920,10 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
         phone: User's phone number (optional)
         email: User's email (optional)
         language: User's preferred language (english, spanish, polish) - defaults to english
+        first_name: User's first name (optional)
+        last_name: User's last name (optional)
+        children_birth_dates: List of children's birth dates in YYYY-MM-DD format (optional)
+        expected_due_date: Expected due date in YYYY-MM-DD format (optional)
 
     Returns:
         Response indicating success or failure
@@ -904,6 +937,14 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
 
     # Validate and normalize language
     language = validate_language(language)
+
+    # ✅ NEW: Process children birth dates
+    processed_children_dates = []
+    if children_birth_dates and isinstance(children_birth_dates, list):
+        for date_str in children_birth_dates:
+            if date_str:  # Only add non-empty dates
+                processed_children_dates.append(date_str)
+        print(f"✅ Processing {len(processed_children_dates)} children birth dates: {processed_children_dates}")
 
     try:
         # Check if user exists
@@ -933,6 +974,27 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
                 update_expressions.append("Email = :email")
                 expression_attribute_values[':email'] = {'S': email}
 
+            # ✅ NEW: Add first and last name updates
+            if first_name:
+                update_expressions.append("FirstName = :first_name")
+                expression_attribute_values[':first_name'] = {'S': first_name}
+
+            if last_name:
+                update_expressions.append("LastName = :last_name")
+                expression_attribute_values[':last_name'] = {'S': last_name}
+
+            # ✅ NEW: Add children birth dates
+            if processed_children_dates:
+                update_expressions.append("children_birth_dates = :children_dates")
+                expression_attribute_values[':children_dates'] = {
+                    'L': [{'S': date} for date in processed_children_dates]
+                }
+
+            # ✅ NEW: Add expected due date
+            if expected_due_date:
+                update_expressions.append("expected_due_date = :due_date")
+                expression_attribute_values[':due_date'] = {'S': expected_due_date}
+
             # Always update language preference
             update_expressions.append("#lang = :language")
             expression_attribute_values[':language'] = {'S': language}
@@ -953,12 +1015,15 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
                     ExpressionAttributeValues=expression_attribute_values
                 )
 
+            print(f"✅ User {user_id} updated successfully with {len(processed_children_dates)} children dates")
             return {
                 'statusCode': 200,
                 'body': json.dumps({
                     'message': 'User data updated successfully.',
                     'user_id': user_id,
-                    'language': language
+                    'language': language,
+                    'children_count': len(processed_children_dates),
+                    'has_due_date': bool(expected_due_date)
                 })
             }
         else:
@@ -974,21 +1039,41 @@ def create_or_update_user(user_id, zipcode, phone=None, email=None, language='en
             if email:
                 item['Email'] = {'S': email}
 
+            # ✅ NEW: Add first and last name for new users
+            if first_name:
+                item['FirstName'] = {'S': first_name}
+            if last_name:
+                item['LastName'] = {'S': last_name}
+
+            # ✅ NEW: Add children birth dates for new users
+            if processed_children_dates:
+                item['children_birth_dates'] = {
+                    'L': [{'S': date} for date in processed_children_dates]
+                }
+
+            # ✅ NEW: Add expected due date for new users
+            if expected_due_date:
+                item['expected_due_date'] = {'S': expected_due_date}
+
             dynamodb_client.put_item(
                 TableName=USER_DATA_TABLE,
                 Item=item
             )
 
+            print(f"✅ User {user_id} created successfully with {len(processed_children_dates)} children dates")
             return {
                 'statusCode': 201,
                 'body': json.dumps({
                     'message': 'User data created successfully.',
                     'user_id': user_id,
-                    'language': language
+                    'language': language,
+                    'children_count': len(processed_children_dates),
+                    'has_due_date': bool(expected_due_date)
                 })
             }
 
     except Exception as e:
+        print(f"❌ Error in create_or_update_user: {str(e)}")
         return {
             'statusCode': 500,
             'body': json.dumps({'error': f'Error storing user data: {str(e)}'})

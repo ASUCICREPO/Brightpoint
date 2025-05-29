@@ -34,10 +34,114 @@ const NewUser = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
+  // ✅ NEW: Phone number validation state
+  const [phoneError, setPhoneError] = useState('');
+
   const navigate = useNavigate();
+
+  // ✅ NEW: Phone number formatting and validation function
+  const formatPhoneNumber = (phoneInput) => {
+    if (!phoneInput) return '';
+
+    // Remove all non-digit characters
+    const digitsOnly = phoneInput.replace(/\D/g, '');
+
+    // Handle different input formats
+    let formattedPhone = '';
+
+    if (digitsOnly.length === 10) {
+      // 10 digits: assume US number, add +1
+      formattedPhone = `+1${digitsOnly}`;
+    } else if (digitsOnly.length === 11 && digitsOnly.startsWith('1')) {
+      // 11 digits starting with 1: add +
+      formattedPhone = `+${digitsOnly}`;
+    } else if (digitsOnly.length === 11 && !digitsOnly.startsWith('1')) {
+      // 11 digits not starting with 1: add +1
+      formattedPhone = `+1${digitsOnly}`;
+    } else if (digitsOnly.length === 12 && digitsOnly.startsWith('1')) {
+      // 12 digits starting with 1: add +
+      formattedPhone = `+${digitsOnly}`;
+    } else {
+      // Invalid length - return as is for now, will be caught by validation
+      formattedPhone = phoneInput;
+    }
+
+    return formattedPhone;
+  };
+
+  // ✅ NEW: Phone number validation function
+  const validatePhoneNumber = (phone) => {
+    if (!phone) return 'Phone number is required';
+
+    const digitsOnly = phone.replace(/\D/g, '');
+
+    // Check if it's a valid US phone number (10 or 11 digits)
+    if (digitsOnly.length === 10) {
+      return ''; // Valid 10-digit number
+    } else if (digitsOnly.length === 11 && digitsOnly.startsWith('1')) {
+      return ''; // Valid 11-digit number starting with 1
+    } else {
+      return 'Please enter a valid US phone number (10 digits)';
+    }
+  };
+
+  // ✅ NEW: Handle phone number change with formatting
+  const handlePhoneChange = (event) => {
+    const inputValue = event.target.value;
+
+    // Allow user to type, but validate on blur
+    setFormData(prev => ({
+      ...prev,
+      phonenumber: inputValue
+    }));
+
+    // Clear previous error when user starts typing
+    if (phoneError) {
+      setPhoneError('');
+    }
+  };
+
+  // ✅ NEW: Handle phone number blur (when user leaves the field)
+  const handlePhoneBlur = () => {
+    const rawPhone = formData.phonenumber;
+
+    if (!rawPhone) {
+      setPhoneError('Phone number is required');
+      return;
+    }
+
+    // Validate the phone number
+    const validationError = validatePhoneNumber(rawPhone);
+    if (validationError) {
+      setPhoneError(validationError);
+      return;
+    }
+
+    // Format the phone number
+    const formattedPhone = formatPhoneNumber(rawPhone);
+
+    // Update the form data with formatted phone
+    setFormData(prev => ({
+      ...prev,
+      phonenumber: formattedPhone
+    }));
+
+    console.log(`📱 Phone formatted: "${rawPhone}" → "${formattedPhone}"`);
+  };
+
   const handleCompleteSignup = async () => {
     const { username, password, email } = userData;
     const { givenName, lastName, zipcode, phonenumber } = formData;
+
+    // ✅ NEW: Final phone validation before signup
+    const phoneValidationError = validatePhoneNumber(phonenumber);
+    if (phoneValidationError) {
+      setPhoneError(phoneValidationError);
+      setSnackbarMessage('Please fix the phone number before continuing.');
+      setSnackbarOpen(true);
+      setPage(1); // Go back to phone page
+      return;
+    }
 
     const targetPool = Amplify.getConfig().Auth?.Cognito?.userPoolId;
 
@@ -108,17 +212,30 @@ const NewUser = () => {
     // If user is confirmed, proceed with REST API call
     if (isUserConfirmed) {
       try {
-        // ✅ FIXED: Ensure consistent field mapping
+        // ✅ ENHANCED: Ensure phone is properly formatted before sending
+        const finalFormattedPhone = formatPhoneNumber(formData.phonenumber);
+
         const restPayload = {
           user_id: username,
           Zipcode: formData.zipcode,
-          Phone: formData.phonenumber,  // API expects "Phone"
+          Phone: finalFormattedPhone, // ✅ Use properly formatted phone
           Email: userData.email,
           FirstName: formData.givenName,
           LastName: formData.lastName,
           Language: formData.language,
+          // ✅ NEW: Add children birth dates (filter out null dates)
+          children_birth_dates: formData.children
+            .filter(child => child.birthDate !== null)
+            .map(child => child.birthDate.toISOString().split('T')[0]), // Convert to YYYY-MM-DD format
+          // ✅ NEW: Add expected due date
+          expected_due_date: formData.dueDate ? formData.dueDate.toISOString().split('T')[0] : null,
           operation: "PUT",
         };
+
+        console.log("✅ Sending payload with formatted phone:", {
+          ...restPayload,
+          Phone: finalFormattedPhone
+        });
 
         const restRes = await fetch(USER_ADD_API, {
           method: 'PUT',
@@ -137,17 +254,20 @@ const NewUser = () => {
           throw new Error(`REST API call failed: ${restData.message || 'Unknown error'}`);
         }
 
-        // ✅ UPDATE USER CONTEXT with complete profile data
+        // ✅ UPDATE USER CONTEXT with complete profile data including formatted phone
         const completeUserData = {
           username: username,
           user_id: username,  // ✅ Fix: Set user_id to username
           email: userData.email,
           zipcode: formData.zipcode,
-          phoneNumber: formData.phonenumber,  // ✅ Fix: Use camelCase for context
-          Phone: formData.phonenumber,        // ✅ Also keep API format for compatibility
+          phoneNumber: finalFormattedPhone,  // ✅ Use formatted phone
+          Phone: finalFormattedPhone,        // ✅ Also keep API format for compatibility
           firstName: formData.givenName,
           lastName: formData.lastName,
           language: formData.language,
+          // ✅ NEW: Add children and due date to context
+          children_birth_dates: restPayload.children_birth_dates,
+          expected_due_date: restPayload.expected_due_date,
         };
 
         updateUser(completeUserData);
@@ -191,6 +311,24 @@ const NewUser = () => {
   };
 
   const handleNext = () => {
+    // ✅ NEW: Validate phone on page 1 before proceeding
+    if (page === 1) {
+      const phoneValidationError = validatePhoneNumber(formData.phonenumber);
+      if (phoneValidationError) {
+        setPhoneError(phoneValidationError);
+        setSnackbarMessage('Please enter a valid phone number before continuing.');
+        setSnackbarOpen(true);
+        return;
+      }
+
+      // Format phone number if valid
+      const formattedPhone = formatPhoneNumber(formData.phonenumber);
+      setFormData(prev => ({
+        ...prev,
+        phonenumber: formattedPhone
+      }));
+    }
+
     if (page === 2) {
       // Last form page - trigger signup
       handleCompleteSignup();
@@ -242,6 +380,14 @@ const NewUser = () => {
       ...formData,
       children: [...formData.children, { birthDate: null }],
     });
+  };
+
+  // ✅ NEW: Remove child function
+  const removeChild = (index) => {
+    if (formData.children.length > 1) {
+      const newChildren = formData.children.filter((_, i) => i !== index);
+      setFormData({ ...formData, children: newChildren });
+    }
   };
 
   return (
@@ -327,14 +473,17 @@ const NewUser = () => {
           <>
             <Box width="100%" mb={2}>
               <Typography variant="body1" alignSelf="flex-start" mb={0.5}>
-                Phone Number
+                Phone Number <span style={{ color: 'red' }}>*</span>
               </Typography>
               <TextField
-                placeholder="Enter your phone number"
+                placeholder="Enter your phone number (e.g., 925-204-8244)"
                 variant="outlined"
                 fullWidth
                 value={formData.phonenumber}
-                onChange={handleChange('phonenumber')}
+                onChange={handlePhoneChange}
+                onBlur={handlePhoneBlur}
+                error={!!phoneError}
+                helperText={phoneError || "Phone will be formatted as +1XXXXXXXXXX"}
                 sx={{
                   backgroundColor: '#f0f0f0',
                   borderRadius: '8px',
@@ -343,6 +492,12 @@ const NewUser = () => {
                   },
                 }}
               />
+              {/* ✅ NEW: Show current formatted phone */}
+              {formData.phonenumber && !phoneError && (
+                <Typography variant="caption" color="success.main" sx={{ mt: 0.5, display: 'block' }}>
+                  ✓ Formatted: {formatPhoneNumber(formData.phonenumber)}
+                </Typography>
+              )}
             </Box>
 
             {/* Preferred Language Radio Group */}
@@ -386,15 +541,40 @@ const NewUser = () => {
 
             {formData.children.map((child, index) => (
               <Box key={index} width="100%" mb={2}>
-                <Typography variant="body1" alignSelf="flex-start" mb={0.5}>
-                  Birth Date of Child #{index + 1}
-                </Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={0.5}>
+                  <Typography variant="body1">
+                    Birth Date of Child #{index + 1}
+                  </Typography>
+                  {/* ✅ NEW: Add remove button for children (but keep at least one) */}
+                  {formData.children.length > 1 && (
+                    <Button
+                      size="small"
+                      color="error"
+                      onClick={() => removeChild(index)}
+                      sx={{ minWidth: 'auto', p: 0.5 }}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </Box>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <Box width="100%" display="flex" flexDirection="column">
                     <DatePicker
                       value={child.birthDate}
                       onChange={(date) => handleChildChange(index, date)}
-                      renderInput={(params) => <TextField {...params} fullWidth />}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          sx={{
+                            backgroundColor: '#f0f0f0',
+                            borderRadius: '8px',
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: '8px',
+                            },
+                          }}
+                        />
+                      )}
                     />
                   </Box>
                 </LocalizationProvider>
@@ -416,14 +596,26 @@ const NewUser = () => {
             {/* Expected Due Date */}
             <Box width="100%" mb={2}>
               <Typography variant="body1" alignSelf="flex-start" mb={0.5}>
-                Expected Due Date
+                Expected Due Date (Optional)
               </Typography>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <Box width="100%" display="flex" flexDirection="column">
                   <DatePicker
                     value={formData.dueDate}
                     onChange={(date) => setFormData({ ...formData, dueDate: date })}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        sx={{
+                          backgroundColor: '#f0f0f0',
+                          borderRadius: '8px',
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '8px',
+                          },
+                        }}
+                      />
+                    )}
                   />
                 </Box>
               </LocalizationProvider>
@@ -500,7 +692,7 @@ const NewUser = () => {
             variant="contained"
             color="error"
             fullWidth
-            disabled={page === 3 && !verificationCode}
+            disabled={(page === 3 && !verificationCode) || (page === 1 && !!phoneError)}
             sx={{
               borderRadius: '20px',
               backgroundColor: '#1F1463',
